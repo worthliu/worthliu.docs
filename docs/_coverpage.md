@@ -6,3 +6,4 @@
 
 [GitHub](https://github.com/worthliu/worthliu.docs)
 [Get Started](#worthliu-docs)
+[Home Page](http://www.worthliu.com)
