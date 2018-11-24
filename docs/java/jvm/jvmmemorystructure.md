@@ -50,6 +50,7 @@ JVM中所划分的内存区域，Java程序中我们主要使用到堆内存，�
 
 JVM为了处理堆内存内对象（内存回收），进行抽象性划分堆内存区域：
 
+![memorygeneration](/images/memorygeneration.png)
 
 ## 问题
 
