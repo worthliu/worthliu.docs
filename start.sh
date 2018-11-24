@@ -11,7 +11,7 @@ if [ $isRun = "1" ]; then
 else
    echo "start docsify service...."
    git pull 
-   docsify serve --port 5000 docs &
+   docsify serve --port 5000 docs
 fi
 
 
