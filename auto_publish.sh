@@ -40,7 +40,10 @@ git checkout -b ${branchInfo}
 #git pull origin mirror:mirror
 git pull origin  ${branchInfo}
 
+echo -e "\033[49;31;1;5m The code pulled successfully ...\033[0m"
+
 ########################################################################
+echo -e "\033[49;31;1;5m restart service beginning ...\033[0m"
 nohup bash ./start.sh &
 #
 git reset --hard && git clean -fdx
