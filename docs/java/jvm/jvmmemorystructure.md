@@ -149,7 +149,7 @@ Parallel Scavenge收集器的目标则是**达到一个可控制的吞吐量**�
 
 Parallel Scavenge收集器提供了两个参数用于精确控制吞吐量，分别是控制最大垃圾收集停顿时间的`-XX:MaxGCPauseMillis`参数及直接设置吞吐量大小的`-XX:GCTimeRatio`参数
 
-(`Parallel Scavenge收集器`无法与CMS收集器配合工作)
+(`Parallel Scavenge收集器`无法与`CMS收集器`配合工作)
 
 ### Serial Old收集器
 
@@ -175,6 +175,12 @@ CMS（concurrent Mark Sweep）收集器是一种以获取最短回收停顿时�
   + **CMS收集器对CPU资源非常敏感**。虽然不会导致用户线程停顿，但是会因为占用了一部分线程（或者说CPU资源）而导致应用程序变慢，总吞吐量会降低。
   + **CMS收集器无法处理浮动垃圾（Floating Garbage）**，由于CMS并发清理阶段用户线程还在运行着，伴随着程序的运行自然还会有新的垃圾不断产生，这部分垃圾出现在标记过程之后，CMS无法在本次收集中处理掉它们；
 
+>参数控制：
+  + -XX:+UseConcMarkSweepGC ： 使用CMS收集器
+  + -XX:+ UseCMSCompactAtFullCollection ：Full GC后，进行一次碎片整理；整理过程是独占的，会引起停顿时间变长
+  + -XX:+CMSFullGCsBeforeCompaction ： 设置进行几次Full GC后，进行一次碎片整理
+  + -XX:ParallelCMSThreads ： 设定CMS的线程数量（一般情况约等于可用CPU数量）
+
 ### G1
 G1收集器：
 * 是基于`标记-整理`算法实现的收集器。它不会产生空间碎片；
@@ -198,6 +204,12 @@ G1收集器：
 这样做的目的是避免在`Eden区`及两个`Survivor区`之间发生大量的内存Copy）
 
 ### 长期存活的对象将进入老年代
+
+JVM采用了分代收集的思想来管理内存,那内存回收时就必须能识别那些对象应当放在新生代,那些对象应放在新生代,那些对象应放在老年代中;
+
+>JVM给每个对象定义了一个对象年龄计数器.如果对象在Eden出生并经过第一次`Minor GC`后仍然存活,并且能被`Survivor`容纳的话,将被移动到`Survivor`空间中,并将对象年龄设为1;对象在`Survivor`区中每熬过一次`Minor GC`,年龄就增加1岁,当它的年龄增加加到一定程度(`默认为15岁`)时,就会被晋升到`老年代`中;
+
+**(对象晋升老年代的年龄阈值,可以通过参数`-XX:MaxTenuringThreshold`)**
 
 
 ---
