@@ -175,11 +175,13 @@ CMS（concurrent Mark Sweep）收集器是一种以获取最短回收停顿时�
   + **CMS收集器对CPU资源非常敏感**。虽然不会导致用户线程停顿，但是会因为占用了一部分线程（或者说CPU资源）而导致应用程序变慢，总吞吐量会降低。
   + **CMS收集器无法处理浮动垃圾（Floating Garbage）**，由于CMS并发清理阶段用户线程还在运行着，伴随着程序的运行自然还会有新的垃圾不断产生，这部分垃圾出现在标记过程之后，CMS无法在本次收集中处理掉它们；
 
->参数控制：
-  + -XX:+UseConcMarkSweepGC ： 使用CMS收集器
-  + -XX:+ UseCMSCompactAtFullCollection ：Full GC后，进行一次碎片整理；整理过程是独占的，会引起停顿时间变长
-  + -XX:+CMSFullGCsBeforeCompaction ： 设置进行几次Full GC后，进行一次碎片整理
-  + -XX:ParallelCMSThreads ： 设定CMS的线程数量（一般情况约等于可用CPU数量）
+>**参数控制**：
+  + `-XX:+UseConcMarkSweepGC` ： 使用CMS收集器
+  + `-XX:+ UseCMSCompactAtFullCollection` ：`Full GC`后，进行一次碎片整理；整理过程是独占的，会引起停顿时间变长
+  + `-XX:+CMSFullGCsBeforeCompaction` ： 设置进行几次`Full GC`后，进行一次碎片整理
+  + `-XX:ParallelCMSThreads` ： 设定`CMS的线程数量`（一般情况约等于可用CPU数量）
+
+![cms](/images/cms.png)
 
 ### G1
 G1收集器：
@@ -187,6 +189,19 @@ G1收集器：
 * 它可以非常精确地控制停顿，即能让使用者明确指定在一个长度为M毫秒的时间片段内，消耗在垃圾收集上的时间不得超过N毫秒，这几乎已经是实时Java（RTSJ）的垃圾收集器的特征了；
 
 >G1将`整个Java堆（包括新生代、老年代）`划分为`多个大小固定的独立区域（Region）`，并且跟踪这些区域里面的垃圾堆积程度，`在后台维护一个优先列表`，每次根据允许的`收集时间`，**优先回收垃圾最多的区域（Garbage First名称来由）**；
+
+![G1](/images/G1.png)
+
+>**G1的新生代收集跟ParNew类似，当新生代占用达到一定比例的时候，开始出发收集。和CMS类似，G1收集器收集老年代对象会有短暂停顿。**
+1. **标记阶段**，首先初始标记(Initial-Mark),这个阶段是停顿的(`Stop the World Event`)，并且会触发一次普通`Minor GC`。对应GC log:GC pause (young) (inital-mark)
+2. **Root Region Scanning**，程序运行过程中会回收survivor区(存活到老年代)，这一过程必须在young GC之前完成。
+3. **Concurrent Marking**，在整个堆中进行并发标记(和应用程序并发执行)，此过程可能被young GC中断。在并发标记阶段，**若发现区域对象中的所有对象都是垃圾，那个这个区域会被立即回收(图中打X)**。同时，**并发标记过程中，会计算每个区域的对象活性(区域中存活对象的比例)**。
+![Concurrent_Marking](/images/Concurrent_Marking.png)
+4. **Remark, 再标记**：会有短暂停顿(STW)。再标记阶段是用来收集 并发标记阶段 产生新的垃圾(并发阶段和应用程序一同运行)；**G1中采用了比CMS更快的初始快照算法:snapshot-at-the-beginning (SATB)**。
+5. **Copy/Clean up**：多线程清除失活对象，会有STW。**G1将回收区域的存活对象拷贝到新区域，清除Remember Sets，并发清空回收区域并把它返回到空闲区域链表中**。
+![Cleanup](/images/Cleanup.png)
+6. **复制/清除过程后**：回收区域的活性对象已经被集中回收到深蓝色和深绿色区域。
+![Cleanup_after](/images/Cleanup_after.png)
 
 ---
 
@@ -211,7 +226,42 @@ JVM采用了分代收集的思想来管理内存,那内存回收时就必须能�
 
 **(对象晋升老年代的年龄阈值,可以通过参数`-XX:MaxTenuringThreshold`)**
 
+## 虚拟机性能监控与故障处理工具
 
+>**工作中需要监控运行于JDK1.5的虚拟机之上的程序，在程序启动时需要添加`-Dcom.sun.management.jmxremote`开启JMX管理功能；**
+
+### Sun JDK监控和故障处理工具
+
+名称|主要作用|
+--|--|
+jps|JVM Process Status Tool，显示指定系统内所有的HotSpot虚拟机进程|
+jstat|JVM Statistics Monitoring Tool，用于收集HotSpot虚拟机各方面的运行数据|
+jinfo|Configuration Info for Java，显示虚拟机配置信息|
+jmap|Memory Map for Java，生成虚拟机的内存转储快照（heapdump文件）|
+jhat|JVM Heap Dump Browser，用于分析heapdump文件，它会建立一个HTTP/HTML服务器，让用户可以在浏览器上查看分析结果|
+jstack|Stack Trace for Java，显式虚拟机的线程快照|
+
+
+>**jps：可以列出正在运行的虚拟机进程，并显示虚拟机执行主类函数所在的名称，以及这些进行本地虚拟机的唯一ID**。
+>1. -q 只输出LVMID，省略主类名称
+2. -m 输出虚拟机进程启动时传递给主类main()函数的参数
+3. -l 输出主类的全名，如果进程执行的是Jar包，输出Jar路径
+4. -v 输出虚拟机进程启动时JVM参数
+
+>**jstat：用于监视虚拟机各种运行状态信息的命令行工具，可以显示本地或远程虚拟机进程中类装载、内存、垃圾收集、JIT编译等运行数据；**
+  >1. -class 监视类装载、卸载数量、总空间及类装载所耗费的时间；
+   2. -gc 监视Java堆状况，包括Eden区，2个Survivor区、老年代、永久代等的容量、已用空间、GC时间合计等信息；
+   3. ......
+
+>**jinfo：实时地查看和调整虚拟机的各项参数**
+  >1. -flag
+
+>**jmap：用于生成堆转储快照文件**
+  >-dump:[live,]format=b,file=<filename> 生成Java堆转储快照
+
+>**jhat：虚拟机堆转储快照分析工具**
+
+>**jstack：用于生成虚拟机当前时刻的线程快照，线程快照就是当前虚拟机内存每一条线程正在执行的方法堆栈的集合；**
 ---
 
 ## 问题
