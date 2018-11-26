@@ -2,7 +2,7 @@
 
 从JDK实现看,线程池通过`Executor`、`ExecutorService`两个接口定义线程池基础，`AbstractExecutorService`、`ThreadPoolExecutor`定义出线程池具体实现：
 
-![executor](/images/Executor.png)
+![executor](/images/executor.png)
 
 ### AbstractExecutorService
 AbstractExecutorService是他们的抽象实现类，提供线程池底层接口方法的所有实现；
