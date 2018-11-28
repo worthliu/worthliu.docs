@@ -48,10 +48,10 @@
 
 Filter有如下几个用处：
 >Filter可以进行对特定的url请求和相应做预处理和后处理。
-  * 在HttpServletRequest到达Servlet之前，拦截客户的HttpServletRequest。
-  * 根据需要检查HttpServletRequest，也可以修改HttpServletRequest头和数据。
-  * 在HttpServletResponse到达客户端之前，拦截HttpServletResponse。
-  * 根据需要检查HttpServletResponse，也可以修改HttpServletResponse头和数据。
+  * 在`HttpServletRequest`到达Servlet之前，拦截客户的`HttpServletRequest`。
+  * 根据需要检查`HttpServletRequest`，也可以修改`HttpServletRequest`头和数据。
+  * 在`HttpServletResponse`到达客户端之前，拦截`HttpServletResponse`。
+  * 根据需要检查`HttpServletResponse`，也可以修改`HttpServletResponse`头和数据。
 
 >实际上Filter和Servlet极其相似，区别只是**Filter不能直接对用户生成响应**。	
 实际上`Filter`里`doFilter()`方法里的代码就是从多个`Servlet`的`service()`方法里抽取的通用代码，通过使用Filter可以实现更好的复用。

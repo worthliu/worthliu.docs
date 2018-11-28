@@ -14,7 +14,7 @@
   * [线程](/java/concurrence/thread.md)
   * [线程池](/java/concurrence/executor.md)
   
-  
+
 * [Servlet](/structure/servlet.md)
 
 
@@ -24,3 +24,6 @@
 
 * 算法
   * [常用排序算法总结](/algorithm/summary.md)
+
+* 其他
+  * [bean](/other/bean.md)
