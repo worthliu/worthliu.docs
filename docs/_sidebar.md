@@ -1,5 +1,9 @@
 * Java
   * [String](/java/base/String.md)
+
+  * [JVM内存结构](/java/jvm/jvmmemorystructure.md)
+  * [双亲加载模型](/java/jvm/classLoader.md)
+  
   * [Java内存模型](/java/concurrence/javamemorymodel.md)
   * [Java重排序](/java/concurrence/javareorder.md)
   * [顺序一致性](/java/concurrence/ordinalconsistency.md)
@@ -9,12 +13,9 @@
   * [final](/java/concurrence/final.md)
   * [线程](/java/concurrence/thread.md)
   * [线程池](/java/concurrence/executor.md)
-
-
-  * [JVM内存结构](/java/jvm/jvmmemorystructure.md)
-
-  * [双亲加载模型](/java/jvm/classLoader.md)
-
+  
+  
+* [Servlet](/structure/servlet.md)
 
 
 * Design Patterns
