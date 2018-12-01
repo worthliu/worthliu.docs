@@ -9,7 +9,6 @@ export BASH_ENV=$HOME/.bashrc
 export NODE_HOME=/usr/node-v10.13.0
 PATH=$NODE_HOME/bin:$PATH
 
-export USERNAME=worthliu
 export PATH
 
 #从ruby上下文中获取分支版本信息
