@@ -1,5 +1,6 @@
 * Java
   * [String](/java/base/String.md)
+  * [hashCodeAndEquals](/java/base/hashCodeAndEquals.md)
 
   * [JVM内存结构](/java/jvm/jvmmemorystructure.md)
   * [双亲加载模型](/java/jvm/classLoader.md)
