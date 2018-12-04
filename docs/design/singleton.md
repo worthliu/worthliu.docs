@@ -78,7 +78,7 @@ public class SingletonSafeSecond {
 }
 ```
 
-5.线程安全内部静态类
+4. 线程安全内部静态类
 
 ```
 public class SingletonSafeThird {

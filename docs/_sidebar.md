@@ -21,9 +21,11 @@
 * Design Patterns
   * [设计原则](/design/philosophy.md)
   * [单态模式](/design/singleton.md)
+  * [工厂模式](/design/factory.md)
+  * [抽象工厂模式](/design/abstractFactory.md)
 
 * 算法
-  * [常用排序算法总结](/algorithm/summary.md)
+  * [常用排序算法总结](/algorithm/algorithmSummary.md)
 
 * 网络
   * [网络基础知识](/network/network.md)
