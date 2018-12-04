@@ -1,6 +1,7 @@
 * Java
   * [String](/java/base/String.md)
   * [hashCodeAndEquals](/java/base/hashCodeAndEquals.md)
+  * [JavaByVal](/java/base/JavaByVal.md)
 
   * [JVM内存结构](/java/jvm/jvmmemorystructure.md)
   * [双亲加载模型](/java/jvm/classLoader.md)
@@ -14,10 +15,8 @@
   * [final](/java/concurrence/final.md)
   * [线程](/java/concurrence/thread.md)
   * [线程池](/java/concurrence/executor.md)
-  
 
 * [Servlet](/structure/servlet.md)
-
 
 * Design Patterns
   * [设计原则](/design/philosophy.md)
@@ -31,3 +30,5 @@
 
 * 其他
   * [bean](/other/bean.md)
+  * [测试类型](/other/testType.md)
+  * [代理](/other/proxy.md)
