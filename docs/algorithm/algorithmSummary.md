@@ -52,5 +52,40 @@ public void sort(int[] sortArray){
         }
     }
 ```
+![bubbleSort](/images/bubbleSort.gif)
 
+### 鸡尾酒排序（定向冒泡排序）
 
+鸡尾酒排序，也叫定向冒泡排序，是冒泡排序的一种改进。
+>此算法与冒泡排序的不同处**在于从低到高然后从高到低**，而冒泡排序则仅从低到高去比较序列里的每个元素。
+
+>1. 先从左到右，由大数往后移；
+2. 从右到左，由小数往前移；
+3. 循环遍历，遍历到中间位置时结束；
+
+```
+public void sort(int[] sortArray) {
+        // initial edge value
+        int left = 0;
+        int right = sortArray.length - 1;
+        while (left < right){
+            for(int rightInd = left; rightInd < right; rightInd++){
+                if(sortArray[rightInd] > sortArray[rightInd + 1]){
+                    sortArray[rightInd] = sortArray[rightInd] ^ sortArray[rightInd + 1];
+                    sortArray[rightInd + 1] = sortArray[rightInd] ^ sortArray[rightInd + 1];
+                    sortArray[rightInd] = sortArray[rightInd] ^ sortArray[rightInd + 1];
+                }
+            }
+            right--;
+            //
+            for (int leftInd = right; leftInd > left; leftInd--){
+                if(sortArray[leftInd] < sortArray[leftInd - 1]){
+                    sortArray[leftInd] = sortArray[leftInd] ^ sortArray[leftInd - 1];
+                    sortArray[leftInd - 1] = sortArray[leftInd] ^ sortArray[leftInd - 1];
+                    sortArray[leftInd] = sortArray[leftInd] ^ sortArray[leftInd - 1];
+                }
+            }
+            left++;
+        }
+    }
+```
