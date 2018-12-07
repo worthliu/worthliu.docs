@@ -80,29 +80,17 @@ mysql> EXPLAIN select * from dev.user;
   + `SUBQUERY` ： **子查询中的第1个SELECT语句**。
   + `DEPENDENT SUBQUERY` ： **子查询中的第1个SELECT语句，取决于外面的查询**。
   + `DERIVED` ： **SELECT(FROM 子句的子查询)**。
-
-4.2.3.	table
-表示查询的表。
-4.2.4.	type（重要）
-表示表的连接类型。
-以下的连接类型的顺序是从最佳类型到最差类型：
-
-1、	system
-表仅有一行，这是const类型的特列，平时不会出现，这个也可以忽略不计。
-2、	const
-数据表最多只有一个匹配行，因为只匹配一行数据，所以很快，常用于PRIMARY KEY或者UNIQUE索引的查询，可理解为const是最优化的。
- 
-3、	eq_ref
-mysql手册是这样说的:"对于每个来自于前面的表的行组合，从该表中读取一行。这可能是最好的联接类型，除了const类型。它用在一个索引的所有部分被联接使用并且索引是UNIQUE或PRIMARY KEY"。eq_ref可以用于使用=比较带索引的列。
- 
++ `table` ： **表示查询的表**。
++ `type`（**重要**）： **表示表的连接类型**。
+  + 以下的连接类型的顺序是从最佳类型到最差类型：
+  + `system` ： **表仅有一行，这是const类型的特列，平时不会出现，这个也可以忽略不计**。
+  + `const` : **数据表最多只有一个匹配行，因为只匹配一行数据，所以很快，常用于PRIMARY KEY或者UNIQUE索引的查询，可理解为const是最优化的**。
+  + `eq_ref` : **mysql手册是这样说的:"对于每个来自于前面的表的行组合，从该表中读取一行。这可能是最好的联接类型，除了const类型。它用在一个索引的所有部分被联接使用并且索引是UNIQUE或PRIMARY KEY"。eq_ref可以用于使用=比较带索引的列**。
 4、	ref
 查询条件索引既不是UNIQUE也不是PRIMARY KEY的情况。ref可用于=或<或>操作符的带索引的列。
- 
 5、	ref_or_null
 该联接类型如同ref，但是添加了MySQL可以专门搜索包含NULL值的行。在解决子查询中经常使用该联接类型的优化。
-
 上面这五种情况都是很理想的索引使用情况。
-
 6、	index_merge
 该联接类型表示使用了索引合并优化方法。在这种情况下，key列包含了使用的索引的清单，key_len包含了使用的索引的最长的关键元素。
 7、	unique_subquery
@@ -112,7 +100,6 @@ unique_subquery是一个索引查找函数,可以完全替换子查询,效率更
 该联接类型类似于unique_subquery。可以替换IN子查询,但只适合下列形式的子查询中的非唯一索引: value IN (SELECT key_column FROM single_table WHERE some_expr)
 9、	range
 只检索给定范围的行,使用一个索引来选择行。
- 
 10、	index
 该联接类型与ALL相同,除了只有索引树被扫描。这通常比ALL快,因为索引文件通常比数据文件小。
 11、	ALL
