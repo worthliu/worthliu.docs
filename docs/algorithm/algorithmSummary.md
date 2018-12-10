@@ -208,5 +208,19 @@ public void sort(int[] sortArray) {
 + 而希尔排序会用较大的步长移动数据，所以小数据只需进行少数比较和交换即可到正确位置。
 
 ```
+public void sort(int[] sortArray) {
+        int length = sortArray.length;
+        int stepLen = length / 2 + 1;
+        while (stepLen > 0){
+            for (int curInd = stepLen; curInd < length; curInd++){
+                if(sortArray[curInd] > sortArray[curInd - stepLen]){
+                    sortArray[curInd] = sortArray[curInd] ^ sortArray[curInd - stepLen];
+                    sortArray[curInd - stepLen] = sortArray[curInd] ^ sortArray[curInd - stepLen];
+                    sortArray[curInd] = sortArray[curInd] ^ sortArray[curInd - stepLen];
+                }
+            }
+            stepLen /= 2;
+        }
+}
 ```
 ![shellSort.gif](/images/shellSort.gif)
