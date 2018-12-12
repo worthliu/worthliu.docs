@@ -20,6 +20,7 @@
 
 * 数据库
   * [mysql](/database/mysql.md)
+  * [存储引擎](/database/storeEngine.md)
 
 * Design Patterns
   * [设计原则](/design/philosophy.md)
