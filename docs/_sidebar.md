@@ -18,6 +18,10 @@
 
 * [Servlet](/structure/servlet.md)
 
+* mybatis
+  * [mybatis介绍](/structure/mybatisIntroduction.md)
+  * [mybatis基础](/structure/mybatisBase.md)
+
 * 数据库
   * [mysql](/database/mysql.md)
   * [存储引擎](/database/storeEngine.md)
