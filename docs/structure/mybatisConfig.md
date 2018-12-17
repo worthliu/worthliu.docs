@@ -1,43 +1,51 @@
 
+**`MyBatis`配置文件的层次结构是不能改变的（其实貌似所有涉及配置的框架容器，其配置层次都是不可以改变的）**
+![mybatisConfig.png](/images/mybatis/mybatisConfig.png)
 
-**MyBatis配置文件的层次结构是不能改变的（其实貌似所有涉及配置的框架容器，其配置层次都是不可以改变的）**
+## `properties`元素
 
-## properties元素
+`properties`是一个配置属性的元素，让我们能在配置文件的上下文中使用它。
 
-properties是一个配置属性的元素，让我们能在配置文件的上下文中使用它。MyBatis提供3种配置方式：
-  ● property子元素
+>MyBatis提供3种配置方式：
++ **`property`子元素**：通过此种方式配置好的属性值，我们在配置时可以直接引用：
+![propertiesElement.png](/images/mybatis/propertiesElement.png)
+![propertiesConfig.png](/images/mybatis/propertiesConfig.png)
++ **`properties`配置文件**：通过`properties`配置文件来配置属性值，我们可以很方便的在多个配置文件中重复使用它们，也方便日后维护和随时修改；
+![propertiesFile.png](/images/mybatis/propertiesFile.png)
+![propertiesFile2.png](/images/mybatis/propertiesFile2.png)
++ **程序参数传递**：
+  + 实际工作中，系统是由运维人员去配置的和维护的，例如数据库密码对于开发人员而言都是透明的，不具有可见性；
+  + 这个时候，我们需要在`SqlSessionFactory`对加密的帐号密码进行解密，需要通过程序进行参数传递；
 
-通过此种方式配置好的属性值，我们在配置时可以直接引用：
+### 优先级
 
-  ● properties配置文件
-通过properties配置文件来配置属性值，我们可以很方便的在多个配置文件中重复使用它们，也方便日后维护和随时修改；
+**`MyBatis`支持3种配置方式可能同时出现，并且属性还会重复配置。而这3种方式是存在优先级的;**
 
+>`MyBatis`将按照下面的顺序来加载：
+1. 在`properties`元素体内指定的属性首先被读取；
+2. 根据`properties`元素中的`resource`属性读取类路径下属性文件，或者根据`url`属性指定的路径读取属性文件，并覆盖已读取的同名属性；
+3. 读取作为方法参数传递的属性，并覆盖已读取的同名属性；
 
+因此，通过方法参数传递的属性具有最高优先级，`resource/url`属性中指定的配置文件次之，最低优先级的是`properties属性`中指定的属性。
 
-  ● 程序参数传递
-实际工作中，系统是由运维人员去配置的和维护的，例如数据库密码对于开发人员而言都是透明的，不具有可见性；这个时候，我们需要在SqlSessionFactory对加密的帐号密码进行解密，需要通过程序进行参数传递；
+## 设置
+设置在`MyBatis`中是最复杂的配置，同时也是最为重要的配置内容之一，它会改变`MyBatis`运行时的行为。
 
-优先级
-MyBatis支持3种配置方式可能同时出现，并且属性还会重复配置。而这3种方式是存在优先级的，MyBatis将按照下面的顺序来加载：
-  1. 在properties元素体内指定的属性首先被读取；
-  2. 根据properties元素中的resource属性读取类路径下属性文件，或者根据url属性指定的路径读取属性文件，并覆盖已读取的同名属性；
-  3. 读取作为方法参数传递的属性，并覆盖已读取的同名属性；
-因此，通过方法参数传递的属性具有最高优先级，resource/url属性中指定的配置文件次之，最低优先级的是properties属性中指定的属性。
---------------------------------------------------------------------------------
-设置
-设置在MyBatis中是最复杂的配置，同时也是最为重要的配置内容之一，它会改变MyBatis运行时的行为。即使不配置settings，MyBatis也可以正常的工作；
+即使不配置`settings`，`MyBatis`也可以正常的工作；
 
+![settings.png](/images/mybatis/settings.png)
+![settings2.png](/images/mybatis/settings2.png)
+![settings3.png](/images/mybatis/settings3.png)
+![settingsFile.png](/images/mybatis/settingsFile.png)
 
+## 别名
+别名（`typeAliases`）是一个指代的名称。
 
+因为我们遇到的类全限定名过长，所以我们希望用一个简短的名称去指代它，而这个名称可以在`MyBatis`上下文中使用。
 
+别名在`MyBatis`里面分为系统定义别名和自定义别名两类。(**注意，在`MyBatis`中别名是不区分大小写的**)
 
-
-
-
-
---------------------------------------------------------------------------------
-别名
-别名（typeAliases）是一个指代的名称。因为我们遇到的类全限定名过长，所以我们希望用一个简短的名称去指代它，而这个名称可以在MyBatis上下文中使用。别名在MyBatis里面分为系统定义别名和自定义别名两类。注意，在MyBatis中别名是不区分大小写的。一个typeAliases的实例是在解析配置文件时生成的，然后长期保存在Configuration对象中，当我们使用它时，再把它拿出来，这样就没有必要运行的时候再次生成它的实例；
+一个`typeAliases`的实例是在解析配置文件时生成的，然后长期保存在`Configuration`对象中，当我们使用它时，再把它拿出来，这样就没有必要运行的时候再次生成它的实例；
 
 系统定义别名
 MyBatis系统定义了一些经常使用的类型的别名，例如，数值、字符串、日期和集合等。我们可以在MyBatis中直接使用它们，在使用时不要重复定义把他们给覆盖了：
