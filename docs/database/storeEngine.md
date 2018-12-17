@@ -1,4 +1,4 @@
-## MySQL数据库MyISAM和InnoDB存储引擎的比较
+## MySQL数据库`MyISAM`和`InnoDB`存储引擎的比较
 
 MySQL有多种存储引擎，`MyISAM`和`InnoDB`是其中常用的两种。这里介绍关于这两种引擎的一些基本概念（非深入介绍）。
 
@@ -22,23 +22,27 @@ MySQL有多种存储引擎，`MyISAM`和`InnoDB`是其中常用的两种。这�
 + `InnoDB`表比`MyISAM`表更安全，可以在保证数据不会丢失的情况下，切换非事务表到事务表（`alter table tablename type=innodb`）。
 
 >应用场景：
-MyISAM管理非事务表。它提供高速存储和检索，以及全文搜索能力。如果应用中需要执行大量的SELECT查询，那么MyISAM是更好的选择。
-InnoDB用于事务处理应用程序，具有众多特性，包括ACID事务支持。如果应用中需要执行大量的INSERT或UPDATE操作，则应该使用InnoDB，这样可以提高多用户并发操作的性能。
++ `MyISAM`管理非事务表。它提供高速存储和检索，以及全文搜索能力。如果应用中需要执行大量的SELECT查询，那么`MyISAM`是更好的选择。
++ `InnoDB`用于事务处理应用程序，具有众多特性，包括ACID事务支持。如果应用中需要执行大量的INSERT或UPDATE操作，则应该使用`InnoDB`，这样可以提高多用户并发操作的性能。
 
 常用命令：
 
-　　（1）查看表的存储类型（三种）：
-
+（1）查看表的存储类型（三种）：
+```
 show create table tablename
 show table status from  dbname  where name=tablename
 mysqlshow  -u user -p password --status dbname tablename
-　　（2）修改表的存储引擎：
-
+```
+（2）修改表的存储引擎：
+```
 alter table tablename type=InnoDB
-　　（3）启动mysql数据库的命令行中添加以下参数使新发布的表都默认使用事务：
-
+```
+（3）启动mysql数据库的命令行中添加以下参数使新发布的表都默认使用事务：
+```
 --default-table-type=InnoDB
-　　（4）临时改变默认表类型：
-
+```
+（4）临时改变默认表类型：
+```
 set table_type=InnoDB
 show variables like 'table_type'
+```
