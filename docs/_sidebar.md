@@ -22,6 +22,7 @@
   * [mybatis介绍](/structure/mybatisIntroduction.md)
   * [mybatis基础](/structure/mybatisBase.md)
   * [mybatis配置](/structure/mybatisConfig.md)
+  * [mybatisMapper](/structure/mybatisMapper.md)
 
 * 数据库
   * [mysql](/database/mysql.md)
