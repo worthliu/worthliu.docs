@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>worthliu's docs</title>
+  <title>worthLiu - 刘泽楚个人文档中心</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <meta name="keywords" content="worthLiu worthliu">
-  <meta name="description" content="The home page is worthliu's Personal site">
+  <meta name="keywords" content="worthLiu,worthliu">
+  <meta name="description" content="worthliu">
   <!-- <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/vue.css" title="vue">
   <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/dark.css" disabled> -->
   <link rel="stylesheet" type="text/css" href="/css/vue.css" title="vue">
@@ -22,6 +22,21 @@
     }
     .markdown-section h3>a>span>code{
       font-size: 1.35rem;
+    }
+    footer{
+      background: #ddd;
+      color: #fff;
+      border-radius: 30px 30px 30px 30px;
+    }
+    .beian a{
+      padding: 5px;
+      text-decoration: none;
+      color: #fff;
+    }
+    .beian a:hover{
+      padding: 5px;
+      text-decoration: none;
+      color: #42b983;
     }
   </style>
 </head>
@@ -60,22 +75,11 @@
       }, 
       // 提供的钩子(hook)支持处理异步逻辑
       plugins: [
-        function (hook, vm) {
-          hook.beforeEach(function (html) {
-            // 每次开始解析Markdown内容时调用
-            var url = 'https://github.com/worthliu/worthliu.docs/edit/master/docs/' + vm.route.file
-            var editHtml = '[:memo: Edit Document](' + url + ')\n'
-            return html
-              + '\n\n----\n\n'
-              + editHtml
-              + ' Last modified {docsify-updated} '              
-          })
-        },
         function (hook) {
           var footer = [
             '<footer style="text-align: center;">',
-            '<span><a href="https://github.com/worthliu" target="_blank" rel="nofollow">worthliu</a> &copy;2018.</span>',
-            '<span>Proudly published with <a href="https://github.com/worthliu/worthliu.docs" target="_blank" rel="nofollow">worthliu\'s docs</a>.</span>',
+            '<p class="beian">Copyright &copy; 2019 <a href="https://github.com/worthliu/worthliu.docs" target="_blank" rel="nofollow">worthliu</a>',
+            '<a href="http://www.miitbeian.gov.cn" target="_blank" rel="nofollow">粤ICP备18154918号</a></p>',
             '</footer>'
           ].join('');
 
