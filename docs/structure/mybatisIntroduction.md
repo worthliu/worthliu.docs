@@ -54,4 +54,4 @@
 
 同时你也可以优化`SQL`，通过配置决定你的SQL映射规则，也能支持存储过程，所以对于一些复杂的和需要优化性能SQL的查询它更加方便，`MyBatis`几乎能做到`JDBC`所能做到的所有事情。
 
-![MyBatis](/images/mybatis/MyBatis.png)
+![MyBatis](/images/mybatis/myBatis.png)
