@@ -116,11 +116,20 @@ password=*****
 
 ### 自定义别名
 系统所定义的别名往往是不够用的，因为不同的应用有着不同的需要，所以`MyBatis`允许自定义别名
-![typeAliasesSelf.png](/images/mybatis/typeAliasesSelf.png)
+```
+<typeAliases>
+  <typeAlias alias="role" type="com.****.Role"/>
+</typeAliases>
 
+```
 如上述，我们就可以在`MyBatis`上下文中使用`role`来代替其全路径，减少配置的复杂度
 如果`POJO`过多的时候，配置也是非常多时，MyBatis允许我们通过自动扫描的形式自定义别名：
-![typeAliasesSelf2.png](/images/mybatis/typeAliasesSelf2.png)
+
+```
+<typeAliases>
+  <package name="com.***.typealiases"/>
+</typeAliases>
+```
 
 我们需要自定义别名的，它是使用注解`@Alias`，如下：
 ```
@@ -154,7 +163,13 @@ public class Role{
 我们自定义的`TypeHandler`需要处理什么类型？
 
 现有的`TypeHandler`适合我们使用吗？
-![typeHandlerSelf.png](/images/mybatis/typeHandlerSelf.png)
+
+```
+<typeHandlers>
+  <typeHandler jdbcType="VARCHAR" javaType="string" 
+  handler="com.***.typeHandler.MyTypeHandler"/>
+</typeHandlers>
+```
 
 这里定义的数据库为`Varchar`型。当`Java`的参数为`String`型的时候，我们将使用`MyStringTypeHandler`进行处理。
 
@@ -210,24 +225,98 @@ public class Role{
 只需要把数据源的属性`type`定义为`UNPOOLED`、`POOLED`、`JNDI`即可；
 如果使用自定义数据源，它必须实现`org.apache.ibatis.datasource.DataSourceFactory`接口。
 
-![datasource2.png](/images/mybatis/datasource2.png)
+使用DBCP数据源需要我们提供一个类去配置它。按照下面配置就可以使用DBCP数据源：
+
+```
+<datasource type="***.***.DbcpDataSourceFactory"/>
+```
 
 ### `databaseIdProvider`数据库厂商标识
 在相同数据库厂商的环境下，数据库厂商标识没有什么意义，在实际的应用中使用的比较少，因为使用不同的厂商的数据库系统还是比较少的，`MyBatis`可能会运行在不同厂商的数据库中，它为此提供一个数据库标识，并提供自定义，它的作用在于指定`SQL`到对应的数据库厂商提供的数据库中运行；
-![databaseldProvider.png](/images/mybatis/databaseldProvider.png)
+
+其次，注册这个类到MyBatis上下文环境中，我们需要这样配置`databaseIdProvider`标签：
+
+```
+<databaseIdProvider type="com.****.MydatabaseIdProvider">
+  <property name="SQL Server" value="sqlserver"/>
+  <property name="MySQL" value="mysql"/>
+  <property name="DB2" value="db2"/>
+  <property name="Oracle" value="oracle"/>
+</databaseIdProvider>
+```
 
 `type=“DB_VENDOR”`是启动`MyBatis`内部注册的策略器。
 
 首先`MyBatis`会将你的配置读入`Configuration`类里面，在连接数据库后调用`getDatabaseProductName()`方法去获取数据库的信息，然后用我们配置的`name`值去做匹配来得到`DatabaseId`。
 
-MyBatis也提供规则允许自定义，只要实现databaseIdProvider接口，并且实现配置即可：
-![datasourceSelf.png](/images/mybatis/datasourceSelf.png)
+MyBatis也提供规则允许自定义，只要实现`databaseIdProvider`接口，并且实现配置即可：
 
+我们也可以指定SQL在那个数据库厂商执行，我们把Mapper的XML配置修改一下，如代码清单：
+
+```
+<select parameterType="string" id="getRole" resultType="role" databaseId="mysql">
+  select * from t_role 
+  where role_no = #{roleNo, javaType=String, jdbcType=VARCHAR}
+</select>
+```
 
 ## 引入映射器的方法
 映射器是`MyBatis`最复杂、最核心的组件。
-![Mapper.png](/images/mybatis/Mapper.png)
+
+首先，定义映射器的接口：
+
+```
+public interface RoleMapper{
+
+   public Role getRole(Long id);
+}
+```
+
+其次，给出XML文件：
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.**.mapper.RoleMapper">
+    <select id="getRole" parameterType="long" resultType="com.**.Role">
+      select * from t_role
+      where id = #{id}
+    </select>
+  </mapper>
+```
 
 引入映射器的方法很多:
-![Mapper2.png](/images/mybatis/Mapper2.png)
 
+1. 用文件路径引入映射器:
+
+```
+<mappers>
+  <mapper resource="com/**/roleMapper.xml"/>
+</mappers>
+```
+
+2. 用包名引入映射器:
+
+```
+<mappers>
+  <package name="com.***.mapper"/>
+</mappers>
+```
+
+3. 用类注册引入映射器:
+
+```
+<mappers>
+  <mapper class="com.***.UserMapper"/>
+  <mapper class="com.***.RoleMapper"/>
+</mappers>
+```
+4. 用userMapper.xml引入映射器：
+
+```
+<mappers>
+  <mapper url="file:///com/***/roleMapper.xml"/>
+  <mapper url="file:///com/***/RoleMapper.xml"/>
+</mappers>
+```

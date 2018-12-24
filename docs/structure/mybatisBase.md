@@ -7,7 +7,6 @@
 
 ![mybatisConstitute](/images/mybatis/mybatisConstitute.png)
 
---------------------------------------------------------------------------------
 ## 构建`SqlSessionFactory`
 每个`MyBatis`的应用都是以`SqlSeesionFactory`的实例为中心的。`SqlSessionFactory`的实例可以通过`sqlSessionFactoryBuilder`获得。
 
@@ -77,7 +76,8 @@
 4. `Mapper`
  + `Mapper`是一个接口，而没有任何实现类，它的作用是发送`SQL`，然后返回我们需要的结果，或者执行`SQL`从而修改数据库的数据，因此它应该在一个`SqlSession`事务方法之内，是一个方法级别的东西。
 
- ## 一些疑问
+## 一些疑问
+
 **1. 在`MyBatis`中保留着`iBatis`，通过“命名空间（`namespace`）+`SQLId`”的方式发送`SQL`并返回数据的形式，而不需要去获取映射器；那么困惑是我们需要`Mapper`吗？**
 
 **`Mapper`是一个接口，相对而言它可以进一步屏蔽`SqlSession`这个对象，使得它具有更强的业务可读性。**
