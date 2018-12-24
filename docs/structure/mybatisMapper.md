@@ -8,15 +8,15 @@ MyBatis还支持自动绑定`JavaBean`，我们只要让`SQL`返回的字段名�
 
 元素名称|描述|备注|
 --|--|--|
-select|查询语句，最常用、最复杂的元素之一|可以自定义参数，返回结果集等|
-insert|插入语句|执行后返回一个整数，代表插入的条数|
-update|更新语句|执行后返回一个整数，代表更新条数|
-delete|删除语句|执行后返回一个整数，代表删除的条数|
-parameterMap|定义参数映射关系|即将被删除的元素，不建议大家使用|
-sql|允许定义一部分的SQL，然后在各个地方引用它|***|
-resultMap|用来描述从数据库结果集中来加载对象，它是最复杂、最强大的元素|它将提供映射规则|
-cache|给定命名空间的缓存配置||
-cache-ref|其他命名空间缓存配置的引用||
+`select`|查询语句，最常用、最复杂的元素之一|可以自定义参数，返回结果集等|
+`insert`|插入语句|执行后返回一个整数，代表插入的条数|
+`update`|更新语句|执行后返回一个整数，代表更新条数|
+`delete`|删除语句|执行后返回一个整数，代表删除的条数|
+`parameterMap`|定义参数映射关系|即将被删除的元素，不建议大家使用|
+`sql`|允许定义一部分的SQL，然后在各个地方引用它|***|
+`resultMap`|用来描述从数据库结果集中来加载对象，它是最复杂、最强大的元素|它将提供映射规则|
+`cache`|给定命名空间的缓存配置||
+`cache-ref`|其他命名空间缓存配置的引用||
 
 
 ### select元素
@@ -24,48 +24,140 @@ cache-ref|其他命名空间缓存配置的引用||
 
 执行`SQL`后，`MyBatis`也提供了强大的映射规则，甚至是自动映射来帮助我们把返回的结果集绑定到`JavaBean`中
 
-![select.png](/images/mybatis/select.png)
-![select2.png](/images/mybatis/select2.png)
+元素|说明|备注|
+--|--|--|
+`id`|它和Mapper的命名空间组合起来是唯一的,提供给MyBatis调用|如过命名空间和id组合起来不唯一,MyBatis将抛出异常|
+`parameterType`|类的全命名、类的别名，但使用别名必须是MyBatis内部定义或者自定义的|选择JavaBean、Map等复杂的参数类型传递给SQL|
+`parameterMap`|即将废弃的元素|——|
+`resultType`|定义类的全路径，在允许自动匹配的情况下，结果集将通过JavaBean的规范映射；或定义位int、double、float等参数；也可以使用别名，但是要符合别名规则，不能和resultMap同时使用|它是我们常用的参数之一，比如我们统计总条数就可以把它的值设置为int|
+`resultMap`|它是映射集的引用，将执行强大的映射功能，我们可以使用resultType或者resultMap其中一个，resultMap可以给予uwomen自定义映射规则的机会|它是MyBatis最复杂的元素，可以配置映射规则、级联、typeHandler等|
+`flushCache`|它的作用是在调用SQL后，是否要求MyBatis清空之前查询的本缓存和二级缓存|true/false,默认值true|
+`useCache`|启动二级缓存的开关，是否要求MyBatis将此次结果缓存|true/false，默认值true|
+`timeout`|设置超时参数，等超时的时候将抛出异常，单位为秒|默认值是数据库厂商提供的JDBC驱动所设置的秒数|
+`fetchSize`|获取记录的总条数设定|默认值是数据库厂商提供的JDBC驱动所设置的秒数|
+`statementType`|告诉MyBatis使用那个JDBC的Statement工作，取值位STATEMENT(Statement)、PREPARED(PreparedStatement)、CallableStatement|默认值为PREPARED|
+`resultSetType`|这是对JDBC的resultType接口而言，它的值包括FORWARD_ONLY(游标允许向前访问)、SCROLL_SENSITIVE(双向滚动，但不及时更新，就是如果数据库里的数据修改过，并不在resultSet中反映出来)、SCROLL_INSENSITIVE(双向滚动，并及时跟踪数据库的更新，以便更改resultSet中的数据)|默认值是数据库厂商提供的JDBC驱动所设置的|
+`databaseId`|查看databaseIdProvider数据库厂商标识这部分内容|提供多种数据库的支持|
+`resultOrdered`|这个设置仅适用于嵌套结果集select语句。如果为true，就是假设包含了嵌套结果集或者是分组了，当返回一个主结果行的时候，就不能对前面结果集的引用。这就确保了在获取嵌套的结果集的时候不至于导致内存不够用|true/false，默认值位false|
+`resultSets`|适合于多个结果集的情况，它将列出执行SQL后每个结果集的名称，每个名称之间用逗号分隔|很少使用|
 
 
 ### 自动映射
 `autoMappingBehavior`参数，当它不设置为`NONE`的时候，`MyBatis`会提供自动映射的功能，只要返回的`SQL`列名和`JavaBean`的属性一致，`MyBatis`就会帮助我们回填这些字段而无需任何配置，它可以在很大程度上简化我们的配置工作。
 
-![selectSelf.png](/images/mybatis/selectSelf.png)
+自动映射可以在settings元素中配置autoMappingBehavior属性知道来设置其策略。它包含3个值：
+>+ NONE：取消自动映射；
++ PARTIAL：只会自动映射，没有定义嵌套结果集映射的结果集；
++ FULL：会自动映射任意复杂的结果集（无论是否嵌套）
+
+默认值PARTIAL。所以在默认的情况下，它可以做到当前对象的映射，使用FULL是嵌套映射，在性能上会下降；
 
 ### 传递多个参数
 使用Map传递参数
 
-![paramters.png](/images/mybatis/paramters.png)
-![paramters2.png](/images/mybatis/paramters2.png)
-![paramters3.png](/images/mybatis/paramters3.png)
+```
+<select id="findRoleByMap" parameterType="map" resultMap="roleMap">
+	select * from t_role
+	where role_name like concat("%", #{roleName}, "%")
+	and note like concat("%", #{note}, "%");
+</select>
+
+public List<Role> findRoleByMap(Map<String, String> params);
+
+
+Map<String, String> paramsMap = new HashMap<String, String>();
+paramsMap.put("roleName", "me");
+paramsMap.put("note", "te");
+roleMapper.findRoleByMap(paramsMap);
+```
 
 这样设置参数使用了`Map`，而`Map`需要键值对应，由于业务关联性不强，你需要深入到程序中看代码，造成可读性下降。
 
 ### 使用注解方式传递参数
-![paramters4.png](/images/mybatis/paramters4.png)
+
+```
+public List<Role> findRoleByAnnotation(@Param("roleName") String roleName, @Param("note") String note);
+```
 
 使用`MyBatis`的参数注解`@Param（org.apache.ibatis.annotations.Param）`来实现：
 
-![paramters5.png](/images/mybatis/paramters5.png)
-
+```
+<select id="findRoleByAnnotation" resultMap="roleMap">
+	select * from t_role
+	where role_name like concat("%", #{roleName}, "%")
+	and note like concat("%", #{note}, "%");
+</select>
+```
 当传入参数太多时，就会使代码变得很长，可读性也是不佳
 
 ### 使用`JavaBean`传递参数
 在参数过多的情况下，`MyBatis`允许组织一个`JavaBean`，通过简单的`setter`和`getter`方法设置参数，这样就可以提高我们的可读性
 
-![JavaBean.png](/images/mybatis/JavaBean.png)
-![JavaBean2.png](/images/mybatis/JavaBean2.png)
-![JavaBean3.png](/images/mybatis/JavaBean3.png)
+```
+public class RoleParam{
+	private String roleName;
+	private String note;
+
+	public String getRoleName(){
+		return roleName;
+	}
+
+	public void setRoleName(String roleName){
+		this.roleName = roleName;
+	}
+
+	public String getNote(){
+		return note;
+	}
+
+	public void setNote(String note){
+		this.note = note;
+	}
+}
+
+
+<select id="findRoleByParms" parameterType="com.**.RoleParam" resultMap="roleMap">
+	select * from t_role
+	where role_name like concat("%", #{roleName}, "%")
+	and note like concat("%", #{note}, "%");
+</select>
+
+同样我们在RoleDao接口提供一个方法
+
+public List<Role> findRoleByParams(RoleParam params);
+
+```
 
 ### 使用`resultMap`映射结果集
 
-![resultMap.png](/images/mybatis/resultMap.png)
-![resultMap2.png](/images/mybatis/resultMap2.png)
+```
+<resultMap id="roleResultMap" type="com.**.Role">
+	<id property="id" column="id"/>
+	<result property="roleName" column="role_name"/>
+	<result property="note" column="note"/>
+</resultMap> 
+
+<select parameterType="long" id="getRole" resultMap="roleResultMap">
+	selecet * from t_role where id = #{id}
+</select>
+
+```
 
 ### `insert`元素
 
-![insert.png](/images/mybatis/insert.png)
+元素|说明|备注|
+--|--|--|
+`id`|它和Mapper的命名空间组合起来是唯一的,提供给MyBatis调用|如过命名空间和id组合起来不唯一,MyBatis将抛出异常|
+`parameterType`|类的全命名、类的别名，但使用别名必须是MyBatis内部定义或者自定义的|选择JavaBean、Map等复杂的参数类型传递给SQL|
+`parameterMap`|即将废弃的元素|——|
+`flushCache`|它的作用是在调用SQL后，是否要求MyBatis清空之前查询的本缓存和二级缓存|true/false,默认值true|
+`timeout`|设置超时参数，等超时的时候将抛出异常，单位为秒|默认值是数据库厂商提供的JDBC驱动所设置的秒数|
+`statementType`|告诉MyBatis使用那个JDBC的Statement工作，取值位STATEMENT(Statement)、PREPARED(PreparedStatement)、CallableStatement|默认值为PREPARED|
+`keyProperty`|表示以那个列作为属性的主键。不能和keyColumn同时使用|设置那个列位主键，如果你是联合主键可以用逗号将其隔开|
+userGeneratedKeys|这会令MyBatis使用JDBC的getGerneratedKeys方法来取出由数据库内部生成的的主键|取值为布尔值，true、false。默认值false|
+keyColumn|指明第几列是主键，不能和KeyProperty同时使用|同keyProperty|
+`databaseId`|查看databaseIdProvider数据库厂商标识这部分内容|提供多种数据库的支持|
+`lang`|自定义语言，可使用第三方语言，使用得较少|——|
 
 #### 主键回填和自定义
 首先我们可以使用`keyProperty`属性指定那个是主键字段，同时使用`useGeneratedKeys`属性告诉`MyBatis`这个主键是否使用数据库内置策略生成；
@@ -85,7 +177,19 @@ cache-ref|其他命名空间缓存配置的引用||
 通过制定参数的类型去让对应的`typeHandler`处理他们：
 
 #### 参数配置
-![paramtersConfig.png](/images/mybatis/paramtersConfig.png)
+正如我们所看到的，我们可以传入一个简单的参数，比如int、double等，也可以传入JavaBean，某些特殊的情况，我们可以指定特定的类型，以确定使用那个typeHandler处理它们，以便我们进行特殊的处理：
+
+```
+#{age,javaType=int,jdbcType=NUMERIC}
+```
+当然我们还可以指定用那个typeHandler去处理参数
+```
+#{age,javaType=int,jdbcType=NUMERIC,typeHandler=MyTypeHandler}
+```
+此外的，我们还可以对一些数值型的参数设置其保存的精度
+```
+#{price,javaType=double,jdbcType=NUMERIC,numericScale=2}
+```
 
 ### 存储过程支持
 对于存储过程而言，存在3种参数，输入参数（`IN`）、输出参数（`OUT`）、输入输出参数（`INOUT`）。
@@ -96,7 +200,8 @@ cache-ref|其他命名空间缓存配置的引用||
 
 ![cursor.png](/images/mybatis/cursor.png)
 
-### 特殊字符串替换和处理（`#`和`$`）
+### 特殊字符串替换和处理（`
+#`和`$`）
 在MyBatis中，传递字符串，我们设置的参数`#`（`name`）在大部分的情况下`MyBatis`会用创建预编译的语句，然后`MyBatis`为它设值，而有时候我们需要的是传递`SQL`语句的本身，而不是`SQL`所需要的参数：
 ![$.png](/images/mybatis/$.png)
 
