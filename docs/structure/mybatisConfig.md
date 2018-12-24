@@ -11,9 +11,22 @@
 ![propertiesElement.png](/images/mybatis/propertiesElement.png)
 ![propertiesConfig.png](/images/mybatis/propertiesConfig.png)
 + **`properties`配置文件**：通过`properties`配置文件来配置属性值，我们可以很方便的在多个配置文件中重复使用它们，也方便日后维护和随时修改；
-![propertiesFile.png](/images/mybatis/propertiesFile.png)
-![propertiesFile2.png](/images/mybatis/propertiesFile2.png)
-+ **程序参数传递**：
+
+```
+properties文件的使用
+
+# 数据库配置文件
+driver=com.mysql.jdbc.Driver
+url=jdbc:mysql://localhost:3306/mybatis
+username=*****
+password=*****
+
+把properties文件放在源包下，只要这样引入这个配置文件即可
+
+<properties resource="jdbc.properties"/>
+```
+
+>+ **程序参数传递**：
   + 实际工作中，系统是由运维人员去配置的和维护的，例如数据库密码对于开发人员而言都是透明的，不具有可见性；
   + 这个时候，我们需要在`SqlSessionFactory`对加密的帐号密码进行解密，需要通过程序进行参数传递；
 
@@ -33,9 +46,28 @@
 
 即使不配置`settings`，`MyBatis`也可以正常的工作；
 
-![settings.png](/images/mybatis/settings.png)
-![settings2.png](/images/mybatis/settings2.png)
-![settings3.png](/images/mybatis/settings3.png)
+设置参数|描述|有效值|默认值|
+--|--|--|--|
+`cacheEnabled`|该配置影响所有映射器中配置的缓存全局开关|`true、false`|true|
+`lazyLoadingEnabled`|延迟加载的全局开关。当它开启时，所有关联对象都会延迟加载。特定关联关系中可通过设置fetchType属性来覆盖该项的开关状态|`true、false`|false|
+`aggressiveLazyLoading`|当启用时，对任意延迟属性的调用会使带有延迟加载属性的对象完整加载；反之，每种属性将会按需加载|`true、false`|true|
+`multipleResultSetsEnabled`|是否允许单一语句返回多结果集（需要兼容驱动）|`true、false`|true|
+`useColumnLabel`|使用列标签代替列名。不同的驱动在这方面会有不同的表现，具体可参考相关驱动文档或通过测试这两种不同的模式来观察所用驱动的结果|`true、false`|true|
+`useGenerateKeys`|允许JDBC支持自动生成主键，需要驱动兼容。如果设置位true，则这个设置强制使用自动生成主键，尽管一些驱动不能兼容但仍可正常工作（比如Derby）|`true、false`|false|
+`autoMappingBehavior`|指定MyBatis应如何自动映射列到字段或属性。NONE表示取消自动映射；PARTIAL只会自动映射没有定义嵌套结果集映射的结果集；FULL会自动映射任意复杂的结果集（无论是否嵌套）|NONE、PARTIAL、FULL|PARTIAL|
+`defaultExecutorType`|配置默认的执行器。SIMPLE是普通的执行器；REUSE执行器会重用预处理语句（preparedstatements）；BATCH执行器将重用语句并执行批量更新|SIMPLE、REUSE、BATCH|SIMPLE|
+`defaultStatementTimeout`|设置超时时间，它决定驱动等待数据库响应的秒数。当没有设置的时候它取的就是驱动默认的时间|Any positive integer|Not set（null）|
+`safeRowBoundsEnabled`|允许在嵌套语句中使用分页（RowBounds）|`true、false`|False|
+`mapUnderscoreToCamelCase`|是否开启自动驼峰命名规则（camel case）映射，即从经典数据库列名A_COLUMN到经典Java属性名aColumn的类似映射|`true、false`|false|
+`localCacheScope`|MyBatis利用本地缓存机制（Local Cache）防止循环引用（circular references）和加速重复嵌套查询。默认值位SESSION，这种情况下会缓存一个会话中执行的所有查询。若设置值位STATEMENT，本地会话仅用在语句执行上，对相同SqlSession的不同调用将不会共享数据|SESSIONS、TATEMENT|SESSION|
+`jdbcTypeForNull`|当没有位参数提供特定的JDBC类型时，为空值指定JDBC类型。某些驱动需要指定列的JDBC类型，多数情况直接用一般类型即可，比如NULL、VARCHAR、OTHER||JdbcType枚举，最常见的是VARCHAR、NULL、OTHER|OTHER|
+`lazyLoadTriggerMethods`|指定对象的方法触发一次延迟加载|如果是一个方法列表，则用逗号将它们隔开|equal、clone、hashCode、toString|
+`defaultScriptingLanguage`|指定动态SQL生成的默认语言|可以配置类的别名或者类的全限定名|****|
+`callSetterOnNulls`|指定当结果集中值位null的时候是否调用映射对象的setter（map对象时位put）方法，这对于有Map。keySet()依赖或null值初始化的时候是有用的。注意基本类型（int、boolean等）是不能设置成null的|`true、false`|false|
+`logPrefix`|指定MyBatis增加到日志名称的前缀|任何字符串|没有设置|
+`logImpl`|指定MyBatis所用日志的具体实现，未指定时将自动查找|SLF4J、LOG4J、LOG4J2等|没有设置|
+`proxyFactory`|指定mybatis创建具有延迟加载能力的对象所用到的代理工具|CGLB、JAVASSIST|版本3.3.0以上JAVASSIST，否则CGLIB|
+
 ![settingsFile.png](/images/mybatis/settingsFile.png)
 
 ## 别名
@@ -50,8 +82,36 @@
 ### 系统定义别名
 `MyBatis`系统定义了一些经常使用的类型的别名，例如，数值、字符串、日期和集合等。我们可以在`MyBatis`中直接使用它们，在使用时不要重复定义把他们给覆盖了：
 
-![typeAliases.png](/images/mybatis/typeAliases.png)
-![typeAliases2.png](/images/mybatis/typeAliases2.png)
+别名|映射的类型|支持数组|
+--|--|--|
+`_byte`|`byte`|是|
+`_long`|`long`|是|
+`_short`|`short`|是|
+`_int`|`int`|是|
+`_integer`|`int`|是|
+`_double`|`double`|是|
+`_float`|`float`|是|
+`_boolean`|`boolean`|是|
+`string`|`String`|否|
+`byte`|`Byte`|是|
+`long`|`Long`|是|
+`short`|`Short`|是|
+`int`|`Integer`|是|
+`integer`|`Integer`|是|
+`double`|`Double`|是|
+`float`|`Float`|是|
+`boolean`|`Boolean`|是|
+`date`|`Date`|是|
+`decimal`|`Decimal`|是|
+`bigdecimal`|`BigDecimal`|是|
+`object`|`Object`|否|
+`map`|`Map`|否|
+`hashmap`|`HashMap`|否|
+`list`|`List`|否|
+`arraylist`|`ArrayList`|否|
+`collection`|`Collection`|否|
+`iterator`|`Iterator`|否|
+`ResultSet`|`ResultSet`|否|
 
 
 ### 自定义别名
@@ -63,7 +123,12 @@
 ![typeAliasesSelf2.png](/images/mybatis/typeAliasesSelf2.png)
 
 我们需要自定义别名的，它是使用注解`@Alias`，如下：
-![typeAliasesSelf3.png](/images/mybatis/typeAliasesSelf3.png)
+```
+@Alias("role")
+public class Role{
+	// some code
+}
+```
 
 ## `typeHandler`类型处理器
 `MyBatis`在预处理语句（`PreparedStatement`）中设置一个参数时，或者从结果集（`ResultSet`）中取出一个值时，都会用注册了的`typeHandler`进行处理；

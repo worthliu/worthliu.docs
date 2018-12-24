@@ -18,11 +18,15 @@
 
 * [Servlet](/structure/servlet.md)
 
+* [hessian](/structure/hessian.md)
+
 * mybatis
   * [mybatis介绍](/structure/mybatisIntroduction.md)
   * [mybatis基础](/structure/mybatisBase.md)
   * [mybatis配置](/structure/mybatisConfig.md)
   * [mybatisMapper](/structure/mybatisMapper.md)
+  * [mybatis原理](/structure/mybatis.md)
+  * [mybatis插件](/structure/mybatisPlugin.md)
 
 * 数据库
   * [mysql](/database/mysql.md)
