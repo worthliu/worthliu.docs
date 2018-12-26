@@ -89,9 +89,27 @@ public Object pluginAll(Object target){
 2. 拦截方法和参数
 当你确定了需要拦截什么对象，接下来就要确定需要拦截什么方法及方法的参数，这些都是在你理解了MyBatis四大对象运作的基础上才能确定的；
 
-查询的过程是通过Executor调度`StatementHandler`来完成的。调度`StatementHandler`的`prepare`方法预编译SQL，于是我们需要拦截的方法便是prepare方法，在此之前完成 SQL的重新编写。
+查询的过程是通过Executor调度`StatementHandler`来完成的。调度`StatementHandler`的`prepare`方法预编译SQL，于是我们需要拦截的方法便是`prepare`方法，在此之前完成 SQL的重新编写。
 
-![StatementHandler.png](/images/mybatis/StatementHandler.png)
+prepare方法预编译SQL，于是我们需要拦截的方法便是perpare方法，在此之前完成SQL的重新编写。
+
+```
+public interface StatementHandler{
+	Statement prepare(Connection connection) throws SQLException;
+
+	void parameterize(Statement statement) throws SQLException;
+
+	void batch(Statement statement) throws SQLException;
+
+	int update(Statement statement) throws SQLException;
+
+	<E> List<E> query(Statement statement, ResultHandler resultHandler)  throws SQLException;
+
+	BoundSql getBoundSql();
+
+	ParameterHandler getParameterHandler();
+}
+```
 
 ```
 @Intercepts({@Signature(type=StatementHandler.class,

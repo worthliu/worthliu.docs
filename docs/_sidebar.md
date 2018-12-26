@@ -16,6 +16,8 @@
   * [线程](/java/concurrence/thread.md)
   * [线程池](/java/concurrence/executor.md)
 
+  * [Java通讯模型](/java/io/connectModel.md)
+
 * [Servlet](/structure/servlet.md)
 
 * [hessian](/structure/hessian.md)
