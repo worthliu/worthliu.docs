@@ -24,8 +24,6 @@ The outputs [4,2,3,1], [2,4,1,3], and [4,2,1,3] would also be accepted.
 class Solution {
     public int[] sortArrayByParity(int[] sortArray) {
         int tailInd = sortArray.length - 1;
-        int totalInd = sortArray.length;
-        //
         for(int curInd = 0;curInd < tailInd; curInd++){
             boolean isOdd = sortArray[curInd] % 2 == 1;
             if(isOdd){
