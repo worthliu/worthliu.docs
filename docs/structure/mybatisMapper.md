@@ -154,24 +154,44 @@ public List<Role> findRoleByParams(RoleParam params);
 `timeout`|设置超时参数，等超时的时候将抛出异常，单位为秒|默认值是数据库厂商提供的JDBC驱动所设置的秒数|
 `statementType`|告诉MyBatis使用那个JDBC的Statement工作，取值位STATEMENT(Statement)、PREPARED(PreparedStatement)、CallableStatement|默认值为PREPARED|
 `keyProperty`|表示以那个列作为属性的主键。不能和keyColumn同时使用|设置那个列位主键，如果你是联合主键可以用逗号将其隔开|
-userGeneratedKeys|这会令MyBatis使用JDBC的getGerneratedKeys方法来取出由数据库内部生成的的主键|取值为布尔值，true、false。默认值false|
-keyColumn|指明第几列是主键，不能和KeyProperty同时使用|同keyProperty|
+`userGeneratedKeys`|这会令MyBatis使用JDBC的getGerneratedKeys方法来取出由数据库内部生成的的主键|取值为布尔值，true、false。默认值false|
+`keyColumn`|指明第几列是主键，不能和KeyProperty同时使用|同keyProperty|
 `databaseId`|查看databaseIdProvider数据库厂商标识这部分内容|提供多种数据库的支持|
 `lang`|自定义语言，可使用第三方语言，使用得较少|——|
 
 #### 主键回填和自定义
 首先我们可以使用`keyProperty`属性指定那个是主键字段，同时使用`useGeneratedKeys`属性告诉`MyBatis`这个主键是否使用数据库内置策略生成；
 
-![insert2.png](/images/mybatis/insert2.png)
-
+```
+	<insert id="insertRole" parameterType="role" useGeneratedKey="true" keyProperty="id">
+		insert into t_role(role_name, note) values (#{roleName}, #{note})
+	</insert>
+```
 需要自定义主键规则时，可以使用`selectKey`元素进行处理：
-![insert3.png](/images/mybatis/insert3.png)
 
+```
+   <insert id="insertRole" parameterType="role" useGeneratedKeys="true" keyProperty="id">
+   	  <selectKey keyProperty="id" resultType="int" order="BEFORE">
+   	  	  select if(max(id)) is null, 1, max(id) + 2) as newId from t_role
+   	  </selectKey>
+   	  insert into t_role(id, role_name, note) values(#{id}, #{roleName}, #{note})
+   </insert>
+```
 
 ### `update`元素和`delete`元素
 和`insert`元素一样，`MyBatis`执行完`update`元素和`delete`元素后会返回一个整数，标出执行后影响的记录条数：
 
-![update.png](/images/mybatis/update.png)
+```
+   <update parameterType="role" id="updateRole">
+   		update t_role set role_name = #{roleName}, note = #{note}
+   		where id = #{id}
+   </update>
+
+   <delete id="delete" parameterType="long">
+   		delete from t_role where id = #{id}
+   </delete>
+
+```
 
 ### 参数
 通过制定参数的类型去让对应的`typeHandler`处理他们：
@@ -198,19 +218,50 @@ keyColumn|指明第几列是主键，不能和KeyProperty同时使用|同keyProp
 
 当你返回的是一个游标（也就是我们制定`JdbcType=CURSOR`）的时候，你还需要去设置`resultMap`以便`MyBatis`将存储过程的参数映射到对应的类型，这时`MyBatis`就会通过你所设置的`resultMap`自动为你设置映射结果；
 
-![cursor.png](/images/mybatis/cursor.png)
+```
+ #{role, mode=OUT, jdbcType=CURSOR, javaType=ResultSet, resultMap=roleResultMap}
+```
 
-### 特殊字符串替换和处理（`
-#`和`$`）
+### 特殊字符串替换和处理（`#`和`$`）
+
 在MyBatis中，传递字符串，我们设置的参数`#`（`name`）在大部分的情况下`MyBatis`会用创建预编译的语句，然后`MyBatis`为它设值，而有时候我们需要的是传递`SQL`语句的本身，而不是`SQL`所需要的参数：
-![$.png](/images/mybatis/$.png)
+
+```
+	select ${columns} from t_tablename
+```
 
 这样`MyBatis`就不会帮我们转译`columns`，而变为直出，而不是作为`SQL`的参数进行设置。只是这样是对`SQL`而言是不安全，`MyBatis`给了灵活性的同时，也需要自己去控制参数以保证`SQL`运转的正确性和安全性；
 
 ### `sql`元素
 `sql`元素的意义，在于我们可以定义一串`SQL`语句的组成部分，其他的语句可以通过引用来使用它。
-![sql.png](/images/mybatis/sql.png)
-![sql2.png](/images/mybatis/sql2.png)
+
+```
+	<sql id="role_columns">
+		id, role_name, note
+	</sql>
+
+	<select parameterType="long" id="getRole" resultMap="roleMap">
+		select 
+		  <include refid="role_columns"/>
+		from t_role 
+		where id = #{id}
+	</select>
+```
+
+```
+	<sql id="role_columns">
+		#{prefix}.role_no, #{prefix}.role_name, #{prefix}.note
+	</sql>
+
+	<select parameterType="string" id="getRole" resultMap="roleResultMap">
+		select
+		  <include refid="role_cloumns">
+		  	  <property name="prefix" value="r"/>
+		  </include>
+		from t_role r
+		where role_no = #{roleNo}
+	</select>
+```
 
 ### `resultMap`结果映射集
 其作用是定义映射规则、级联的更新、定制类型转化器等
@@ -218,9 +269,25 @@ keyColumn|指明第几列是主键，不能和KeyProperty同时使用|同keyProp
 
 其中`constructor`元素用于配置构造方法。
 
-![resultMapConst.png](/images/mybatis/resultMapConst.png)
+```
+	<resultMap ...>
+       <constructor>
+       		<idArg column="id" javaType="int"/>
+       		<arg column="role_name" javaType="string"/>
+       </constructor>
+       ....
+	</resultMap>
+```
 
-![resultMapTable.png](/images/mybatis/resultMapTable.png)
+`id`元素是表示那个列是主键,允许多个主键,多个主键则称为联合主键。`result`是配置`POJO`到`SQL`列名的映射关系。
+
+元素名称|说明|备注|
+--|--|--|
+`property`|映射到列结果的字段或属性。如果POJO的属性匹配的是存在的，和给定SQL列名（column元素）相同的，那么MyBatis就会映射到POJO上|可以使用导航式的字段，比如访问一个学生对象（Student）需要访问学生证（selfcard）的发证日期（issueDate），那么我们可以写成selfcard.issueDate|
+`column`|这里对应的是SQL的列||
+`javaType`|配置Java的类型|可以是特定的类完全限定名或者MyBatis上下文的别名|
+`jdbcType`|配置数据库类型|这是一个JDBC的类型，MyBatis已经为我们做了限定，基本支持所有常用的数据库类型|
+`typeHandler`|类型处理器|允许你用的特定的处理器来覆盖MyBatis默认的处理器，这就要制定jdbcType和javaType相互转化的规则|
 
 #### 级联
 >在MyBatis中级联分为3种：
@@ -238,8 +305,17 @@ keyColumn|指明第几列是主键，不能和KeyProperty同时使用|同keyProp
 >+ 为了解决这个问题我们应该考虑采用延迟加载的功能；
 + 为了处理`N+1`的问题，`MyBatis`引入了延迟加载的功能，延迟加载功能的意义在于，一开始并不取出级联数据，只有当使用它了才发送`SQL`去取回数据；
 
-![lazyLoading.png](/images/mybatis/lazyLoading.png)
-![lazyLoadingConfig.png](/images/mybatis/lazyLoadingConfig.png)
+在MyBatis的配置中有两个全局的参数lazyLoadingEnabled和aggressiveLazyLoading。
++ `lazyLoadingEnabled`的含义是是否开启延迟加载功能。
++ `aggressiveLazyLoading`的含义是对任意延迟属性的调用会使带有延迟加载属性的对象完整加载；反之，每种属性将按需加载；
+
+```
+  <settings>
+  	...
+  	<setting name="lazyLoadingEnabled" value="true"/>
+  	...
+  </settings>
+```
 
 上面的是全局设置，不太灵活；因为我们不能制定到那些属性可以立即加载，那些属性可以延迟加载。当一个功能的两个对象经常需要一起用时，我们采用及时加载更好，因为即时加载可以多条SQL一次性发送，性能高。
 
