@@ -41,12 +41,12 @@
   + 消费者每次调用服务提供方是不经过`ZooKeeper`的，消费者只是从`zookeeper`那里获取服务提供方地址列表。
   + 所以当`zookeeper`宕机之后，不会影响消费者调用服务提供者，影响的是`zookeeper`宕机之后如果提供者有变动，增加或者减少，无法把最新的服务提供者地址列表推送给消费者，所以消费者感知不到。
 
-## ZooKeeper使用场景
-**zookeeper是一个基于观察者的模式的分布式服务管理框架，负责存储和管理大家都关心的数据，并且接受观察者的注册，一旦发生变化，zookeeper就将通知到这些观察者做相应的变化。**
+## `zooKeeper`使用场景
+**`zookeeper`是一个基于观察者的模式的分布式服务管理框架，负责存储和管理大家都关心的数据，并且接受观察者的注册，一旦发生变化，`zookeeper`就将通知到这些观察者做相应的变化。**
 
 ### 核心场景：解决分布式系统中的一致性问题
 
-核心特性: **zookeeper会维护一个目录结点树，每个节点znode可以被监控，包括监控某个目录中存储的数据变化，子目录节点的变化，一旦变化可以通知设置监控的客户端。**
+核心特性: **`zookeeper`会维护一个目录结点树，每个节点`znode`可以被监控，包括监控某个目录中存储的数据变化，子目录节点的变化，一旦变化可以通知设置监控的客户端。**
 
 术语：**客户端有二种，一种是client连接zookeeper的客户端，另一种是follower做为客户端与leader连接。**
 
@@ -92,8 +92,8 @@
 
 需要说明的是，这些状态在触发时，所记录的事件类型都是：`EventType.None`
 
-#### zookeeper中的事件。
-当zookeeper客户端监听某个znode节点”/node-x”时：
+#### zookeeper中的事件
+当`zookeeper`客户端监听某个`znode`节点`”/node-x”`时：
 
 zookeeper事件|事件含义|
 --|--|
@@ -104,9 +104,9 @@ zookeeper事件|事件含义|
 `EventType.None`|当zookeeper客户端的连接状态发生变更时，即`KeeperState.Expired`、`KeeperState.Disconnected`、`KeeperState.SyncConnected`、`KeeperState.AuthFailed`状态切换时，描述的事件类型为`EventType.None`|
 
 #### 获取相应的响应
-我们详细描述了zookeeper客户端连接的状态和zookeeper对znode节点监听的事件类型，下面我们来讲解如何建立zookeeper的watcher监听。
+我们详细描述了`zookeeper`客户端连接的状态和`zookeeper`对znode节点监听的事件类型，下面我们来讲解如何建立`zookeeper`的watcher监听。
 
-在zookeeper中，并没有传统的add****Listener这样的注册监听器的方法。
+在`zookeeper`中，并没有传统的`add****Listener`这样的注册监听器的方法。
 
 而是采用`zk.getChildren(path, watch)`、`zk.exists(path, watch)`、`zk.getData(path, watcher, stat)`这样的方式为某个`znode`注册监听。也可以通过`zk.register(watcher)`注册默认监听。
 
@@ -124,21 +124,28 @@ zookeeper事件|事件含义|
 zookeeper中的watcher机制很特别，请注意以下一些关键的经验提醒（这些经验提醒在其他地方找不到）：
 >+ 一个节点可以注册多个watcher，但是分成两种情况，当一个watcher实例多次注册时，zkClient也只会通知一次；当多个不同的watcher实例都注册时，zkClient会依次进行通知（并不是很多网贴粗略说的“多次注册一次通知”），后文将会有实验。
 + 监控同一个节点X的一个watcher实例，通过exist、getData等注册方式多次注册的，zkClient也只会通知一次。这个原理在很多网贴上也都有说明，后文我们同样进行实验。
-+ 注意，很多网贴都说zk.getData(“/node-x”,watcher)这种注册方式可以监控节点的NodeCreated事件，实际上是不行的（或者说没有意义）。当一个节点还不存在时，zk.getData这样设置的watcher是会抛出KeeperException$NoNodeException异常的，这次注册会失败，watcher也不会起作用；一旦node-x节点存在了，那这个节点的NodeCreated事件又有什么意义呢？
++ 注意，很多网贴都说`zk.getData(“/node-x”,watcher)`这种注册方式可以监控节点的`NodeCreated`事件，实际上是不行的（或者说没有意义）。当一个节点还不存在时，`zk.getData`这样设置的`watcher`是会抛出`KeeperException$NoNodeException`异常的，这次注册会失败，watcher也不会起作用；一旦node-x节点存在了，那这个节点的`NodeCreated`事件又有什么意义呢？
 + zookeeper中并没有“永久监听”这种机制。网上所谓实现了”永久监听”的帖子，只是一种编程技巧。
-思路可以归为两类：一种是“在保证所有节点的watcher都被重新注册”的前提下，再进行目录、子目录的更改；
-另外一种是“在监听被触发后，被重新注册前，重新取一次节点的信息”确保在“监听真空期”znode没有变化。 有兴趣的读者可自行百度。
+  + 一种是“在保证所有节点的`watcher`都被重新注册”的前提下，再进行目录、子目录的更改；
+  + 另外一种是“在监听被触发后，被重新注册前，重新取一次节点的信息”确保在“监听真空期”`znode`没有变化。 
 下图可以反映zookeeper-watcher的监听真空期：
 
 ![zookeeper-watcher.png](/images/zookeeper-watcher.png)
 
 我本人对真空期的处理，更倾向于，注册监听后主动检查本次节点的znode-version和上次节点的znode-version是否一致，来确定是否真空期有节点变化。
-3、代码示例
-实践是检验真理的唯一途径
-3.1、验证监听
-3.1.1、验证对一个znode多次注册watcher
-为了简单起见，我们先检验一个最好检验的东西，就是为一个znode注册多个watcher时，watcher的通知机制到底是什么样的。这样依赖，第一次接触zookeeper的读者也可以根据代码，快速上手。我们依据前文建立的zookeeper集群，启动了zookeeper的三个工作节点，并注册watcher（我们只会使用其中的一个）：
-然后我们加测，使用getDate方法是否能够检测一个不存在的节点“Y”的创建事件。
+
+##### 代码示例(转)
+
+###### 验证监听
+
+###### 验证对一个znode多次注册watcher
+
+为了简单起见，我们先检验一个最好检验的东西，就是为一个znode注册多个watcher时，watcher的通知机制到底是什么样的。
+
+这样依赖，第一次接触zookeeper的读者也可以根据代码，快速上手。
+
+我们依据前文建立的zookeeper集群，启动了zookeeper的三个工作节点，并注册watcher（我们只会使用其中的一个）：然后我们加测，使用getDate方法是否能够检测一个不存在的节点“Y”的创建事件。
+
 ```
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -191,7 +198,7 @@ public class TestManyWatcher implements Runnable {
         ManyWatcherDefault watcherDefault = new ManyWatcherDefault();
         ZooKeeper zkClient = null;
         try {
-            zkClient = new ZooKeeper("192.168.61.129:2181", 120000, watcherDefault);
+            zkClient = new ZooKeeper("IP:2181", 120000, watcherDefault);
         } catch (IOException e) {
             TestManyWatcher.LOGGER.error(e.getMessage(), e);
             return;
@@ -344,13 +351,13 @@ class ManyWatcherTwo implements Watcher {
     }
 }
 ```
-代码中的注释自我感觉写得比较详细，这里就不再介绍了。以下是执行这段测试代码后，所运行的Log4j的日志信息。
+
 ```
-[2015-08-18 19:27:37] INFO  Thread-0 Initiating client connection, connectString=192.168.61.129:2181 sessionTimeout=120000 watcher=com.test.test.zookeepertest.test.ManyWatcherDefault@6db38815 (ZooKeeper.java:379)
+[2015-08-18 19:27:37] INFO  Thread-0 Initiating client connection, connectString=IP1:2181 sessionTimeout=120000 watcher=com.test.test.zookeepertest.test.ManyWatcherDefault@6db38815 (ZooKeeper.java:379)
   [2015-08-18 19:27:37] INFO  Thread-0 =================以下是第一个实验 (TestManyWatcher.java:67)
-  [2015-08-18 19:27:37] INFO  Thread-0-SendThread() Opening socket connection to server /192.168.61.129:2181 (ClientCnxn.java:1061)
-  [2015-08-18 19:27:37] INFO  Thread-0-SendThread(192.168.61.129:2181) Socket connection established to 192.168.61.129/192.168.61.129:2181, initiating session (ClientCnxn.java:950)
-  [2015-08-18 19:27:37] INFO  Thread-0-SendThread(192.168.61.129:2181) Session establishment complete on server 192.168.61.129/192.168.61.129:2181, sessionid = 0x14f40902e2a0000, negotiated timeout = 40000 (ClientCnxn.java:739)
+  [2015-08-18 19:27:37] INFO  Thread-0-SendThread() Opening socket connection to server /IP1:2181 (ClientCnxn.java:1061)
+  [2015-08-18 19:27:37] INFO  Thread-0-SendThread(IP1:2181) Socket connection established to IP1/IP1:2181, initiating session (ClientCnxn.java:950)
+  [2015-08-18 19:27:37] INFO  Thread-0-SendThread(IP1:2181) Session establishment complete on server IP1/IP1:2181, sessionid = 0x14f40902e2a0000, negotiated timeout = 40000 (ClientCnxn.java:739)
   [2015-08-18 19:27:37] INFO  Thread-0-EventThread =========默认监听到None事件：keeperState = SyncConnected  :  eventType = None (TestManyWatcher.java:130)
   [2015-08-18 19:27:37] INFO  Thread-0 =================以下是第二个实验 (TestManyWatcher.java:85)
   [2015-08-18 19:27:37] INFO  Thread-0-EventThread =========ManyWatcherTwo监听到/X地址发生事件：keeperState = SyncConnected  :  eventType = NodeCreated (TestManyWatcher.java:206)
@@ -363,11 +370,12 @@ class ManyWatcherTwo implements Watcher {
     at com.test.test.zookeepertest.test.TestManyWatcher.run(TestManyWatcher.java:91)
     at java.lang.Thread.run(Unknown Source)
 ```
-在我们调用getData，抛出异常后，我们试图创建“Y”节点。并且发现没有任何监听日志输出。于是我们肯定了上文中的两个描述：
-  ● 针对一个节点发生的事件，zkClient是不是做多次watcher通知，和使用什么方法注册的没有关系，关键在于所注册的watcher实例是否为同一个实例。
-  ● 使用getDate注册一个不存在的节点的监听，并试图监听这个节点create event是无法实现的。因为会抛出NoNodeException异常，注册watcher的动作也会变得无效。
-3.1.2、验证default watcher监听EventType.None事件
-这个测试在指定了默认watcher监听和没有指定默认watcher监听的两种情况下。zkClient对Event-NONE事件的响应机制。
+>在我们调用getData，抛出异常后，我们试图创建“Y”节点。并且发现没有任何监听日志输出。于是我们肯定了上文中的两个描述：
+  + 针对一个节点发生的事件，zkClient是不是做多次watcher通知，和使用什么方法注册的没有关系，关键在于所注册的watcher实例是否为同一个实例。
+  + 使用getDate注册一个不存在的节点的监听，并试图监听这个节点create event是无法实现的。因为会抛出NoNodeException异常，注册watcher的动作也会变得无效。
+
+##### 验证default watcher监听EventType.None事件
+这个测试在指定了默认`watcher`监听和没有指定默认`watcher`监听的两种情况下。zkClient对`Event-NONE`事件的响应机制。
 
 ```
 import java.io.FileNotFoundException;
@@ -386,8 +394,8 @@ import org.springframework.util.Log4jConfigurer;
 
 /**
  * 这个测试类测试在指定了默认watcher，并且有不止一个watcher实例的情况下。zkClient对Event-NONE事件的响应机制。
- * servers：192.168.61.129:2181，192.168.61.130:2181，192.168.61.132:2181<br>
- * 我们选择一个节点进行连接(192.168.61.129)，这样好在主动停止这个zk节点后，观察watcher的响应情况。
+ * servers：IP1:2181，IP2:2181，IP3:2181<br>
+ * 我们选择一个节点进行连接(IP1)，这样好在主动停止这个zk节点后，观察watcher的响应情况。
  * @author test
  */
 public class TestEventNoneWatcher implements Runnable {
@@ -418,14 +426,14 @@ public class TestEventNoneWatcher implements Runnable {
          * 验证过程如下：
          * 1、连接zk后，并不进行进行默认的watcher的注册，并且使用exist方法注册一个监听节点"X"的监听器。
          *      （完成后主线程进入等待状态）
-         * 2、关闭192.168.61.129:2181这个zk节点，让Disconnected事件发生。
+         * 2、关闭IP1:2181这个zk节点，让Disconnected事件发生。
          *      观察到底是哪个watcher响应这些None事件。
          * */
         //1、========================================================
         //注册默认监听
         EventNodeWatcherDefault watcherDefault = new EventNodeWatcherDefault(this);
         try {
-            this.zkClient = new ZooKeeper("192.168.61.129:2181", 120000, watcherDefault);
+            this.zkClient = new ZooKeeper("IP1:2181", 120000, watcherDefault);
         } catch (IOException e) {
             TestEventNoneWatcher.LOGGER.error(e.getMessage(), e);
             return;
@@ -444,7 +452,7 @@ public class TestEventNoneWatcher implements Runnable {
             return;
         }
 
-        //完成注册后，主线程等待。然后关闭192.168.61.129上的zk节点
+        //完成注册后，主线程等待。然后关闭IP1上的zk节点
         synchronized(this) {
             try {
                 this.wait();
@@ -533,13 +541,20 @@ JMX enabled by default
 Using config: /usr/zookeeper-3.4.6/bin/../conf/zoo.cfg
 Stopping zookeeper ... STOPPED
 ```
-以下是zk客户端响应的log4j日志信息：
+我们看到zkServer的节点断开后，EventType.None事件被已经注册的两个watcher分别响应了一次。
 
-红圈处，我们看到zkServer的节点断开后，EventType.None事件被已经注册的两个watcher分别响应了一次。这里注意两个异常：第一个异常是断开连接后，socket报的错误，从错误中我们可以看到zookeeper客户端的连接使用了sun的nio框架（如果您不知道nio请自行百度，或者关注我后续的博文）；第二个错，是在断开连接后，EventNodeWatcherOne试图重新使用exists方式注册监听，所以报错。
+>这里注意两个异常：
++ 第一个异常是断开连接后，socket报的错误，从错误中我们可以看到zookeeper客户端的连接使用了sun的nio框架；
++ 第二个错，是在断开连接后，EventNodeWatcherOne试图重新使用exists方式注册监听，所以报错。
+
 可见EventType.None事件，会由所有的监听器全部响应。所以这里我们的编程建议是：一定要使用默认监听器，并由默认监听器来响应EventType.None事件；其他针对znode节点的接听器，只针对节点事件进行处理，使用if语句进行过滤，如果发现是EventType.None事件，则忽略不作处理。
+
 当然，任何编码过程都是要根据您自己的业务规则来设计。以上的建议只是笔者针对一般业务情况的处理方式。
-3.2、协调独享资源的抢占
-下面的代码，用来向各位看官演示，zookeeper利用其znode机制，是怎么完成资源抢占的协调过程的。为了简化代码片段，我没有使用默认的watcher监听，所以启动的时候会报一个空指针错误是正常的，原因在org.apache.zookeeper.ClientCnxn的524行（3.4.5版本）：
+
+##### 协调独享资源的抢占
+zookeeper利用其znode机制，是怎么完成资源抢占的协调过程的。
+
+为了简化代码片段，没有使用默认的watcher监听，所以启动的时候会报一个空指针错误是正常的，原因在`org.apache.zookeeper.ClientCnxn`的524行（3.4.5版本）：
 ```
 private void processEvent(Object event) {
     try {
@@ -556,8 +571,7 @@ private void processEvent(Object event) {
      } else {
          。。。。
 ```
-通过这段代码，读者还可以跟踪出各种事件的响应方式。但这个不是本文中扩散讨论的了，在我后续hadoop系列文章中，我还会介绍zookeeper，那时我们会深入讨论zookeeper客户端重连过程、更深层次的watcher事件机制。
-话锋转回，下面的代码是如何使用zookeeper进行独享资源的协调，同样的，代码中注释写得比较清楚，就不在进行文字叙述了（代码是可以运行的，但是不建议拷贝粘贴哈^_^）：
+
 ```
 import java.io.FileNotFoundException;
 import java.util.List;
@@ -602,7 +616,7 @@ public class TestZookeeperAgainst implements Runnable {
     }
 
     public TestZookeeperAgainst() throws Exception {
-        this.zk = new ZooKeeper("192.168.61.129:2181,192.168.61.130:2181,192.168.61.132:2181", 7200000, new DefaultWatcher());
+        this.zk = new ZooKeeper("IP1:2181,IP2:2181,IP3:2181", 7200000, new DefaultWatcher());
 
         //创建一个父级节点filesq（如果没有的话）
         Stat pathStat = null;

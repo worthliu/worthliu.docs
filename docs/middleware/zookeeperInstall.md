@@ -120,13 +120,13 @@ Mode: standalone
 
 准备多台机器，最好3台以上（n+1）;
 
-安装JDK，设置环境变量，解压并zookeeper，这些步骤就都不说了，请参见上文中的设置。
+安装JDK，设置环境变量，解压并`zookeeper`，这些步骤就都不说了，请参见上文中的设置。
 
->+ 所有节点的JDK安装路径，zookeeper的安装路径和环境变量的设置都完全一样，这样不会配着配着就把自己脑袋配晕（特别是如果您是第一次进行zookeeper的配置）
-+ 在正式环境中，我们不会使用root用户进行zookeeper的运行。所以您最好在测试环境的时候创建一个用户，例如名字叫做zookeeper的用户。
-+ 正式换进下我们一般也不会关闭防火墙。但是为了保证在测试环境下熟悉相关的配置，我建议您关闭防火墙。（如果开启防火墙的话，请打开2181、2888、3888这几个端口）
+>+ 所有节点的JDK安装路径，`zookeeper`的安装路径和环境变量的设置都完全一样，这样不会配着配着就把自己脑袋配晕（特别是如果您是第一次进行`zookeeper`的配置）
++ 在正式环境中，我们不会使用root用户进行`zookeeper`的运行。所以您最好在测试环境的时候创建一个用户，例如名字叫做`zookeeper`的用户。
++ 正式换进下我们一般也不会关闭防火墙。但是为了保证在测试环境下熟悉相关的配置，我建议您关闭防火墙。（如果开启防火墙的话，请打开`2181`、`2888`、`3888`这几个端口）
 
-我们先创建几个文件夹，注意文件夹的权限要为您当前的用户打开（如果是root用户，就不需要关心这个问题）。等一下配置过程中，我们会用到这些文件夹。
+我们先创建几个文件夹，注意文件夹的权限要为您当前的用户打开（如果是`root`用户，就不需要关心这个问题）。等一下配置过程中，我们会用到这些文件夹。
 ```
 创建zookeeper工作目录：
 mkdir -p /usr/zookeeperdata/
@@ -138,7 +138,7 @@ mkdir -p /usr/zookeeperdata/log
 ```
 到此，准备工作结束。
 ### 正式安装（配置项讲解）
-如果您是按照我的建议进行的准备工作，那么到这里，您三台机器的目录结构、环境变量、执行用户都应该是完全一致的。这里您只需要配置其中的一台，然后将配置文件scp到另外两台，就可以完成配置了。
+如果您是按照我的建议进行的准备工作，那么到这里，您三台机器的目录结构、环境变量、执行用户都应该是完全一致的。这里您只需要配置其中的一台，然后将配置文件`scp`到另外两台，就可以完成配置了。
 以下是其中一台的配置信息：
 ```
 # The number of milliseconds of each tick
@@ -230,28 +230,28 @@ JMX enabled by default
 Using config: /usr/zookeeper-3.4.6/bin/../conf/zoo.cfg
 Mode: follower
 ```
-在一个zookeeper集群集群中，始终有一个节点会通过集群所有节点参与的选举被推举为“leader”节点。其他节点就是“follower”节点。
+在一个`zookeeper`集群集群中，始终有一个节点会通过集群所有节点参与的选举被推举为“leader”节点。其他节点就是“follower”节点。
 
 ## 简要命令和结构说明
-本小结，我们简单说明一下zookeeper的数据存储结构，算是为下一篇文章介绍zookeeper中几个重要的原理打打基础。
+本小结，我们简单说明一下`zookeeper`的数据存储结构，算是为下一篇文章介绍`zookeeper`中几个重要的原理打打基础。
 
 ### zookeeper的存储结构
 
 zookeeper中的数据是按照“树”结构进行存储的。而且znode节点还分为4中不同的类型。如下：
 
 >+ `PERSISTENT-持久化节点`：创建这个节点的客户端在与zookeeper服务的连接断开后，这个节点也不会被删除（除非您使用API强制删除）。
-+ `PERSISTENT_SEQUENTIAL-持久化顺序编号节点`：当客户端请求创建这个节点A后，zookeeper会根据parent-znode的zxid状态，为这个A节点编写一个全目录唯一的编号（这个编号只会一直增长）。当客户端与zookeeper服务的连接断开后，这个节点也不会被删除。
++ `PERSISTENT_SEQUENTIAL-持久化顺序编号节点`：当客户端请求创建这个节点A后，zookeeper会根据`parent-znode`的zxid状态，为这个A节点编写一个全目录唯一的编号（这个编号只会一直增长）。当客户端与zookeeper服务的连接断开后，这个节点也不会被删除。
 + `EPHEMERAL-临时znode节点`：创建这个节点的客户端在与zookeeper服务的连接断开后，这个节点就会被删除。
-+ `EPHEMERAL_SEQUENTIAL-临时顺序编号znode节点`：当客户端请求创建这个节点A后，zookeeper会根据parent-znode的zxid状态，为这个A节点编写一个全目录唯一的编号（这个编号只会一直增长）。当创建这个节点的客户端与zookeeper服务的连接断开后，这个节点被删除
++ `EPHEMERAL_SEQUENTIAL-临时顺序编号znode节点`：当客户端请求创建这个节点A后，zookeeper会根据`parent-znode`的zxid状态，为这个A节点编写一个全目录唯一的编号（这个编号只会一直增长）。当创建这个节点的客户端与zookeeper服务的连接断开后，这个节点被删除
 
-### 运行zkCli.sh命令
-我们可以使用zkCli.sh命令，登录到一个zookeeper节点（不一定是leader节点），并通过命令行操作zookeeper的数据结构。
+### 运行`zkCli.sh`命令
+我们可以使用`zkCli.sh`命令，登录到一个`zookeeper`节点（不一定是`leader`节点），并通过命令行操作`zookeeper`的数据结构。
 
 ```
 [root@vm2 ~]# zkCli.sh
 Connecting to localhost:2181
-2015-08-08 08:18:15,181 [myid:] - INFO  [main:Environment@100] - Client environment:zookeeper.version=3.4.6-1569965, built on 02/20/2014 09:09 GMT
-2015-08-08 08:18:15,193 [myid:] - INFO  [main:Environment@100] - Client environment:host.name=vm2
+[myid:] - INFO  [main:Environment@100] - Client environment:zookeeper.version=3.4.6-1569965, built on 02/20/2014 09:09 GMT
+[myid:] - INFO  [main:Environment@100] - Client environment:host.name=vm2
 
 [zk: localhost:2181(CONNECTED) 0]
 ```
@@ -260,7 +260,6 @@ Connecting to localhost:2181
 ```
 [zk: localhost:2181(CONNECTED) 1] ls /
 [zookeeper]
-
 ```
 当然，您还可以更多的命令：
 ```

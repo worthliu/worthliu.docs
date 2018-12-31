@@ -31,6 +31,7 @@
     * [ZooKeeper原理](/middleware/zookeeper.md)
     * [ZooKeeper与Dubbo](/middleware/zookeeperDubbo.md)
     * [ZooKeeper安装](/middleware/zookeeperInstall.md)
+  * [LVS](/middleware/lvs.md)
 
 * 数据库
   * [mysql](/database/mysql.md)
