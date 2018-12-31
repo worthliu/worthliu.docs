@@ -108,19 +108,26 @@ Tomcat8以上版本，默认使用的就是`NIO模式`，不需要额外修改
 ## tomcat8的并发参数控制
 本篇的tomcat版本是tomcat8.5。可以到这里看下tomcat8.5的配置参数
 
-1. acceptCount 
+1. `acceptCount` 
  + 文档描述为：The maximum queue length for incoming connection requests when all possible request processing threads are in use. Any requests received when the queue is full will be refused. The default value is 100. 
- + 这里可以简单理解为：连接在被ServerSocketChannel accept之前就暂存在这个队列中，acceptCount就是这个队列的最大长度。
-ServerSocketChannel accept就是从这个队列中不断取出已经建立连接的的请求。所以当ServerSocketChannel accept取出不及时就有可能造成该队列积压，一旦满了连接就被拒绝了;
-2. acceptorThreadCount 
+ + 这里可以简单理解为：连接在被`ServerSocketChannel accept`之前就暂存在这个队列中，**`acceptCount`就是这个队列的最大长度。**
+`ServerSocketChannel accept`就是从这个队列中不断取出已经建立连接的的请求。
+ + 所以当`ServerSocketChannel accept`取出不及时就有可能造成该队列积压，一旦满了连接就被拒绝了;
+2. `acceptorThreadCount` 
  + 文档如下描述 :The number of threads to be used to accept connections. Increase this value on a multi CPU machine, although you would never really need more than 2. Also, with a lot of non keep alive connections, you might want to increase this value as well. Default value is 1. 
- + Acceptor线程只负责从上述队列中取出已经建立连接的请求。在启动的时候使用一个ServerSocketChannel监听一个连接端口如8080，可以有多个Acceptor线程并发不断调用上述ServerSocketChannel的accept方法来获取新的连接。参数acceptorThreadCount其实使用的Acceptor线程的个数。
-3. maxConnections 
+ + `Acceptor`线程只负责从上述队列中取出已经建立连接的请求。
+ + 在启动的时候使用一个`ServerSocketChannel`监听一个`连接端口`如`8080`，可以有多个`Acceptor线程`并发不断调用上述`ServerSocketChannel`的`accept`方法来获取新的连接。
+ + **参数`acceptorThreadCount`其实使用的`Acceptor`线程的个数。**
+3. `maxConnections` 
  + 文档描述如下：The maximum number of connections that the server will accept and process at any given time. When this number has been reached, the server will accept, but not process, one further connection. 
  + This additional connection be blocked until the number of connections being processed falls below maxConnections at which point the server will start accepting and processing new connections again. Note that once the limit has been reached, the operating system may still accept connections based on the acceptCount setting. 
  + The default value varies by connector type. For NIO and NIO2 the default is 10000. For APR/native, the default is 8192. 
  + Note that for APR/native on Windows, the configured value will be reduced to the highest multiple of 1024 that is less than or equal to maxConnections. This is done for performance reasons. If set to a value of -1, the maxConnections feature is disabled and connections are not counted. 
- + 这里就是tomcat对于连接数的一个控制，即最大连接数限制。一旦发现当前连接数已经超过了一定的数量（NIO默认是10000），上述的Acceptor线程就被阻塞了，即不再执行ServerSocketChannel的accept方法从队列中获取已经建立的连接。但是它并不阻止新的连接的建立，新的连接的建立过程不是Acceptor控制的，Acceptor仅仅是从队列中获取新建立的连接。所以当连接数已经超过maxConnections后，仍然是可以建立新的连接的，存放在上述acceptCount大小的队列中，这个队列里面的连接没有被Acceptor获取，就处于连接建立了但是不被处理的状态。当连接数低于maxConnections之后，Acceptor线程就不再阻塞，继续调用ServerSocketChannel的accept方法从acceptCount大小的队列中继续获取新的连接，之后就开始处理这些新的连接的IO事件了。
-4. maxThreads 
+ + **这里就是tomcat对于连接数的一个控制，即最大连接数限制。**
+ + 一旦发现当前连接数已经超过了一定的数量（NIO默认是10000），上述的`Acceptor`线程就被阻塞了，即不再执行`ServerSocketChannel`的`accept`方法从队列中获取已经建立的连接。
+ + 但是它并不阻止新的连接的建立，新的连接的建立过程不是`Acceptor`控制的，`Acceptor`仅仅是从队列中获取新建立的连接。
+ + 所以当连接数已经超过`maxConnections`后，仍然是可以建立新的连接的，存放在上述`acceptCount`大小的队列中，这个队列里面的连接没有被`Acceptor`获取，就处于连接建立了但是不被处理的状态。
+ + 当连接数低于`maxConnections`之后，`Acceptor`线程就不再阻塞，继续调用`ServerSocketChannel`的`accept`方法从`acceptCount`大小的队列中继续获取新的连接，之后就开始处理这些新的连接的IO事件了。
+4. `maxThreads` 
  + 文档描述如下：The maximum number of request processing threads to be created by this Connector, which therefore determines the maximum number of simultaneous requests that can be handled. If not specified, this attribute is set to 200. If an executor is associated with this connector, this attribute is ignored as the connector will execute tasks using the executor rather than an internal thread pool. 
- + 这个简单理解就算是上述worker的线程数。他们专门用于处理IO事件，默认是200。
+ + 这个简单理解就算是上述`worker`的线程数。他们专门用于处理IO事件，默认是`200`。

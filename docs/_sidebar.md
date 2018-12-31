@@ -33,6 +33,7 @@
     * [ZooKeeper安装](/middleware/zookeeperInstall.md)
   * [LVS](/middleware/lvs.md)
   * [tomcat](/middleware/tomcat.md)
+  * [rpc](/middleware/rpc.md)
 
 * 数据库
   * [mysql](/database/mysql.md)
