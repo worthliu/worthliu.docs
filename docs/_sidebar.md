@@ -32,6 +32,7 @@
     * [ZooKeeper与Dubbo](/middleware/zookeeperDubbo.md)
     * [ZooKeeper安装](/middleware/zookeeperInstall.md)
   * [LVS](/middleware/lvs.md)
+  * [tomcat](/middleware/tomcat.md)
 
 * 数据库
   * [mysql](/database/mysql.md)
