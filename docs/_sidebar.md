@@ -55,6 +55,8 @@
 
 * 网络
   * [网络基础知识](/network/network.md)
+  * [HTTP](/network/http.md)
+  * [HTTPS](/network/https.md)
 
 * LeetCode
   * [SortArrayByParity](/leetcode/SortArrayByParity.md)
