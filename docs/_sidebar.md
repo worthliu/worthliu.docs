@@ -58,6 +58,8 @@
 
 * LeetCode
   * [SortArrayByParity](/leetcode/SortArrayByParity.md)
+  * [FlippingAnImage](/leetcode/FlippingAnImage.md)
+  * [HamMingDistance](/leetcode/HamMingDistance.md)
 
 * 其他
   * [bean](/other/bean.md)
