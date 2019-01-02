@@ -60,6 +60,7 @@
   * [SortArrayByParity](/leetcode/SortArrayByParity.md)
   * [FlippingAnImage](/leetcode/FlippingAnImage.md)
   * [HamMingDistance](/leetcode/HamMingDistance.md)
+  * [TwoSum](/leetcode/TwoSum.md)
 
 * 其他
   * [bean](/other/bean.md)
