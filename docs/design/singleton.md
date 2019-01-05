@@ -59,20 +59,26 @@ public class SingletonFirst {
 
 ```
 public class SingletonSafeSecond {
-    private static SingletonSafeSecond instance = null;
+    private Singleton instance = null;
 
-    private SingletonSafeSecond(){
+    private Object lock = new Object();
 
+    private SingletonSafeSecond() {
     }
 
-    public static SingletonSafeSecond getInstance(){
-        if(instance == null){
-            synchronized (SingletonSafeSecond.class){
-                if (instance == null){
+    /**
+     * 
+     * @return
+     */
+    public SingletonSafeSecond getInstance() {
+        if (instance == null) {
+            synchronized (lock) {
+                if (instance == null) {
                     instance = new SingletonSafeSecond();
                 }
             }
         }
+        //
         return instance;
     }
 }

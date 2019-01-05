@@ -59,11 +59,14 @@
   * [HTTPS](/network/https.md)
 
 * LeetCode
-  * [SortArrayByParity](/leetcode/SortArrayByParity.md)
-  * [FlippingAnImage](/leetcode/FlippingAnImage.md)
-  * [HamMingDistance](/leetcode/HamMingDistance.md)
+  * [数组奇偶归并](/leetcode/SortArrayByParity.md)
+  * [图片反转](/leetcode/FlippingAnImage.md)
+  * [汉明距离](/leetcode/HamMingDistance.md)
   * [TwoSum](/leetcode/TwoSum.md)
-  * [AddTwoNumbers](/leetcode/AddTwoNumbers.md)
+  * [计算两数之和](/leetcode/AddTwoNumbers.md)
+  * [单值二叉树](/leetcode/UnivaluedBinaryTree.md)
+  * [设计循环队列](/leetcode/DesignCircularQueue.md)
+  * [搜索二维数组](/leetcode/Search2DMatrix.md)
 
 * 其他
   * [bean](/other/bean.md)
@@ -71,3 +74,4 @@
   * [代理](/other/proxy.md)
 
 * [时间管理](/time/time.md)
+* [剑指OFFER](/time/time.md)
