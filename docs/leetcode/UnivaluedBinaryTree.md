@@ -37,6 +37,7 @@ Each node's value will be an integer in the range [0, 99].
 
 ```
 >递归遍历方式
+
 ```
 public boolean isUnivalTree(TreeNode root) {
         //
@@ -62,6 +63,7 @@ public boolean isUnivalTreeRecu(TreeNode root, int tarVal){
 + 遇到一个节点,访问它,然后把它压栈,并去遍历它的左子树; 
 + 当左子树遍历结束后,从栈顶弹出该节点并将其指向右子树,继续第一步骤;
 + 当所有节点访问完即最后访问的树节点为空且栈空时,停止;
+
 
 ```
 public boolean isUnivalTree(TreeNode root) {
