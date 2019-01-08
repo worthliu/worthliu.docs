@@ -59,11 +59,40 @@ public boolean isUnivalTreeRecu(TreeNode root, int tarVal){
 }
 ```
 
->**先中序遍历采用非递归的方式**
+>+ 先序遍历：根节点->左节点->右节点
++ 中序遍历：左节点->根节点->右节点
++ 后续遍历：左节点->右节点->根节点
+
+>**先序遍历采用非递归的方式**
+
+```
+public boolean isUnivalTree(TreeNode root) {
+        Stack<TreeNode> stackTree = new Stack<>();
+        int tarVal = root.val;
+        while (true){
+            while (root != null){
+                if(root.val != tarVal){
+                   return false;
+                }
+                stackTree.push(root);
+                root = root.left;
+            }
+
+            if(stackTree.isEmpty()){
+               return true;
+            }
+            //
+            root = stackTree.pop();
+            root = root.right;
+        }
+    }
+```
+
+
+>**中序遍历采用非递归的方式**
 + 遇到一个节点,访问它,然后把它压栈,并去遍历它的左子树; 
 + 当左子树遍历结束后,从栈顶弹出该节点并将其指向右子树,继续第一步骤;
 + 当所有节点访问完即最后访问的树节点为空且栈空时,停止;
-
 
 ```
 public boolean isUnivalTree(TreeNode root) {

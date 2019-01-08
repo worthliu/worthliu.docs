@@ -245,3 +245,60 @@ public void sort(int[] sortArray) {
 
 ```
 ![mergeSort](/images/mergeSort.gif)
+
+## 快速排序（quick sort）
+
+>快速排序算法的关键在于先在数组中选择一个数字，接下来把数组中的数字分为两部分：
+1. 比选择的数字小的数字移到数组的左边；
+2. 比选择的数字大的数字移到数组的右边；
+
+```
+public void quickSort(int[] data, int length, int start, int end){
+    if(start == end){
+        return;
+    }
+    //
+    int index = partition(data, length, start, end);
+    if(index > start){
+        quickSort(data, length, start, index - 1);
+    }
+
+    if(index < end){
+        quickSort(data, length, index + 1, end);
+    }
+}
+
+/**
+ * 分隔数组，按照选定数字
+ * @param data
+ * @param length
+ * @param start
+ * @param end
+ * @return
+ */
+public int partition(int[] data, int length, int start, int end){
+    if(data == null || length <= 0 || start < 0 || end >= length){
+        throw new IllegalArgumentException("Invalid parameters");
+    }
+    //
+    int small = start - 1;
+    for(int curInd = start; curInd < end; ++curInd){
+        if(data[curInd] < data[end]){
+            ++small;
+            if(small != curInd){
+                data[small] = data[small] ^ data[curInd];
+                data[curInd] = data[small] ^ data[curInd];
+                data[small] = data[small] ^ data[curInd];
+            }
+        }
+    }
+    //
+    ++small;
+    if(data[small] != data[end]){
+        data[small] = data[small] ^ data[end];
+        data[end] = data[small] ^ data[end];
+        data[small] = data[small] ^ data[end];
+    }
+    return small;
+}
+```

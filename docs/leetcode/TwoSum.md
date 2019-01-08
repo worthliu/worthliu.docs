@@ -14,15 +14,15 @@ return [0, 1].
 
 ```
 public int[] twoSum(int[] nums, int target) {
-        Map<Integer, Integer> calcMap = new HashMap<>();
+    Map<Integer, Integer> calcMap = new HashMap<>();
 
-        for(int curInd = 0; curInd < nums.length; curInd++){
-            if(calcMap.containsKey(nums[curInd])){
-                return new int[]{calcMap.get(nums[curInd]), curInd};
-            }else{
-                calcMap.put(target - nums[curInd], curInd);
-            }
+    for(int curInd = 0; curInd < nums.length; curInd++){
+        if(calcMap.containsKey(nums[curInd])){
+            return new int[]{calcMap.get(nums[curInd]), curInd};
+        }else{
+            calcMap.put(target - nums[curInd], curInd);
         }
-        return new int[2];
+    }
+    return new int[2];
  }
 ```
