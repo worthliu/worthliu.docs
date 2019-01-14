@@ -73,6 +73,12 @@
   * [实现队列](/leetcode/MyQueue.md)
   * [实现栈](/leetcode/MyStack.md)
   * [旋转数组的最小数字](/leetcode/RotateArrayMinNumber.md)
+  * [斐波那契数列](/leetcode/Fibonacci.md)
+  * [爬楼梯](/leetcode/ClimbingStairs.md)
+  * [位运算](/leetcode/BitOperation.md)
+  * [打印1到最大的n位数](/leetcode/PrintNNumber.md)
+  * [删除链表结点](/leetcode/DeleteLinkNode.md)
+  * [链表中倒数第k个结点](/leetcode/SearchKNode.md)
 
 * 其他
   * [bean](/other/bean.md)

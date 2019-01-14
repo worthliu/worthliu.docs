@@ -36,31 +36,52 @@ public int rotateArrayMinNum(int[] array){
     return array[minInd];
 }
 ```
-
-上述代码中，若排序数组，两个指针指向数字及它们中间的数字三者相同的时候，无法移动两个指针来缩小查找的范围，不得不采用顺序查找的方法；
+**上述代码中，若排序数组，两个指针指向数字及它们中间的数字三者相同的时候，无法移动两个指针来缩小查找的范围，不得不采用顺序查找的方法；**
 
 ```
-public int rotateArrayMinNum(int[] array){
-    if(array == null){
+public int rotateArrayMinNumPro(int[] nums){
+    if(nums == null){
         throw new IllegalArgumentException("Invalid parameter.");
     }
-    
+
     int head = 0;
-    int tail = array.length - 1;
+    int tail = nums.length - 1;
     int minInd = head;
-    while (array[head] >= array[tail]){
+    while (nums[head] >= nums[tail]){
         if(tail - head == 1){
             minInd = tail;
             break;
         }
         //
         minInd = (head + tail) / 2;
-        if(array[minInd] >= array[head]){
+        //如果下标为head、tail、minInd指向的三个数字相等，则只能顺序查找
+        if(nums[head] == nums[minInd] && nums[minInd] == nums[tail]){
+            return minInOrder(nums, head, tail);
+        }
+        //
+        if(nums[minInd] >= nums[head]){
             head = minInd;
-        }else if(array[minInd] <= array[tail]){
+        }else if(nums[minInd] <= nums[tail]){
             tail = minInd;
         }
     }
-    return array[minInd];
+    return nums[minInd];
+}
+
+/**
+ * 顺序查找
+ * @param nums
+ * @param head
+ * @param tail
+ * @return
+ */
+private int minInOrder(int[] nums, int head, int tail) {
+    int result = nums[head];
+    for(int ind = head + 1; ind <= tail; ++ind){
+        if(result > nums[ind]){
+            result = nums[ind];
+        }
+    }
+    return result;
 }
 ```
