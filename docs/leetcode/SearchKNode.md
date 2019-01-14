@@ -16,4 +16,23 @@
 ## solution
 
 ```
+public ListNode serachKNode(ListNode head, int n){
+    if(head == null || n <= 0){
+        return null;
+    }
+
+    ListNode preNext = head;
+    ListNode backNext = head;
+    int count = 1;
+
+    while(preNext.next != null){
+        if(count >= n){
+            backNext = backNext.next;
+        }
+        preNext = preNext.next;
+        ++count;
+    }
+    //
+    return backNext;
+}
 ```

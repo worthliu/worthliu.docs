@@ -79,6 +79,7 @@
   * [打印1到最大的n位数](/leetcode/PrintNNumber.md)
   * [删除链表结点](/leetcode/DeleteLinkNode.md)
   * [链表中倒数第k个结点](/leetcode/SearchKNode.md)
+  * [反转链表](/leetcode/ReverseLink.md)
 
 * 其他
   * [bean](/other/bean.md)
