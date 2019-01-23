@@ -93,6 +93,15 @@
   * [二叉搜索树与双向链表](/leetcode/BSTConvertDoubleLinked.md)
   * [字符串的排列](/leetcode/StringArrange.md)
   * [出现次数超过一半的数字](/leetcode/NumberFrequency.md)
+  * [最小的k个数](/leetcode/GetLeastKNumbers.md)
+  * [连续子数组的最大和](/leetcode/SubArrayMaxSum.md)
+  * [从1到n整数中1出现的次数](/leetcode/TargetAppearTimes.md)
+  * [把数组排成最小的数](/leetcode/ArrayFormMinValue.md)
+  * [丑数](/leetcode/IsUglyNumber.md)
+  * [第一个出现一次的字符](/leetcode/FirstAppear1Times.md)
+  * [数组中的逆序对](/leetcode/ArrayInversion.md)
+  * [链表的第一个公共结点](/leetcode/LinkFirstCommonNode.md)
+  * [数字在数组次数](/leetcode/NumberAppearTimes.md)
 
 * 其他
   * [bean](/other/bean.md)
