@@ -16,3 +16,85 @@
 
 ## solution
 
+```
+	/**
+     * 统计目标值在排序数组中出现的次数
+     * @param nums
+     * @param tarVal
+     * @return
+     */
+    public int statTargetValAppTimes(int[] nums, int tarVal){
+        int numCount = 0;
+        if(nums != null || nums.length > 0){
+            int firstInd = getFirstKLoop(nums, tarVal, 0, nums.length - 1);
+            int lastInd = getLastKLoop(nums, tarVal, 0, nums.length - 1);
+            if(firstInd > -1 && lastInd > -1){
+                numCount = lastInd - firstInd + 1;
+            }
+        }
+        return numCount;
+    }
+
+    /**
+     * 获取排序数组中第一个目标值下标
+     * @param nums
+     * @param tarVal
+     * @param start
+     * @param end
+     * @return
+     */
+    private int getFirstKLoop(int[] nums, int tarVal, int start, int end) {
+        if(nums == null || start > end){
+            return -1;
+        }
+
+        int midInd = (start + end) / 2;
+        int midData = nums[midInd];
+        if(midData == tarVal){
+            boolean checked = (midInd > 0 && nums[midInd - 1] != tarVal)
+                                || midInd == 0;
+            if(checked){
+                return midInd;
+            }else {
+                end = midInd - 1;
+            }
+        }else if(midData > tarVal){
+            end = midInd - 1;
+        }else {
+            start = midInd + 1;
+        }
+        return getFirstKLoop(nums, tarVal, start, end);
+    }
+
+    /**
+     * 获取排序数组中最后一个目标值下标
+     * @param nums
+     * @param tarVal
+     * @param start
+     * @param end
+     * @return
+     */
+    private int getLastKLoop(int[] nums, int tarVal, int start, int end){
+        if(nums == null || start > end){
+            return -1;
+        }
+        //
+        int midInd = (start + end) / 2;
+        int midData = nums[midInd];
+        //
+        if(midData == tarVal){
+            boolean checked = (midInd < nums.length - 1 && nums[midInd + 1] != tarVal)
+                    || midInd == nums.length - 1;
+            if(checked){
+                return midInd;
+            }else{
+                start = midInd + 1;
+            }
+        }else if(midData < tarVal){
+            start = midInd + 1;
+        }else {
+            end = midInd - 1;
+        }
+        return getLastKLoop(nums, tarVal, start, end);
+    }
+```
