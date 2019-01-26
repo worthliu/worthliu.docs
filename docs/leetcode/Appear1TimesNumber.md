@@ -96,7 +96,7 @@
     }
 ```
 
->数组重复数字出现三次：
+>数组重复数字出现三次：（位运算： `0 & a & a & ~a = 0`）
 
 ```
     public int singleNumber(int[] nums) {

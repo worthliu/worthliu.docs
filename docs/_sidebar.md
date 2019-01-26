@@ -105,6 +105,11 @@
   * [二叉树的深度](/leetcode/BinaryTreeDepth.md)
   * [是否平衡二叉树](/leetcode/IsBalancedBinaryTree.md)
   * [出现一次的数字](/leetcode/Appear1TimesNumber.md)
+  * [数字对和](/leetcode/SumEqualNumbersPair.md)
+  * [连续数字对和](/leetcode/SumEqualConNumbersPair.md)
+  * [字符串翻转](/leetcode/StringReverse.md)
+  * [字符串旋转](/leetcode/StringLeftReverse.md)
+  * [骰子点数概率](/leetcode/DiceProbability.md)
 
 * 其他
   * [bean](/other/bean.md)
