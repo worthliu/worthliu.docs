@@ -110,6 +110,10 @@
   * [字符串翻转](/leetcode/StringReverse.md)
   * [字符串旋转](/leetcode/StringLeftReverse.md)
   * [骰子点数概率](/leetcode/DiceProbability.md)
+  * [扑克牌的顺子](/leetcode/PlayingCard.md)
+  * [圆圈中最后剩下的数字](/leetcode/LastRemainNumber.md)
+  * [数字运算](/leetcode/NumberOperation.md)
+  * [树中两个结点的最低公共祖先](/leetcode/LowestCommonAncestor.md)
 
 * 其他
   * [bean](/other/bean.md)
