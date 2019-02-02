@@ -16,21 +16,27 @@ The outputs [4,2,3,1], [2,4,1,3], and [4,2,1,3] would also be accepted.
 + 0 <= A[i] <= 5000
 
 
+### 题解
+
+>+ 建立两个指针，分别为指向开头和结尾处，定义为`headInd`、`tailInd`；
++ 头指针`headInd`往前扫描，找到偶数数字，与尾指针所指向数字交换；
++ 若尾指针所指向的数字同样为偶数，尾指针往前扫描，找到第一个奇数数字进行交换；
++ 当头指针`headInd>=tailInd`时，循环结束；
+
 ## solution
 
 ```
-class Solution {
     public int[] sortArrayByParity(int[] sortArray) {
         int tailInd = sortArray.length - 1;
-        for(int curInd = 0;curInd < tailInd; curInd++){
-            boolean isOdd = sortArray[curInd] % 2 == 1;
+        for(int headInd = 0;headInd < tailInd; headInd++){
+            boolean isOdd = sortArray[headInd] % 2 == 1;
             if(isOdd){
-                for(;tailInd > curInd;tailInd--){
+                for(;tailInd > headInd;tailInd--){
                     boolean isEven = sortArray[tailInd] % 2 == 0;
                     if(isEven){
-                        sortArray[curInd] = sortArray[curInd] ^ sortArray[tailInd];
-                        sortArray[tailInd] = sortArray[curInd] ^ sortArray[tailInd];
-                        sortArray[curInd] = sortArray[curInd] ^ sortArray[tailInd];
+                        sortArray[headInd] = sortArray[headInd] ^ sortArray[tailInd];
+                        sortArray[tailInd] = sortArray[headInd] ^ sortArray[tailInd];
+                        sortArray[headInd] = sortArray[headInd] ^ sortArray[tailInd];
                         break;
                     }
                 }
@@ -39,5 +45,4 @@ class Solution {
         
         return sortArray;
     }
-}
 ```

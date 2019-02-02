@@ -44,7 +44,8 @@ public boolean isUnivalTree(TreeNode root) {
         if(root == null){
             return true;
         }
-        return isUnivalTreeRecu(root.left, root.val) && isUnivalTreeRecu(root.right, root.val);
+        return isUnivalTreeRecu(root.left, root.val) && 
+               isUnivalTreeRecu(root.right, root.val);
     }
 
 
@@ -55,7 +56,8 @@ public boolean isUnivalTreeRecu(TreeNode root, int tarVal){
         return false;
     }
     //
-    return isUnivalTreeRecu(root.left, root.val) && isUnivalTreeRecu(root.right, root.val);
+    return isUnivalTreeRecu(root.left, root.val) && 
+           isUnivalTreeRecu(root.right, root.val);
 }
 ```
 

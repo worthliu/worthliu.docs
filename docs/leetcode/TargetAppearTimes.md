@@ -4,7 +4,13 @@
 
 ### 题解
 
-直观做法：累加1到n中每个整数1出现的次数。可以每次通过对10求余数判断整数的个位数字是不是1.如果这个数字大于10，除以10之后再判断个位数字是不是1。**时间复杂度是O(nlogn)**
+直观做法：累加1到n中每个整数1出现的次数。
+
+可以每次通过对10求余数判断整数的个位数字是不是1。
+
+如果这个数字大于10，除以10之后再判断个位数字是不是1。
+
+**时间复杂度是O(nlogn)**
 
 
 
@@ -44,7 +50,8 @@
     }
 
     private int numberOf1(char[] tarChar, int start, int end){
-        if(tarChar == null || tarChar.length <= 0 || start < 0 || end >= tarChar.length || start > end){
+        if(tarChar == null || tarChar.length <= 0 || 
+            start < 0 || end >= tarChar.length || start > end){
             return 0;
         }
         //

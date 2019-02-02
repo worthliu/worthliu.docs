@@ -47,3 +47,32 @@ public List<Integer> sequenceTraversal(TreeNode root){
     return resList;
 }
 ```
+
+```
+    public List<List<Integer>> levelOrder(TreeNode root){
+        List<List<Integer>> resList = new ArrayList<>();
+        if(root != null){
+            Deque<TreeNode> data = new ArrayDeque<>();
+            data.offer(root);
+            while (!data.isEmpty()){
+                int count = data.size();
+                List<Integer> nodeList = new ArrayList<>(count);
+                while (count > 0){
+                    TreeNode node = data.poll();
+                    nodeList.add(node.val);
+                    //
+                    if(node.left != null){
+                        data.offer(node.left);
+                    }
+                    //
+                    if(node.right != null){
+                        data.offer(node.right);
+                    }
+                    count--;
+                }
+                resList.add(nodeList);
+            }
+        }
+        return resList;
+    }
+```
