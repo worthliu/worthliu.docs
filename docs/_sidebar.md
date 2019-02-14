@@ -125,7 +125,6 @@
   * [二叉搜索树中的插入操作](/leetcode/InsertIntoBST.md)
   * [删除二叉搜索树中的节点](/leetcode/DeleteBSTNode.md)
 
-
   * [计算两数之和](/leetcode/AddTwoNumbers.md)
   * [删除链表结点](/leetcode/DeleteLinkNode.md)
   * [链表的第一个公共结点](/leetcode/LinkFirstCommonNode.md)
@@ -139,5 +138,4 @@
   * [bean](/other/bean.md)
   * [测试类型](/other/testType.md)
   * [代理](/other/proxy.md)
-
-* [时间管理](/time/time.md)
+  * [时间管理](/time/time.md)
