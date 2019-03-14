@@ -17,10 +17,16 @@
   * [线程池](/computer/concurrence/executor.md)
   * [Java通讯模型](/computer/io/connectModel.md)
 
+* 分布式系统问题锦集
+  * [分布式Session](/distributedSystem/distributedSession.md)
+
 * 框架
   * [Servlet](/structure/servlet.md)
   * [hessian](/structure/hessian.md)
   * spring
+    * [spring整体架构](/structure/springStructure.md)
+    * [spring IOC And AOP](/structure/springIOC&AOP.md)
+    * [spring Transaction](/structure/springTransaction.md)
   * springboot
   * springclound
   * mybatis
