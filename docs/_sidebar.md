@@ -19,6 +19,7 @@
 
 * 分布式系统问题锦集
   * [分布式Session](/distributedSystem/distributedSession.md)
+  * [一致Hash算法](/distributedSystem/consistentHash.md)
 
 * 框架
   * [Servlet](/structure/servlet.md)
@@ -59,8 +60,9 @@
   * [工厂模式](/design/factory.md)
   * [抽象工厂模式](/design/abstractFactory.md)
 
-* 算法
+* 算法与数据结构
   * [常用排序算法总结](/algorithm/algorithmSummary.md)
+  * [B树](/algorithm/BalancedTreeOfOrder.md)
 
 * 前端
   * [JS闭包](/frontend/jsclosure.md)
