@@ -20,6 +20,7 @@
 * 分布式系统问题锦集
   * [分布式Session](/distributedSystem/distributedSession.md)
   * [一致Hash算法](/distributedSystem/consistentHash.md)
+  * [缓存一致性](/distributedSystem/cacheConsistent.md)
 
 * 框架
   * [Servlet](/structure/servlet.md)
@@ -63,6 +64,11 @@
 * 算法与数据结构
   * [常用排序算法总结](/algorithm/algorithmSummary.md)
   * [B树](/algorithm/BalancedTreeOfOrder.md)
+  * [红黑树](/algorithm/BalancedTreeOfOrder.md)
+  * [Hash树](/algorithm/HashTree.md)
+  * [前綴树](/algorithm/PrefixTree.md)
+  * [布隆過濾器](/algorithm/BloomFilter.md)
+  * [环形缓冲](/algorithm/RingBuffer.md)
 
 * 前端
   * [JS闭包](/frontend/jsclosure.md)
