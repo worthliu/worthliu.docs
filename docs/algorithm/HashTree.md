@@ -185,3 +185,135 @@
 哈希树可以广泛应用于那些需要对大容量数据进行快速匹配操作的地方。
 
 例如：数据库索引系统、短信息中的收条匹配、大量号码路由匹配、信息过滤匹配。哈希树不需要额外的平衡和防止退化的操作，效率十分理想。
+
+
+### 代码集
+
+``` 非线程安全
+public class HashTree {
+
+    /**
+     * 10连续不相同的质数,定义每层节点数
+     */
+    private static final int[] PRIME = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29};
+
+    /**
+     * hash树根节点
+     */
+    private final HashNode ROOT = new HashNode(null, null, PRIME[0]);
+
+    /**
+     * @param key
+     * @param value
+     */
+    public boolean insert(Integer key, Integer value) {
+        int level = 0;
+        HashNode curNode = this.ROOT;
+        while (true){
+            int remain = key % PRIME[level];
+            if (curNode.next[remain] == null){
+                // 当前节点为NULL,赋值操作
+                curNode.next[remain] = new HashNode(key, value, level + 1);
+                curNode.next[remain].occupied = true;
+                break;
+            }else if(curNode.next[remain].occupied){
+                // 当前节点已被占用,层级往下,继续求余
+                if(level >= 10){
+                    return false;
+                }
+                curNode = curNode.next[remain];
+                level++;
+            }else{
+                // 当前节点已被删除,直接占用
+                curNode.next[remain].key = key;
+                curNode.next[remain].value = value;
+                curNode.next[remain].occupied = true;
+                break;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @param key
+     * @return
+     */
+    public boolean delete(Integer key){
+        int level = 0;
+        HashNode targetNode;
+        HashNode curNode = this.ROOT;
+        while (true){
+            int remain = key % PRIME[level];
+            targetNode = curNode.next[remain];
+            if(targetNode == null){
+                break;
+            } else if(targetNode.occupied && targetNode.key.equals(key)){
+                targetNode.occupied = false;
+                break;
+            }else {
+                if(level >= 10){
+                    return false;
+                }
+                curNode = curNode.next[remain];
+                level++;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @param key
+     * @return
+     */
+    public HashNode search(Integer key){
+        int level = 0;
+        HashNode targetNode;
+        HashNode curNode = this.ROOT;
+        while (true){
+            int remain = key % PRIME[level];
+            targetNode = curNode.next[remain];
+            if(targetNode == null || (targetNode.occupied && targetNode.key.equals(key))){
+                break;
+            }else {
+                curNode = curNode.next[remain];
+                level++;
+            }
+        }
+        return targetNode;
+    }
+
+
+    /**
+     * Hashing Tree's node
+     */
+    private class HashNode {
+        private Integer key;
+
+        private Integer value;
+
+        private boolean occupied = false;
+
+        /**
+         * the level of current nodes
+         */
+        private int level;
+
+        /**
+         * 
+         */
+        private HashNode[] next;
+
+
+        public HashNode(Integer key, Integer value, int level) {
+            this.key = key;
+            this.value = value;
+            this.next = new HashNode[level];
+        }
+
+        public HashNode(Integer key, Integer value) {
+            this.key = key;
+            this.value = value;
+        }
+    }
+}
+```

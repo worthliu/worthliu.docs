@@ -16,6 +16,7 @@
   * [线程](/computer/concurrence/thread.md)
   * [线程池](/computer/concurrence/executor.md)
   * [Java通讯模型](/computer/io/connectModel.md)
+  * [JavaBase64](/computer/base/Base64.md)
 
 * 分布式系统问题锦集
   * [分布式Session](/distributedSystem/distributedSession.md)
