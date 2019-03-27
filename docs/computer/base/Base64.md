@@ -200,8 +200,23 @@ Base64.Decoder提出了几种解码字节序列的线程安全实例方法。将
 #### 示例
 
 ```
+        String msg = "Hello, Base64";
+        Base64.Encoder encoder = Base64.getEncoder();
+        byte[] encBytes = encoder.encode(msg.getBytes());
+        for (int i = 0; i < encBytes.length; i++){
+            System.out.printf("%c", encBytes[i]);
+            if(i != 0 && i % 4 == 0){
+                System.out.print(" ");
+            }
+        }
+        System.out.println();
+        Base64.Decoder decoder = Base64.getDecoder();
+        byte[] decBytes = decoder.decode(encBytes);
+        System.out.println(new String(decBytes));
 
 ```
 
 ```
+SGVsb G8sI EJhc 2U2N A==
+Hello, Base64
 ```
