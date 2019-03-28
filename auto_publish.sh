@@ -42,7 +42,7 @@ else
    git clean -fdx && git reset --hard
 fi
 
-git checkout -b ${branchInfo}
+git checkout  ${branchInfo}
 
 git pull origin  ${branchInfo}
 
