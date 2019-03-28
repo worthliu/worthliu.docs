@@ -15,6 +15,7 @@ export PATH
 pversion=`git branch --no-color 2>/dev/null | awk '{print $2}'`
 
 branchInfo=${pversion}
+
 echo -e "\033[49;31;1;5m current branch is ${pversion}...\033[0m"
 
 #########################################################################
@@ -22,11 +23,17 @@ echo -e "\033[49;31;1;5m current branch is ${pversion}...\033[0m"
 #########################################################################
 
 ## initialize current base path
+
 cd ..
+
 gitdir=`pwd`
+
 echo -e "\033[49;31;1;5m current base path is ${gitdir}...\033[0m"
+
 ###########################################
+
 cd  ${gitdir}
+
 if [ ! -d ${gitdir}/worthliu.docs ]; then
    git clone --branch=${branchInfo} --depth=1 git@github.com:worthliu/worthliu.docs.git
    cd ${gitdir}/worthliu.docs;
@@ -36,14 +43,16 @@ else
 fi
 
 git checkout -b ${branchInfo}
-#git pull origin mirror:mirror
+
 git pull origin  ${branchInfo}
 
 echo -e "\033[49;31;1;5m The code pulled successfully ...\033[0m"
 
 ########################################################################
+
 echo -e "\033[49;31;1;5m restart service beginning ...\033[0m"
 nohup bash ./start.sh &
+
 #
 git reset --hard && git clean -fdx
 
