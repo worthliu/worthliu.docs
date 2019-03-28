@@ -11,12 +11,20 @@ PATH=$NODE_HOME/bin:$PATH
 
 export PATH
 
+###
+
+publishdir=/home/git/worthliu.docs
+
+cd ${publishdir}
+
+echo -e "\033[49;31;1;5m current base path is [ `pwd` ] ...\033[0m"
+
 #从ruby上下文中获取分支版本信息
 pversion=`git branch --no-color 2>/dev/null | awk '{print $2}'`
 
 branchInfo=${pversion}
 
-echo -e "\033[49;31;1;5m current branch is ${pversion}...\033[0m"
+echo -e "\033[49;31;1;5m current branch is ${pversion} ...\033[0m"
 
 #########################################################################
 ##########     update code     ##########################################
@@ -28,7 +36,7 @@ cd ..
 
 gitdir=`pwd`
 
-echo -e "\033[49;31;1;5m current base path is ${gitdir}...\033[0m"
+echo -e "\033[49;31;1;5m current base path is [ `pwd` ] ...\033[0m"
 
 ###########################################
 
