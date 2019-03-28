@@ -13,6 +13,8 @@ export PATH
 
 ###
 
+originaldir=`pwd`
+
 publishdir=/home/git/worthliu.docs
 
 cd ${publishdir}
@@ -66,3 +68,5 @@ git reset --hard && git clean -fdx
 
 #
 cd ..
+
+cd ${originaldir}
