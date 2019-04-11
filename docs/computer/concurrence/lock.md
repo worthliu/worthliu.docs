@@ -15,13 +15,15 @@
 
 JDk中同步锁实现提供了两类：`synchronized` 和`Lock接口`
 
+### `synchronized`
 
+`synchronized`关键字简洁、清晰、语义明确，其应用层的语义是可以把任何一个非null对象 作为"锁".
 
+>+ 当`synchronized`作用在`方法`上时，锁住的便是`对象实例（this）`；
++ 当`synchronized`作用在`静态方法`时锁住的便是`对象对应的Class实例`，因为 Class数据存在于`永久带`(JDK8后更换成元数据区)，因此静态方法锁相当于该类的一个`全局锁`；
+`+ 当synchronized`作用于某一个对象实例时，锁住的便是对应的`代码块`;
 
-
-
-
-
+在 HotSpot JVM实现中，锁有个专门的名字：`对象监视器`。
 
 
 >* `synchronized`，编译器通过在编译字节码时，在临界区添加内存屏障，交由JVM控制；
