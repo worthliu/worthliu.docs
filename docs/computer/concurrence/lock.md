@@ -21,15 +21,15 @@ JDk中同步锁实现提供了两类：`synchronized` 和`Lock接口`
 
 >+ 当`synchronized`作用在`方法`上时，锁住的便是`对象实例（this）`；
 + 当`synchronized`作用在`静态方法`时锁住的便是`对象对应的Class实例`，因为 Class数据存在于`永久带`(JDK8后更换成元数据区)，因此静态方法锁相当于该类的一个`全局锁`；
-`+ 当synchronized`作用于某一个对象实例时，锁住的便是对应的`代码块`;
++ 当`synchronized`作用于某一个对象实例时，锁住的便是对应的`代码块`;
 
 在 HotSpot JVM实现中，锁有个专门的名字：`对象监视器`。
 
 #### `synchronized`底层语义
 
-Java 虚拟机中的同步(Synchronization)`基于进入和退出管程(Monitor)对象实现`，无论是显式同步(有明确的`monitorenter` 和 `monitorexit` 指令,即同步代码块)还是隐式同步都是如此。
+>Java 虚拟机中的同步(Synchronization)`基于进入和退出管程(Monitor)对象实现`，无论是显式同步(有明确的`monitorenter` 和 `monitorexit` 指令,即同步代码块)还是隐式同步都是如此。
 
-在 Java 语言中，同步用的最多的地方可能是被`synchronized`修饰的同步方法。同步方法并不是由`monitorenter`和`monitorexit`指令来实现同步的，而是由方法调用指令读取运行时常量池中方法的`ACC_SYNCHRONIZED`标志来隐式实现的;
+>在 Java 语言中，同步用的最多的地方可能是被`synchronized`修饰的同步方法。同步方法并不是由`monitorenter`和`monitorexit`指令来实现同步的，而是由方法调用指令读取运行时常量池中方法的`ACC_SYNCHRONIZED`标志来隐式实现的;
 
 
 ##### 理解`Java对象头`与`Monitor`关系
@@ -111,7 +111,7 @@ Java 虚拟机中的同步(Synchronization)`基于进入和退出管程(Monitor)
  <!--[endif]-->
 </tbody></table>
 
-其中轻量级锁和偏向锁是Java 6 对`synchronized`锁进行优化后新增加的;
+其中轻量级锁和偏向锁是`Java 6`对`synchronized`锁进行优化后新增加的;
 
 重量级锁也就是通常说`synchronized`的对象锁，锁标识位为`10`，其中指针指向的是`monitor`对象（也称为管程或监视器锁）的起始地址。每个对象都存在着一个`monitor`与之关联，对象与其`monitor`之间的关系有存在多种实现方式，如monitor可以与对象一起创建销毁或当线程试图获取对象锁时自动生成，但当一个`monitor`被某个线程持有后，它便处于锁定状态。
 
@@ -146,6 +146,38 @@ ObjectMonitor() {
 + 若线程调用`wait()` 方法，将释放当前持有的`monitor`，`owner`变量恢复为`null`，`count`自减1，同时该线程进入`WaitSet`集合中等待被唤醒。
 + 若当前线程执行完毕也将释放`monitor(锁)`并复位变量的值，以便其他线程进入获取`monitor(锁)`。
 
+
+#### `synchronized`代码块底层原理
+
+`synchronized`修饰代码块时,JDK编译字节码时会在代码块前后增加`monitorenter`和`monitorexit`指令:
+
+```
+3: monitorenter  //进入同步方法
+//..........省略其他  
+15: monitorexit   //退出同步方法
+16: goto          24
+//省略其他.......
+21: monitorexit //退出同步方法
+```
+
+从字节码中可知同步语句块的实现使用的是`monitorenter`和`monitorexit`指令;其中`monitorenter`指令指向同步代码块的开始位置，monitorexit指令则指明同步代码块的结束位置;
+
+当执行`monitorenter`指令时，当前线程将试图获取`objectref(即对象锁)`所对应的`monitor`的持有权，当`objectref`的`monitor`的进入计数器为`0，那线程可以成功取得`monitor`，并将计数器值设置为`1`，取锁成功。如果当前线程已经拥有`objectref`的`monitor`的持有权，那它可以重入这个`monitor`，重入时计数器的值也会加`1。
+
+倘若其他线程已经拥有`objectref`的`monitor`的所有权，那当前线程将被阻塞，直到正在执行线程执行完毕，即`monitorexit`指令被执行，执行线程将释放`monitor(锁)`并设置计数器值为`0` ，其他线程将有机会持有`monitor`。
+
+值得注意的是编译器将会确保无论方法通过何种方式完成，方法中调用过的每条`monitorenter`指令都有执行其对应`monitorexit`指令，而无论这个方法是正常结束还是异常结束。
+
+为了保证在方法异常完成时`monitorenter`和`monitorexit`指令依然可以正确配对执行，编译器会自动产生一个异常处理器，这个异常处理器声明可处理所有的异常，它的目的就是用来执行`monitorexit`指令。从字节码中也可以看出多了一个`monitorexit`指令，它就是异常结束时被执行的释放`monitor`的指令。
+
+
+#### synchronized方法底层原理
+
+方法级的同步是隐式，即无需通过字节码指令来控制的，它实现在方法调用和返回操作之中。
+
+JVM可以从方法常量池中的方法表结构(method_info Structure) 中的`ACC_SYNCHRONIZED`访问标志区分一个方法是否同步方法。
+
+当方法调用时，调用指令将会检查方法的`ACC_SYNCHRONIZED`访问标志是否被设置，如果设置了，执行线程将先持有monitor（虚拟机规范中用的是管程一词）， 然后再执行方法，最后再方法完成(无论是正常完成还是非正常完成)时释放monitor。在方法执行期间，执行线程持有了monitor，其他任何线程都无法再获得同一个monitor。如果一个同步方法执行期间抛 出了异常，并且在方法内部无法处理此异常，那这个同步方法所持有的monitor将在异常抛到同步方法之外时自动释放
 
 
 >* `synchronized`，编译器通过在编译字节码时，在临界区添加内存屏障，交由JVM控制；
