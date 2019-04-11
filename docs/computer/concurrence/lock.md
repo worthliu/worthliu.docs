@@ -53,7 +53,63 @@ Java 虚拟机中的同步(Synchronization)`基于进入和退出管程(Monitor)
 --|--|--|--|--|
 无锁状态|对象HashCode|对象分代年龄|`0`|`01`|
 
+由于对象头的信息是与对象自身定义的数据没有关系的额外存储成本，因此考虑到JVM的空间效率，Mark Word 被设计成为一个非固定的数据结构，以便存储更多有效的数据，它会根据对象本身的状态复用自己的存储空间，如32位JVM下，除了上述列出的Mark Word默认存储结构外，还有如下可能变化的结构：
 
+<table border="0" cellpadding="0" cellspacing="0" width="449" style="border-collapse:
+ collapse;table-layout:fixed;width:337pt">
+ <colgroup><col width="69" style="mso-width-source:userset;mso-width-alt:2446;width:52pt">
+ <col width="64" style="width:48pt">
+ <col width="47" style="mso-width-source:userset;mso-width-alt:1678;width:35pt">
+ <col width="100" span="2" style="mso-width-source:userset;mso-width-alt:3555;
+ width:75pt">
+ <col width="69" style="mso-width-source:userset;mso-width-alt:2446;width:52pt">
+ </colgroup><tbody><tr height="19" style="height:14.4pt">
+  <td rowspan="2" height="38" class="xl65" width="69" style="height:28.8pt;width:52pt">锁状态</td>
+  <td colspan="2" class="xl65" width="111" style="width:83pt">25bit</td>
+  <td rowspan="2" class="xl65" width="100" style="width:75pt">4bit</td>
+  <td class="xl65" width="100" style="width:75pt">1bit</td>
+  <td class="xl65" width="69" style="width:52pt">2bit</td>
+ </tr>
+ <tr height="19" style="height:14.4pt">
+  <td height="19" class="xl65" style="height:14.4pt">23bit</td>
+  <td class="xl65">2bit</td>
+  <td class="xl65">是否是偏向锁</td>
+  <td class="xl65">锁标志位</td>
+ </tr>
+ <tr height="19" style="height:14.4pt">
+  <td height="19" class="xl65" style="height:14.4pt">轻量级锁</td>
+  <td colspan="4" class="xl65">指向栈中锁记录的指针</td>
+  <td class="xl66">00</td>
+ </tr>
+ <tr height="19" style="height:14.4pt">
+  <td height="19" class="xl65" style="height:14.4pt">重量级锁</td>
+  <td colspan="4" class="xl65">指向互斥量(重量级锁)指针</td>
+  <td class="xl66">10</td>
+ </tr>
+ <tr height="19" style="height:14.4pt">
+  <td height="19" class="xl65" style="height:14.4pt">GC标记</td>
+  <td colspan="4" class="xl65">空</td>
+  <td class="xl66">11</td>
+ </tr>
+ <tr height="19" style="height:14.4pt">
+  <td height="19" class="xl65" style="height:14.4pt">偏向锁</td>
+  <td class="xl65">线程ID</td>
+  <td class="xl65">Epoch</td>
+  <td class="xl65">对象分代年龄</td>
+  <td class="xl65">1</td>
+  <td class="xl66">01</td>
+ </tr>
+ <!--[if supportMisalignedColumns]-->
+ <tr height="0" style="display:none">
+  <td width="69" style="width:52pt"></td>
+  <td width="64" style="width:48pt"></td>
+  <td width="47" style="width:35pt"></td>
+  <td width="100" style="width:75pt"></td>
+  <td width="100" style="width:75pt"></td>
+  <td width="69" style="width:52pt"></td>
+ </tr>
+ <!--[endif]-->
+</tbody></table>
 
 
 >* `synchronized`，编译器通过在编译字节码时，在临界区添加内存屏障，交由JVM控制；
