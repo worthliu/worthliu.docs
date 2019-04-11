@@ -53,7 +53,7 @@ Java 虚拟机中的同步(Synchronization)`基于进入和退出管程(Monitor)
 --|--|--|--|--|
 无锁状态|对象HashCode|对象分代年龄|`0`|`01`|
 
-由于对象头的信息是与对象自身定义的数据没有关系的额外存储成本，因此考虑到JVM的空间效率，Mark Word 被设计成为一个非固定的数据结构，以便存储更多有效的数据，它会根据对象本身的状态复用自己的存储空间，如32位JVM下，除了上述列出的Mark Word默认存储结构外，还有如下可能变化的结构：
+由于对象头的信息是与对象自身定义的数据没有关系的额外存储成本，因此考虑到JVM的空间效率，`Mark Word `被设计成为一个非固定的数据结构，以便存储更多有效的数据，它会根据对象本身的状态复用自己的存储空间，如32位JVM下，除了上述列出的`Mark Word`默认存储结构外，还有如下可能变化的结构：
 
 <table border="0" cellpadding="0" cellspacing="0" width="449" style="border-collapse:
  collapse;table-layout:fixed;width:337pt">
@@ -110,6 +110,42 @@ Java 虚拟机中的同步(Synchronization)`基于进入和退出管程(Monitor)
  </tr>
  <!--[endif]-->
 </tbody></table>
+
+其中轻量级锁和偏向锁是Java 6 对`synchronized`锁进行优化后新增加的;
+
+重量级锁也就是通常说`synchronized`的对象锁，锁标识位为`10`，其中指针指向的是`monitor`对象（也称为管程或监视器锁）的起始地址。每个对象都存在着一个`monitor`与之关联，对象与其`monitor`之间的关系有存在多种实现方式，如monitor可以与对象一起创建销毁或当线程试图获取对象锁时自动生成，但当一个`monitor`被某个线程持有后，它便处于锁定状态。
+
+在Java虚拟机(HotSpot)中，`monitor`是由`ObjectMonitor`实现的，其主要数据结构如下（位于HotSpot虚拟机源码`ObjectMonitor.hpp`文件，C++实现的）
+
+```
+ObjectMonitor() {
+    _header       = NULL;
+    _count        = 0; //记录个数
+    _waiters      = 0,
+    _recursions   = 0;
+    _object       = NULL;
+    _owner        = NULL;
+    _WaitSet      = NULL; //处于wait状态的线程，会被加入到该队列
+    _WaitSetLock  = 0 ;
+    _Responsible  = NULL ;
+    _succ         = NULL ;
+    _cxq          = NULL ;
+    FreeNext      = NULL ;
+    _EntryList    = NULL ; //处于等待锁block状态的线程，会被加入到该队列(阻塞状态)
+    _SpinFreq     = 0 ;
+    _SpinClock    = 0 ;
+    OwnerIsThread = 0 ;
+  }
+```
+
+`ObjectMonitor`中有两个队列，`_WaitSet`和`_EntryList`，用来保存`ObjectWaiter`对象列表(每个等待锁的线程都会被封装成`ObjectWaiter`对象);**`_owner`指向持有`ObjectMonitor`对象的线程;**
+
+>当多个线程同时访问一段同步代码时:
++ 首先会进入`_EntryList`集合;
++ 当线程获取到对象的`monitor`后,进入`_Owner`区域并把`monitor`中的`owner`变量设置为当前线程,同时`monitor`中的`计数器count`加1;
++ 若线程调用`wait()` 方法，将释放当前持有的`monitor`，`owner`变量恢复为`null`，`count`自减1，同时该线程进入`WaitSet`集合中等待被唤醒。
++ 若当前线程执行完毕也将释放`monitor(锁)`并复位变量的值，以便其他线程进入获取`monitor(锁)`。
+
 
 
 >* `synchronized`，编译器通过在编译字节码时，在临界区添加内存屏障，交由JVM控制；
