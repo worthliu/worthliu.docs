@@ -25,6 +25,18 @@ JDk中同步锁实现提供了两类：`synchronized` 和`Lock接口`
 
 在 HotSpot JVM实现中，锁有个专门的名字：`对象监视器`。
 
+#### `synchronized`底层语义
+
+Java 虚拟机中的同步(Synchronization)`基于进入和退出管程(Monitor)对象实现`，无论是显式同步(有明确的`monitorenter` 和 `monitorexit` 指令,即同步代码块)还是隐式同步都是如此。
+
+在 Java 语言中，同步用的最多的地方可能是被`synchronized`修饰的同步方法。同步方法并不是由`monitorenter`和`monitorexit`指令来实现同步的，而是由方法调用指令读取运行时常量池中方法的`ACC_SYNCHRONIZED`标志来隐式实现的;
+
+
+
+
+
+
+
 
 >* `synchronized`，编译器通过在编译字节码时，在临界区添加内存屏障，交由JVM控制；
 * `ReentrantLock`,可重入锁,调用`lock()`方法获取锁;调用`unlock()`方法释放锁;
