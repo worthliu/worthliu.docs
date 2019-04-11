@@ -13,41 +13,43 @@
 
 ## 锁内存语义的实现
 
-JDk中同步锁实现提供了两类：`synchronized` 和`Lock接口`
+JDk中同步锁实现提供了两种实现：`synchronized` 和`Lock接口`
 
 ### `synchronized`
 
-`synchronized`关键字简洁、清晰、语义明确，其应用层的语义是可以把任何一个非null对象 作为"锁".
+`synchronized`关键字简洁、清晰、语义明确，其应用层的语义是可以把任何一个非`null`对象作为"锁".
 
 >+ 当`synchronized`作用在`方法`上时，锁住的便是`对象实例（this）`；
-+ 当`synchronized`作用在`静态方法`时锁住的便是`对象对应的Class实例`，因为 Class数据存在于`永久带`(JDK8后更换成元数据区)，因此静态方法锁相当于该类的一个`全局锁`；
++ 当`synchronized`作用在`静态方法`时锁住的便是`对象对应的Class实例`，因为`Class`数据存在于`永久带`(`JDK8`后为元数据区)，因此静态方法锁相当于该类的一个`全局锁`；
 + 当`synchronized`作用于某一个对象实例时，锁住的便是对应的`代码块`;
 
-在 HotSpot JVM实现中，锁有个专门的名字：`对象监视器`。
+在`HotSpot JVM`实现中，锁有个专门的名字：`对象监视器`。
 
 #### `synchronized`底层语义
 
->Java 虚拟机中的同步(Synchronization)`基于进入和退出管程(Monitor)对象实现`，无论是显式同步(有明确的`monitorenter` 和 `monitorexit` 指令,即同步代码块)还是隐式同步都是如此。
+>Java虚拟机中的同步(Synchronization)`基于进入和退出管程(Monitor)对象实现`，无论是显式同步(有明确的`monitorenter` 和 `monitorexit` 指令,即`同步代码块`)还是隐式同步(`ACC_SYNCHRONIZED`标志)都是如此。
 
->在 Java 语言中，同步用的最多的地方可能是被`synchronized`修饰的同步方法。同步方法并不是由`monitorenter`和`monitorexit`指令来实现同步的，而是由方法调用指令读取运行时常量池中方法的`ACC_SYNCHRONIZED`标志来隐式实现的;
+>在 Java 语言中，同步用的最多的地方可能是被`synchronized`修饰的同步方法。
++ 同步方法并不是由`monitorenter`和`monitorexit`指令来实现同步的;
++ 而是由方法调用指令读取运行时常量池中方法的`ACC_SYNCHRONIZED`标志来隐式实现的;
 
 
 ##### 理解`Java对象头`与`Monitor`关系
 
-在JVM中，对象在内存中的布局分为三块区域：对象头、实例数据和对齐填充
+在JVM中，对象在内存中的布局分为三块区域：**对象头、实例数据和对齐填充**
 
-+ `实例变量`：存放类的属性数据信息，包括父类的属性信息，如果是数组的实例部分还包括数组的长度，这部分内存按4字节对齐;
++ `实例变量`：存放类的属性数据信息，包括父类的属性信息，如果是数组的实例部分还包括数组的长度，这部分内存按`4字节`对齐;
 + `填充数据`：由于虚拟机要求对象起始地址必须是8字节的整数倍。填充数据不是必须存在的，仅仅是为了字节对齐，这点了解即可;
-+ `Java头对象`:其主要结构是由Mark Word 和 Class Metadata Address 组成;
++ `Java头对象`:其主要结构是由`Mark Word`和`Class Metadata Address`组成;
 
-**Java头对象，它实现synchronized的锁对象的基础，一般而言，synchronized使用的锁对象是存储在Java对象头里的，jvm中采用2个字来存储对象头(如果对象是数组则会分配3个字，多出来的1个字记录的是数组长度)**
+**Java头对象，它实现`synchronized`的锁对象的基础，一般而言,`synchronized`使用的锁对象是存储在Java对象头里的，jvm中采用2个字来存储对象头(如果对象是数组则会分配3个字，多出来的1个字记录的是数组长度)**
 
 虚拟机位数|头对象结构|说明|
 --|--|--|
 `32/64bit`|`Mark Word`|存储对象的hashCode、锁信息或分代年龄或GC标志等信息|
 `32/64bit`|`Class Metadata Address`|类型指针指向对象的类元数据，JVM通过这个指针确定该对象是哪个类的实例|
 
-其中Mark Word在默认情况下存储着对象的HashCode、分代年龄、锁标记位等以下是32位JVM的Mark Word默认存储结构
+其中`Mark Word`在默认情况下存储着对象的HashCode、分代年龄、锁标记位等以下是32位JVM的`Mark Word`默认存储结构
 
 锁状态|`25bit`|`4bit`|`1bit是否是偏向锁`|`2bit锁标志位`|
 --|--|--|--|--|
@@ -55,50 +57,51 @@ JDk中同步锁实现提供了两类：`synchronized` 和`Lock接口`
 
 由于对象头的信息是与对象自身定义的数据没有关系的额外存储成本，因此考虑到JVM的空间效率，`Mark Word `被设计成为一个非固定的数据结构，以便存储更多有效的数据，它会根据对象本身的状态复用自己的存储空间，如32位JVM下，除了上述列出的`Mark Word`默认存储结构外，还有如下可能变化的结构：
 
-<table border="0" cellpadding="0" cellspacing="0" width="449" style="border-collapse:
- collapse;table-layout:fixed;width:337pt">
- <colgroup><col width="69" style="mso-width-source:userset;mso-width-alt:2446;width:52pt">
- <col width="64" style="width:48pt">
- <col width="47" style="mso-width-source:userset;mso-width-alt:1678;width:35pt">
- <col width="100" span="2" style="mso-width-source:userset;mso-width-alt:3555;
- width:75pt">
- <col width="69" style="mso-width-source:userset;mso-width-alt:2446;width:52pt">
- </colgroup><tbody><tr height="19" style="height:14.4pt">
-  <td rowspan="2" height="38" class="xl65" width="69" style="height:28.8pt;width:52pt">锁状态</td>
-  <td colspan="2" class="xl65" width="111" style="width:83pt">25bit</td>
-  <td rowspan="2" class="xl65" width="100" style="width:75pt">4bit</td>
-  <td class="xl65" width="100" style="width:75pt">1bit</td>
-  <td class="xl65" width="69" style="width:52pt">2bit</td>
- </tr>
- <tr height="19" style="height:14.4pt">
-  <td height="19" class="xl65" style="height:14.4pt">23bit</td>
-  <td class="xl65">2bit</td>
-  <td class="xl65">是否是偏向锁</td>
-  <td class="xl65">锁标志位</td>
- </tr>
- <tr height="19" style="height:14.4pt">
-  <td height="19" class="xl65" style="height:14.4pt">轻量级锁</td>
-  <td colspan="4" class="xl65">指向栈中锁记录的指针</td>
-  <td class="xl66">00</td>
- </tr>
- <tr height="19" style="height:14.4pt">
-  <td height="19" class="xl65" style="height:14.4pt">重量级锁</td>
-  <td colspan="4" class="xl65">指向互斥量(重量级锁)指针</td>
-  <td class="xl66">10</td>
- </tr>
- <tr height="19" style="height:14.4pt">
-  <td height="19" class="xl65" style="height:14.4pt">GC标记</td>
-  <td colspan="4" class="xl65">空</td>
-  <td class="xl66">11</td>
- </tr>
- <tr height="19" style="height:14.4pt">
-  <td height="19" class="xl65" style="height:14.4pt">偏向锁</td>
-  <td class="xl65">线程ID</td>
-  <td class="xl65">Epoch</td>
-  <td class="xl65">对象分代年龄</td>
-  <td class="xl65">1</td>
-  <td class="xl66">01</td>
- </tr>
+<table align="center" border="0" cellpadding="0" cellspacing="0" width="550" style="border-collapse:collapse;table-layout:fixed;width:400pt;align-content: center;">
+ <colgroup>
+  <col width="69" style="mso-width-source:userset;mso-width-alt:2446;width:52pt">
+  <col width="64" style="width:48pt">
+  <col width="47" style="mso-width-source:userset;mso-width-alt:1678;width:35pt">
+  <col width="100" span="2" style="mso-width-source:userset;mso-width-alt:3555;width:75pt">
+  <col width="69" style="mso-width-source:userset;mso-width-alt:2446;width:52pt">
+ </colgroup>
+ <tbody>
+  <tr height="19" style="height:14.4pt">
+   <td rowspan="2" height="38" class="xl65" width="69" style="height:28.8pt;width:52pt">锁状态</td>
+   <td colspan="2" class="xl65" width="111" style="width:83pt">25bit</td>
+   <td rowspan="2" class="xl65" width="100" style="width:75pt">4bit</td>
+   <td class="xl65" width="100" style="width:75pt">1bit</td>
+   <td class="xl65" width="69" style="width:52pt">2bit</td>
+  </tr>
+  <tr height="19" style="height:14.4pt">
+   <td height="19" class="xl65" style="height:14.4pt">23bit</td>
+   <td class="xl65">2bit</td>
+   <td class="xl65">是否是偏向锁</td>
+   <td class="xl65">锁标志位</td>
+  </tr>
+  <tr height="19" style="height:14.4pt">
+   <td height="19" class="xl65" style="height:14.4pt">轻量级锁</td>
+   <td colspan="4" class="xl65">指向栈中锁记录的指针</td>
+   <td class="xl66">00</td>
+  </tr>
+  <tr height="19" style="height:14.4pt">
+   <td height="19" class="xl65" style="height:14.4pt">重量级锁</td>
+   <td colspan="4" class="xl65">指向互斥量(重量级锁)指针</td>
+   <td class="xl66">10</td>
+  </tr>
+  <tr height="19" style="height:14.4pt">
+   <td height="19" class="xl65" style="height:14.4pt">GC标记</td>
+   <td colspan="4" class="xl65">空</td>
+   <td class="xl66">11</td>
+  </tr>
+  <tr height="19" style="height:14.4pt">
+   <td height="19" class="xl65" style="height:14.4pt">偏向锁</td>
+   <td class="xl65">线程ID</td>
+   <td class="xl65">Epoch</td>
+   <td class="xl65">对象分代年龄</td>
+   <td class="xl65">1</td>
+   <td class="xl66">01</td>
+  </tr>
  <!--[if supportMisalignedColumns]-->
  <tr height="0" style="display:none">
   <td width="69" style="width:52pt"></td>
@@ -109,7 +112,8 @@ JDk中同步锁实现提供了两类：`synchronized` 和`Lock接口`
   <td width="69" style="width:52pt"></td>
  </tr>
  <!--[endif]-->
-</tbody></table>
+</tbody>
+</table>
 
 其中轻量级锁和偏向锁是`Java 6`对`synchronized`锁进行优化后新增加的;
 
@@ -160,24 +164,53 @@ ObjectMonitor() {
 21: monitorexit //退出同步方法
 ```
 
-从字节码中可知同步语句块的实现使用的是`monitorenter`和`monitorexit`指令;其中`monitorenter`指令指向同步代码块的开始位置，monitorexit指令则指明同步代码块的结束位置;
+**从字节码中可知同步语句块的实现使用的是`monitorenter`和`monitorexit`指令;其中`monitorenter`指令指向同步代码块的开始位置，`monitorexit`指令则指明同步代码块的结束位置;**
 
-当执行`monitorenter`指令时，当前线程将试图获取`objectref(即对象锁)`所对应的`monitor`的持有权，当`objectref`的`monitor`的进入计数器为`0，那线程可以成功取得`monitor`，并将计数器值设置为`1`，取锁成功。如果当前线程已经拥有`objectref`的`monitor`的持有权，那它可以重入这个`monitor`，重入时计数器的值也会加`1。
++ 当执行`monitorenter`指令时，当前线程将试图获取`objectref(即对象锁)`所对应的`monitor`的持有权;
++ 当`objectref`的`monitor`的进入计数器为`0`，那线程可以成功取得`monitor`，并将计数器值设置为`1`，取锁成功。
++ 如果当前线程已经拥有`objectref`的`monitor`的持有权，那它可以重入这个`monitor`，重入时计数器的值也会加`1`。
++ 倘若其他线程已经拥有`objectref`的`monitor`的所有权，那当前线程将被阻塞，直到正在执行线程执行完毕，即`monitorexit`指令被执行，执行线程将释放`monitor(锁)`并设置计数器值为`0` ，其他线程将有机会持有`monitor`。
 
-倘若其他线程已经拥有`objectref`的`monitor`的所有权，那当前线程将被阻塞，直到正在执行线程执行完毕，即`monitorexit`指令被执行，执行线程将释放`monitor(锁)`并设置计数器值为`0` ，其他线程将有机会持有`monitor`。
-
-值得注意的是编译器将会确保无论方法通过何种方式完成，方法中调用过的每条`monitorenter`指令都有执行其对应`monitorexit`指令，而无论这个方法是正常结束还是异常结束。
+**值得注意的是编译器将会确保无论方法通过何种方式完成，方法中调用过的每条`monitorenter`指令都有执行其对应`monitorexit`指令，而无论这个方法是正常结束还是异常结束。**
 
 为了保证在方法异常完成时`monitorenter`和`monitorexit`指令依然可以正确配对执行，编译器会自动产生一个异常处理器，这个异常处理器声明可处理所有的异常，它的目的就是用来执行`monitorexit`指令。从字节码中也可以看出多了一个`monitorexit`指令，它就是异常结束时被执行的释放`monitor`的指令。
 
 
 #### synchronized方法底层原理
 
-方法级的同步是隐式，即无需通过字节码指令来控制的，它实现在方法调用和返回操作之中。
+**方法级的同步是隐式，即无需通过字节码指令来控制的，它实现在方法调用和返回操作之中。**
 
-JVM可以从方法常量池中的方法表结构(method_info Structure) 中的`ACC_SYNCHRONIZED`访问标志区分一个方法是否同步方法。
+JVM可以从**方法常量池**中的**方法表结构(method_info Structure)**中的`ACC_SYNCHRONIZED`访问标志区分一个方法是否同步方法。
 
-当方法调用时，调用指令将会检查方法的`ACC_SYNCHRONIZED`访问标志是否被设置，如果设置了，执行线程将先持有monitor（虚拟机规范中用的是管程一词）， 然后再执行方法，最后再方法完成(无论是正常完成还是非正常完成)时释放monitor。在方法执行期间，执行线程持有了monitor，其他任何线程都无法再获得同一个monitor。如果一个同步方法执行期间抛 出了异常，并且在方法内部无法处理此异常，那这个同步方法所持有的monitor将在异常抛到同步方法之外时自动释放
+>+ 当方法调用时，调用指令将会检查方法的`ACC_SYNCHRONIZED`访问标志是否被设置;
++ 如果设置了，执行线程将先持有`monitor`（虚拟机规范中用的是管程一词）， 然后再执行方法，最后再方法完成(无论是正常完成还是非正常完成)时释放`monitor`。
++ 在方法执行期间，执行线程持有了`monitor`，其他任何线程都无法再获得同一个`monitor`。
++ 如果一个同步方法执行期间抛 出了异常，并且在方法内部无法处理此异常，那这个同步方法所持有的monitor将在异常抛到同步方法之外时自动释放;
+
+```
+//==================syncTask方法======================
+  public synchronized void syncTask();
+    descriptor: ()V
+    //方法标识ACC_PUBLIC代表public修饰，ACC_SYNCHRONIZED指明该方法为同步方法
+    flags: ACC_PUBLIC, ACC_SYNCHRONIZED
+    Code:
+      stack=3, locals=1, args_size=1
+         0: aload_0
+         1: dup
+         2: getfield      #2                  // Field i:I
+         5: iconst_1
+         6: iadd
+         7: putfield      #2                  // Field i:I
+        10: return
+      LineNumberTable:
+        line 12: 0
+        line 13: 10
+}
+```
+从字节码中可以看出，`synchronized`修饰的方法并没有`monitorenter`指令和`monitorexit`指令，取得代之的确实是`ACC_SYNCHRONIZED`标识，该标识指明了该方法是一个同步方法，JVM通过该`ACC_SYNCHRONIZED`访问标志来辨别一个方法是否声明为同步方法，从而执行相应的同步调用。
+
+
+>**在Java早期版本中，`synchronized`属于重量级锁，效率低下，因为监视器锁（`monitor`）是依赖于底层的操作系统的`Mutex Lock`来实现的，而操作系统实现线程之间的切换时需要从用户态转换到核心态，这个状态之间的转换需要相对比较长的时间，时间成本相对较高，这也是为什么早期的`synchronized`效率低的原因。**
 
 
 >* `synchronized`，编译器通过在编译字节码时，在临界区添加内存屏障，交由JVM控制；
