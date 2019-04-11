@@ -1,6 +1,6 @@
 # 锁
 
-## 锁的释放-获取建立的happens-before关系
+## 锁的`释放-获取`建立的`happens-before`关系
 
 锁是java并发编程中最重要的同步机制，锁除了让临界区互斥执行外，还可以让释放锁的线程向获取同一个锁的线程发送消息；
 
@@ -13,7 +13,17 @@
 
 ## 锁内存语义的实现
 
-JDk中锁实现有两种：
+JDk中同步锁实现提供了两类：`synchronized` 和`Lock接口`
+
+
+
+
+
+
+
+
+
+
 >* `synchronized`，编译器通过在编译字节码时，在临界区添加内存屏障，交由JVM控制；
 * `ReentrantLock`,可重入锁,调用`lock()`方法获取锁;调用`unlock()`方法释放锁;
   * `ReentrantLock`的实现依赖于Java同步器框架`AbstractQueuedSynchronizer`(AQS).AQS使用一个整型的`volatile`变量(命名为`state`)来维护同步状态;
