@@ -264,3 +264,18 @@ JVM可以从**方法常量池**中的**方法表结构(method_info Structure)**�
 在java中 `synchronized`是基于原子性的内部锁机制，是可重入的，因此在一个线程调用 `synchronized`方法的同时在其方法体内部调用该对象另一个 `synchronized`方法，也就是说一个线程得到一个对象锁后再次请求该对象锁，是允许的，这就是 `synchronized`的可重入性。
 
 
+**偏向锁获取流程**
+
+![biasedLock.png](/image/biasedLock.png)
+
+**偏向锁发生冲突流程**
+
+![biasedLockConflict.png](/image/biasedLockConflict.png)
+
+**轻量级锁获取流程**
+
+![LightweightLock.png](/image/LightweightLock.png)
+
+**锁变化过程中Java对象头标签变化**
+
+![lockStatusChange.png](/image/lockStatusChange.png)
