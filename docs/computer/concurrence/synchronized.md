@@ -27,7 +27,7 @@ JDk中同步锁实现提供了两种实现：`synchronized` 和`Lock接口`
 
 #### `synchronized`底层语义
 
->Java虚拟机中的同步(Synchronization)`基于进入和退出管程(Monitor)对象实现`，无论是显式同步(有明确的`monitorenter` 和 `monitorexit` 指令,即`同步代码块`)还是隐式同步(`ACC_SYNCHRONIZED`标志)都是如此。
+>Java虚拟机中的同步(Synchronization)`基于进入和退出管程(Monitor)对象实现`，无论是显式同步(有明确的`monitorenter` 和 `monitorexit` 指令,即`同步代码块`)还是隐式同步(`ACC_SYNCHRONIZED标志`)都是如此。
 
 >在 Java 语言中，同步用的最多的地方可能是被`synchronized`修饰的同步方法。
 + 同步方法并不是由`monitorenter`和`monitorexit`指令来实现同步的;
@@ -142,7 +142,9 @@ ObjectMonitor() {
   }
 ```
 
-`ObjectMonitor`中有两个队列，`_WaitSet`和`_EntryList`，用来保存`ObjectWaiter`对象列表(每个等待锁的线程都会被封装成`ObjectWaiter`对象);**`_owner`指向持有`ObjectMonitor`对象的线程;**
+>+ `ObjectMonitor`中有两个队列，`_WaitSet`和`_EntryList`，用来保存`ObjectWaiter`对象列表(每个等待锁的线程都会被封装成`ObjectWaiter`对象);
++ **`_owner`指向持有`ObjectMonitor`对象的线程;**
+
 
 >当多个线程同时访问一段同步代码时:
 + 首先会进入`_EntryList`集合;
@@ -173,7 +175,9 @@ ObjectMonitor() {
 
 **值得注意的是编译器将会确保无论方法通过何种方式完成，方法中调用过的每条`monitorenter`指令都有执行其对应`monitorexit`指令，而无论这个方法是正常结束还是异常结束。**
 
-为了保证在方法异常完成时`monitorenter`和`monitorexit`指令依然可以正确配对执行，编译器会自动产生一个异常处理器，这个异常处理器声明可处理所有的异常，它的目的就是用来执行`monitorexit`指令。从字节码中也可以看出多了一个`monitorexit`指令，它就是异常结束时被执行的释放`monitor`的指令。
+为了保证在方法异常完成时`monitorenter`和`monitorexit`指令依然可以正确配对执行，编译器会自动产生一个异常处理器，这个异常处理器声明可处理所有的异常，它的目的就是用来执行`monitorexit`指令。
+
+从字节码中也可以看出多了一个`monitorexit`指令，它就是异常结束时被执行的释放`monitor`的指令。
 
 
 #### synchronized方法底层原理
