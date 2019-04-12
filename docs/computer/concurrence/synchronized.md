@@ -266,16 +266,16 @@ JVM可以从**方法常量池**中的**方法表结构(method_info Structure)**�
 
 **偏向锁获取流程**
 
-![biasedLock.png](/image/biasedLock.png)
+![biasedLock.png](/images/biasedLock.png)
 
 **偏向锁发生冲突流程**
 
-![biasedLockConflict.png](/image/biasedLockConflict.png)
+![biasedLockConflict.png](/images/biasedLockConflict.png)
 
 **轻量级锁获取流程**
 
-![LightweightLock.png](/image/LightweightLock.png)
+![LightweightLock.png](/images/LightweightLock.png)
 
 **锁变化过程中Java对象头标签变化**
 
-![lockStatusChange.png](/image/lockStatusChange.png)
+![lockStatusChange.png](/images/lockStatusChange.png)
