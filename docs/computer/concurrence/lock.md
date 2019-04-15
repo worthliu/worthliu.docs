@@ -130,15 +130,27 @@ static final class Node {
 
 变量`waitStatus`则表示当前被封装成`Node`结点的等待状态，共有4种取值`CANCELLED`、`SIGNAL`、`CONDITION`、`PROPAGATE`。
 
->+ `CANCELLED`：值为1，在同步队列中等待的线程等待超时或被中断，需要从同步队列中取消该`Node`的结点，其结点的`waitStatus`为`CANCELLED`，即结束状态，进入该状态后的结点将不会再变化。
-+ `SIGNAL`：值为-1，被标识为该等待唤醒状态的后继结点，当其前继结点的线程释放了同步锁或被取消，将会通知该后继结点的线程执行。说白了，就是处于唤醒状态，只要前继结点释放锁，就会通知标识为SIGNAL状态的后继结点的线程执行。
-+ `CONDITION`：值为-2，与 `Condition`相关，该标识的结点处于等待队列中，结点的线程等待在 `Condition`上，当其他线程调用了`Condition`的`signal()`方法后，`CONDITION`状态的结点将从等待队列转移到同步队列中，等待获取同步锁。
-+ `ROPAGATE`：值为-3，与共享模式相关，在共享模式中，该状态标识结点的线程处于可运行状态。
-+ `0状态`：值为0，代表初始化状态。
+>+ `CANCELLED`：值为`1`，在同步队列中等待的线程等待超时或被中断，需要从同步队列中取消该`Node`的结点，其结点的`waitStatus`为`CANCELLED`，即结束状态，进入该状态后的结点将不会再变化。
++ `SIGNAL`：值为`-1`，被标识为该等待唤醒状态的后继结点，当其前继结点的线程释放了同步锁或被取消，将会通知该后继结点的线程执行。说白了，就是处于唤醒状态，只要前继结点释放锁，就会通知标识为SIGNAL状态的后继结点的线程执行。
++ `CONDITION`：值为`-2`，与 `Condition`相关，该标识的结点处于等待队列中，结点的线程等待在 `Condition`上，当其他线程调用了`Condition`的`signal()`方法后，`CONDITION`状态的结点将从等待队列转移到同步队列中，等待获取同步锁。
++ `ROPAGATE`：值为`-3`，与共享模式相关，在共享模式中，该状态标识结点的线程处于可运行状态。
 
 我们从JDK源码中,可以查看`ReentrantLock`类结构:
 
 ![ReentrantLock.AQS](/images/ReentrantLock.AQS.png)
+
++ `AbstractOwnableSynchronizer`：定义了存储独占当前锁的线程和获取的方法
++ `AbstractQueuedSynchronizer`：抽象类，AQS框架核心类，其内部以虚拟队列的方式管理线程的锁获取与锁释放，其中获取锁(`tryAcquire`方法)和释放锁(`tryRelease`方法)并没有提供默认实现，需要子类重写这两个方法实现具体逻辑;
+  + `Node`：`AbstractQueuedSynchronizer`的内部类，用于构建虚拟队列(链表双向链表)，管理需要获取锁的线程。
++ `ReentrantLock`：实现了`Lock`接口的，其内部类有`Sync`、`NonfairSync`、`FairSync`，在创建时可以根据`fair参数`决定创建`NonfairSync`(默认非公平锁)还是`FairSync`。
+  + `Sync`：抽象类，是`ReentrantLock`的内部类，继承自`AbstractQueuedSynchronizer`，实现了释放锁的操作(`tryRelease()`方法)，并提供了`lock`抽象方法，由其子类实现。
+  + `NonfairSync`：是`ReentrantLock`的内部类，继承自`Sync`，非公平锁的实现类。
+  + `FairSync`：是`ReentrantLock`的内部类，继承自`Sync`，公平锁的实现类。
+
+
+#### `ReetrantLock`,`AQS`独占模式实现
+
+`AQS同步器`的实现依赖于内部的同步队列(FIFO的双向链表对列)完成对同步状态(state)的管理，当前线程获取锁(同步状态)失败时，**AQS会将该线程以及相关等待信息包装成一个节点(Node)并将其加入同步队列，同时会阻塞当前线程**，当同步状态释放时，会将`头结点head`中的线程唤醒，让其尝试获取同步状态。
 
 ReentrantLock分为公平锁和非公平锁:
 >* 使用公平锁时,加锁方法`lock()`的方法调用轨迹如下:
@@ -146,41 +158,224 @@ ReentrantLock分为公平锁和非公平锁:
   2. `FairSync:lock()`
   3. `AbstractQueuedSynchronizer:accquire(int arg)`
   4. `ReentrantLock:tryAcquire(int acquires)`
-![tryAcquire](/images/tryAcquire.png)
+```
+    protected final boolean tryAcquire(int acquires) {
+        final Thread current = Thread.currentThread();
+        //获取锁的开始,首先读取volatile变量state
+        int c = getState();
+        if (c == 0) {
+            // 判断是否已有线程等待获取锁
+            // 若无,则CAS操作替换state值为1
+            if (!hasQueuedPredecessors() &&
+                compareAndSetState(0, acquires)) {
+                // 获取锁成功,设置独占线程对象
+                setExclusiveOwnerThread(current);
+                return true;
+            }
+        }
+        // 请求锁线程是当前已获得锁线程,重入操作,状态值加一
+        else if (current == getExclusiveOwnerThread()) {
+            int nextc = c + acquires;
+            if (nextc < 0)
+                throw new Error("Maximum lock count exceeded");
+            setState(nextc);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+    * 判断内部队列里面是否存在长时间等待获取锁的线程
+    */
+    public final boolean hasQueuedPredecessors() {
+        Node t = tail; // Read fields in reverse initialization order
+        Node h = head;
+        Node s;
+        return h != t &&
+            ((s = h.next) == null || s.thread != Thread.currentThread());
+    }
+```
 
 >* 使用公平锁时,解锁方法`unlock()`的方法调用轨迹如下:
   1. `ReentrantLock:unlock()`
   2. `AbstractQueuedSychronizer:release(int arg)`
+```
+    public final boolean release(int arg) {
+        // 释放锁
+        if (tryRelease(arg)) {
+            Node h = head;
+            if (h != null && h.waitStatus != 0)
+                unparkSuccessor(h);
+            return true;
+        }
+        return false;
+    }
+```
   3. `Sync:tryRelease(int releases)`
-![tryRelease](/images/tryRelease.png)
+```
+    protected final boolean tryRelease(int releases) {
+        // 获得释放锁后的状态值
+        int c = getState() - releases;
+        // 判断线程对象是否独占锁线程;
+        if (Thread.currentThread() != getExclusiveOwnerThread())
+            throw new IllegalMonitorStateException();
+        boolean free = false;
+        // 状态值为0,释放独占线程对象
+        if (c == 0) {
+            free = true;
+            setExclusiveOwnerThread(null);
+        }
+        // 设置状态值
+        setState(c);
+        return free;
+    }
+```
 
-(公平锁在释放锁的最后写`volatile`变量`state`;
- 在获取锁时首先读这个volatile变量.**根据volatile的happens-before规则,释放锁的线程在写volatile变量之前可见的共享变量,在获取锁的线程读取同一个volatile变量后将立即变的对获取锁的线程可见**)
+>公平锁在释放锁的最后写`volatile`变量`state`;
+ 在获取锁时首先读这个`volatile`变量.**根据`volatile`的`happens-before`规则,释放锁的线程在写`volatile`变量之前可见的共享变量,在获取锁的线程读取同一个`volatile`变量后将立即变的对获取锁的线程可见**
 
 >* 使用非公平锁时,加锁方法lock()的方法调用轨迹如下:
   1. `ReentrantLock:lock()`
   2. `NonfairSync:lock()`
-  3. `AbstractQueuedSynchronizer:compareAndSetState(int expect, int update)`
-![compareAndSwapInt](/images/compareAndSwapInt.png) 
+```
+    final void lock() {
+        // 非公平锁,先直接设置状态值和独占线程对象
+        if (compareAndSetState(0, 1))
+            setExclusiveOwnerThread(Thread.currentThread());
+        else
+        // 失败再次获取锁操作
+            acquire(1);
+    }
+
+
+    public final void acquire(int arg) {
+        // 尝试获取锁操作,失败
+        if (!tryAcquire(arg) &&
+            acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
+            selfInterrupt();
+    }
+
+
+    protected final boolean tryAcquire(int acquires) {
+        return nonfairTryAcquire(acquires);
+    }
+
+    // 获取锁失败,将当前线程包装成Node节点,塞入同步队列中
+    private Node addWaiter(Node mode) {
+        // 将请求同步状态失败的线程封装成结点
+        Node node = new Node(Thread.currentThread(), mode);
+        // Try the fast path of enq; backup to full enq on failure
+        Node pred = tail;
+        // 尝试快速在队列尾部插入
+        if (pred != null) {
+            node.prev = pred;
+            // 使用CAS执行尾部结点替换,尝试在尾部快速添加
+            if (compareAndSetTail(pred, node)) {
+                pred.next = node;
+                return node;
+            }
+        }
+        // 如果第一次加入或者CAS操作没有成功执行enq入队操作
+        enq(node);
+        return node;
+    }
+
+    final boolean nonfairTryAcquire(int acquires) {
+        final Thread current = Thread.currentThread();
+        int c = getState();
+        if (c == 0) {
+            if (compareAndSetState(0, acquires)) {
+                setExclusiveOwnerThread(current);
+                return true;
+            }
+        }
+        else if (current == getExclusiveOwnerThread()) {
+            int nextc = c + acquires;
+            if (nextc < 0) // overflow
+                throw new Error("Maximum lock count exceeded");
+            setState(nextc);
+            return true;
+        }
+        return false;
+    }
+
+    // 自旋不断获取锁
+    final boolean acquireQueued(final Node node, int arg) {
+        boolean failed = true;
+        try {
+            boolean interrupted = false;
+            for (;;) {
+                // 前驱结点
+                final Node p = node.predecessor();
+                if (p == head && tryAcquire(arg)) {
+                    setHead(node);
+                    p.next = null; // help GC
+                    failed = false;
+                    return interrupted;
+                }
+                // 如果前驱结点不是head,判断是否挂起线程
+                if (shouldParkAfterFailedAcquire(p, node) &&
+                    parkAndCheckInterrupt())
+                    interrupted = true;
+            }
+        } finally {
+            if (failed)
+               // 若没有获取同步状态,结束该线程的请求
+                cancelAcquire(node);
+        }
+    }
+```
+
+### `CAS`原子操作
 
 >* 编译器不会对`volatile`读与`volatile`读后面的任意内存操作重排序;
 * 编译器不会对`volatile`写与`volatile`写前面的任意内存操作重排序;
 
 **(为了同时是实现`volatile`读和`volatile`写的内存语义,编译器不能对CAS与CAS前面和后面的任意内存操作重排序)**
 
-![casSource](/images/casSource.png)
+```
+public final native boolean compareAndSwapInt(Object o, long offset, int expected, int x);
+```
+
+可以看到这是个本地方法调用,这个本地方法在openjdk中依次调用的c++代码为:`unsafe.cpp`,`atomic.cpp`,`atomic_windows_x86.inline.hpp`
+
+```
+// Adding a lock prefix to an instruction on MP machine
+// VC++ doesn't like the lock prefix to be on a single line
+// so we can't insert a label after the lock prefix.
+// By emitting a lock prefix, we can define a label after it.
+#define LOCK_IF_MP(mp) __asm cmp mp, 0  \
+                       __asm je L0      \
+                       __asm _emit 0xF0 \
+                       __asm L0:
 
 
->如源代码所示,程序会根据当前处理器的类型来决定是否为cmpxchg指令添加lock前缀.如果程序时在多处理器上运行,就为cmpxchg指令加上lock前缀(lock cmpxchg).反之,不需要lock前缀提供的内存屏障效果.
 
->Intel的手册对lock前缀的说明:
-1. 确保对内存的读-改-写操作源自执行.*在Pentium及Pentium之前的处理器中,带有lock前缀的指令在执行期间会锁住总线,使得其他处理器暂时无法通过总线访问内存.
-  * 从Pentium 4 ,Intel Xeon及P6处理器开始,Intel在原有总线锁的基础上做了一个很有意义的优化:如果要访问的内存区域在lock前缀指令执行期间已经在处理器内部的缓存中被锁定(即包含改内存区域的缓存行当前处于独占或以修改状态),并且该内存被完成包含在单个缓存行中,那么处理器将直接执行该指令.
-  * **由于在指令执行期间该缓存行一直被锁定,其他处理器无法读/写该指令要访问的内存区域,因此能保证指令执行的原子性.**缓存锁定将大大降低lock前缀指令的执行开销,但是当多处理器之间的竞争程度很高或者指令访问的内存地址未对齐时,仍然会锁住总线;
+inline jint     Atomic::cmpxchg    (jint     exchange_value, volatile jint*     dest, jint     compare_value) {
+  // alternative for InterlockedCompareExchange
+  int mp = os::is_MP();
+  __asm {
+    mov edx, dest
+    mov ecx, exchange_value
+    mov eax, compare_value
+    LOCK_IF_MP(mp)
+    cmpxchg dword ptr [edx], ecx
+  }
+}
+
+```
+
+>如源代码所示,程序会根据当前处理器的类型来决定是否为`cmpxchg`指令添加`lock`前缀.如果程序时在多处理器上运行,就为`cmpxchg`指令加上`lock`前缀(`lock cmpxchg`).反之,不需要`lock`前缀提供的内存屏障效果.
+
+>**`Intel`的手册对`lock`前缀的说明:**
+1. 确保对内存的读-改-写操作源自执行.在`Pentium`及`Pentium`之前的处理器中,带有lock前缀的指令在执行期间会锁住总线,使得其他处理器暂时无法通过总线访问内存.
+  + 从`Pentium 4` ,`Intel Xeon`及`P6`处理器开始,`Intel`在原有总线锁的基础上做了一个很有意义的优化:
+    + 如果要访问的内存区域在`lock前缀指令执行期间已经在处理器内部的缓存中被锁定(即包含改内存区域的缓存行当前处于独占或以修改状态),并且该内存被完成包含在单个缓存行中,那么处理器将直接执行该指令.
+  + **由于在指令执行期间该缓存行一直被锁定,其他处理器无法读/写该指令要访问的内存区域,因此能保证指令执行的原子性.**
+  + 缓存锁定将大大降低lock前缀指令的执行开销,但是当多处理器之间的竞争程度很高或者指令访问的内存地址未对齐时,仍然会锁住总线;
 2. 禁止该指令与之前和之后的读和写指令重排序;
 3. 把写缓冲区中所有数据刷新到内存中;
 
----
 
 >公平锁和非公平锁的内存语义总结:
 1. 公平锁和非公平锁释放时,最后都要写一个`volatile`变量state;
@@ -189,20 +384,20 @@ ReentrantLock分为公平锁和非公平锁:
 
 ## concurrent包的实现
 
-由于Java的CAS同时具有volatile读和volatile写的内存语义,因此Java线程之间的通信现在有了下面四种方式:
->1. A线程写volatile变量,随后B线程读这个volatile变量;
-2. A线程写volatile变量,随后B线程用CAS更新这个volatile变量;
-3. A线程用CAS更新一个volatile变量,随后B线程用CAS更新这个volatile变量;
-4. A线程用CAS更新一个volatile变量,随后B线程读这个volatile变量;
+由于Java的`CAS`同时具有`volatile`读和`volatile`写的内存语义,因此Java线程之间的通信现在有了下面四种方式:
+>1. A线程写`volatile`变量,随后B线程读这个`volatile`变量;
+2. A线程写`volatile`变量,随后B线程用CAS更新这个`volatile`变量;
+3. A线程用CAS更新一个`volatile`变量,随后B线程用CAS更新这个`volatile`变量;
+4. A线程用CAS更新一个`volatile`变量,随后B线程读这个`volatile`变量;
 
-***Java的CAS会使用现代处理器上提供的高效机器级别原子指令,这些原子指令以原子方式对内存执行读-改-写操作,只是在多处理器中实现同步的关键来说,能够支持原子性读-改-写指令的计算器,是顺序计算图灵机的异步等价机器;***
+***Java的`CAS`会使用现代处理器上提供的高效机器级别原子指令,这些原子指令以原子方式对内存执行读-改-写操作,只是在多处理器中实现同步的关键来说,能够支持原子性读-改-写指令的计算器,是顺序计算图灵机的异步等价机器;***
 
-同时,volatile变量的读/写和CAS可以实现线程之间的通信.这形成呢整个concurrent包得以实现的基石.
->concurrent包的源代码实现,会发现一个通用化的实现模式:
+同时,`volatile`变量的读/写和`CAS`可以实现线程之间的通信.这形成呢整个`concurrent`包得以实现的基石.
+>`concurrent`包的源代码实现,会发现一个通用化的实现模式:
 1. 首先,声明共享变量为`volatile`;
 2. 然后,使用CAS的原子条件更新来实现线程之间的同步;
 3. 同时配合以`volatile`的读/写和CAS所具有的`volatile`读和写的内存语义来实现线程之间的通信;
 
->AQS,非阻塞数据结构和原子变量类(`java.util.concurrent.atomic`包中的类)
+>`AQS`,非阻塞数据结构和原子变量类(`java.util.concurrent.atomic`包中的类)
 
 ![cas](/images/cas.png)
