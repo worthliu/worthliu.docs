@@ -21,9 +21,18 @@ public final class String
 ，以包含修改后的字符串内容，而最初的`String对象`则丝毫未动；
 
 ```
+	public static String upcase(String str){
+        return str.toUpperCase();
+    }
 
+    public static void main(String[] args){
+        String q = "howdy";
+        System.out.println(q);
+        //
+        String qq = upcase(q);
+        System.out.println(qq);
+        System.out.println(q);
+    }
 ```
 
-
-![Immutability](/images/Immutability.jpg)
-
+上述示例中,当把q传给`upcase()`方法时,实际传递的是引用的一个拷贝.其实,每当把`String`对象作为方法的参数时,都会复制一份引用,而该引用所指的对象其实一直待在单一的物理位置上,从未动过;
