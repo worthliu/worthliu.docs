@@ -158,6 +158,7 @@ ReentrantLock分为公平锁和非公平锁:
   2. `FairSync:lock()`
   3. `AbstractQueuedSynchronizer:accquire(int arg)`
   4. `ReentrantLock:tryAcquire(int acquires)`
+
 ```
     protected final boolean tryAcquire(int acquires) {
         final Thread current = Thread.currentThread();
@@ -194,9 +195,11 @@ ReentrantLock分为公平锁和非公平锁:
     }
 ```
 
->* 使用公平锁时,解锁方法`unlock()`的方法调用轨迹如下:
+>使用公平锁时,解锁方法`unlock()`的方法调用轨迹如下:
   1. `ReentrantLock:unlock()`
   2. `AbstractQueuedSychronizer:release(int arg)`
+  3. `Sync:tryRelease(int releases)`
+
 ```
     public final boolean release(int arg) {
         // 释放锁
@@ -209,7 +212,6 @@ ReentrantLock分为公平锁和非公平锁:
         return false;
     }
 ```
-  3. `Sync:tryRelease(int releases)`
 ```
     protected final boolean tryRelease(int releases) {
         // 获得释放锁后的状态值
@@ -232,9 +234,10 @@ ReentrantLock分为公平锁和非公平锁:
 >公平锁在释放锁的最后写`volatile`变量`state`;
  在获取锁时首先读这个`volatile`变量.**根据`volatile`的`happens-before`规则,释放锁的线程在写`volatile`变量之前可见的共享变量,在获取锁的线程读取同一个`volatile`变量后将立即变的对获取锁的线程可见**
 
->* 使用非公平锁时,加锁方法lock()的方法调用轨迹如下:
+>使用非公平锁时,加锁方法lock()的方法调用轨迹如下:
   1. `ReentrantLock:lock()`
   2. `NonfairSync:lock()`
+
 ```
     final void lock() {
         // 非公平锁,先直接设置状态值和独占线程对象
@@ -349,7 +352,8 @@ public final native boolean compareAndSwapInt(Object o, long offset, int expecte
 
 
 
-inline jint     Atomic::cmpxchg    (jint     exchange_value, volatile jint*     dest, jint     compare_value) {
+inline jint     Atomic::cmpxchg    (jint     exchange_value, 
+    volatile jint*     dest, jint     compare_value) {
   // alternative for InterlockedCompareExchange
   int mp = os::is_MP();
   __asm {
