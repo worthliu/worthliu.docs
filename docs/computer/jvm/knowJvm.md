@@ -1,6 +1,10 @@
 >Java源代码是怎么被机器识别并执行的呢?
 
-答案是Java虚拟机,即Java Virtual Machine,简称JVM.JVM提供商包括Sun,BEA,IBM等.1999年,Sun公司发布呢由C/C++实现的HotSpot Java虚拟机.2006年,在JavaOne大会上开源其关键核心技术,启动OpenJDK项目,逐步形成呢活跃的OpenJDK社区.2010年,sun公司被Oracle公司收购.Oracle的HotSpot JVM实现,是目前OpenJDK使用的主流JMV,**它采用解释与编译混合执行的模式,其JIT技术采用分层编译,极大地提升了Java的执行速度;**
+是Java虚拟机,即`Java Virtual Machine`,简称`JVM`.JVM提供商包括`Sun`,`BEA`,`IBM`等.
+
+>+ 1999年,Sun公司发布呢由C/C++实现的HotSpot Java虚拟机.
++ 2006年,在JavaOne大会上开源其关键核心技术,启动OpenJDK项目,逐步形成呢活跃的OpenJDK社区.
++ 2010年,sun公司被Oracle公司收购.Oracle的HotSpot JVM实现,是目前OpenJDK使用的主流JMV,**它采用解释与编译混合执行的模式,其JIT技术采用分层编译,极大地提升了Java的执行速度;**
 
 
 ### 字节码
