@@ -184,9 +184,7 @@ ReentrantLock分为公平锁和非公平锁:
         return false;
     }
 
-    /**
-    * 判断内部队列里面是否存在长时间等待获取锁的线程
-    */
+    //判断内部队列里面是否存在长时间等待获取锁的线程
     public final boolean hasQueuedPredecessors() {
         Node t = tail; // Read fields in reverse initialization order
         Node h = head;
