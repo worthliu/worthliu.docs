@@ -13,6 +13,7 @@
   * [volatile](/computer/concurrence/volatile.md)
   * [synchronized锁](/computer/concurrence/synchronized.md)
   * [Lock锁](/computer/concurrence/lock.md)
+  * [Semaphore](/computer/concurrence/semaphore.md)
   * [ThreadLocal](/computer/concurrence/ThreadLocal.md)
   * [final](/computer/concurrence/final.md)
   * [线程](/computer/concurrence/thread.md)
