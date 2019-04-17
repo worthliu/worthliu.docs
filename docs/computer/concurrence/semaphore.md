@@ -17,6 +17,12 @@
 
 从上述看到`Semaphore`的类结构与`ReentrantLock`类结构基本一致;同样是在继承自`AQS`的内部类`Sync`以及继承自`Sync`的公平锁(`FairSync`)和非公平锁(`NofairSync`)的实现;
 
+就`Semaphore`而言,一般使用示例如下:
+
+```
+
+```
+
 
 对于内部实现而言,`Sync`基于`AQS`组件实现共享锁提供对外方法应用,具体实现如下:
 
