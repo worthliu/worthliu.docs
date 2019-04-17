@@ -325,11 +325,113 @@
 
 >从上述实例代码中,使用`Semaphore`共享锁释放调用流程如下:
 + 使用`Semaphore.release()`释放资源
-+ 通过`sync.acquireSharedInterruptibly(1)`获取同步资源(`AbstractQueuedSynchronizer.acquireSharedInterruptibly(int arg)`)
++ 通过`sync.releaseShared(1)`获取同步资源(`AbstractQueuedSynchronizer.releaseShared(int arg)`)
 + 通过公平锁或非公平锁获取资源`NonfairSync.tryAcquireShared(int acquires)`或`FairSync.tryAcquireShared(int acquires)`
+
+```Semaphore
+	public void release() {
+		// 释放共享资源
+        sync.releaseShared(1);
+    }
+```
+
+```Sync
+	protected final boolean tryReleaseShared(int releases) {
+		// 自旋
+        for (;;) {
+        	// 获取当前资源同步状态
+            int current = getState();
+            // 计算释放后同步状态值
+            int next = current + releases;
+            if (next < current) // overflow
+                throw new Error("Maximum permit count exceeded");
+            // 采用CAS更新当前共享状态值
+            if (compareAndSetState(current, next))
+                return true;
+        }
+    }
+```
+
+```AbstractQueuedSynchronizer
+	public final boolean releaseShared(int arg) {
+		// 尝试释放资源同步状态
+        if (tryReleaseShared(arg)) {
+        	// 同步状态释放成功,进行资源释放
+            doReleaseShared();
+            return true;
+        }
+        return false;
+    }
+
+    // 
+    private void doReleaseShared() {
+        /*
+         * 确保释放操作传播出去,即使当前没有正在执行的请求/释放动作;
+         * 如果头结点后续结点需要唤醒信号,那么就执行唤醒操作;
+         * 如果不需要,将status设置为PROPAGATE确保后续释放,继续传播;
+         * 此外,我们必须循环操作,防止有新的结点加入队列在我们执行操作的时候;
+         * 而且,不同于其他使用unparkSuccessor操作,我们需要知道CAS重置状态是否失败,是否重新检查;
+         */
+
+        // 自旋操作
+        for (;;) {
+        	// 获取头结点
+            Node h = head;
+            // 同步队列存在其他结点
+            if (h != null && h != tail) {
+            	// 获取头结点等待状态
+                int ws = h.waitStatus;
+                // 若头结点等待状态为SIGNAL状态
+                if (ws == Node.SIGNAL) {
+                	// 设置头结点线程状态为0,循环处理直至成功
+                    if (!compareAndSetWaitStatus(h, Node.SIGNAL, 0))
+                        continue;            // loop to recheck cases
+                    // 唤醒头结点的后续结点所对应的线程
+                    unparkSuccessor(h);
+                }
+                else if (ws == 0 &&
+                         !compareAndSetWaitStatus(h, 0, Node.PROPAGATE))
+                    continue;                // loop on failed CAS
+            }
+            // 如果头结点发生变化,则继续循环
+            if (h == head)                   // loop if head changed
+                break;
+        }
+    }
+
+    private static final boolean compareAndSetWaitStatus(Node node,
+                                                         int expect,
+                                                         int update) {
+        return unsafe.compareAndSwapInt(node, waitStatusOffset,
+                                        expect, update);
+    }
+
+    // 唤醒传入结点的后续结点对应线程
+    private void unparkSuccessor(Node node) {
+        // 如果状态为负值,尝试清除预期信号. 
+        // 如果状态设置失败或者状态已被其他线程更改,则无需理会;
+        int ws = node.waitStatus;
+        if (ws < 0)
+            compareAndSetWaitStatus(node, ws, 0);
+
+        // 唤醒传入结点后继结点.但是如果后继结点为取消状态或为空;
+        // 从同步队列队尾往前找寻未被取消的后继结点; 
+        Node s = node.next;
+        if (s == null || s.waitStatus > 0) {
+            s = null;
+            for (Node t = tail; t != null && t != node; t = t.prev)
+                if (t.waitStatus <= 0)
+                    s = t;
+        }
+        // 唤醒线程
+        if (s != null)
+            LockSupport.unpark(s.thread);
+    }
+```
+
 
 通过对`Semaphore`代码查看，共享锁的实现，即`AQS`中通过`state`值来控制对共享资源访问的线程数，每当线程请求同步状态成功，`state`值将会减1，如果超过限制数量的线程将被封装共享模式的Node结点加入同步队列等待，直到其他执行线程释放同步状态，才有机会获得执行权，而每个线程执行完成任务释放同步状态后，`state`值将会增加1，这就是共享锁的基本实现模型。
 
-至于公平锁与非公平锁的不同之处在于公平锁会在线程请求同步状态前，判断同步队列是否存在Node，如果存在就将请求线程封装成Node结点加入同步队列，从而保证每个线程获取同步状态都是先到先得的顺序执行的。
+至于公平锁与非公平锁的不同之处在于公平锁会在线程请求同步状态前，判断同步队列是否存在`Node`，如果存在就将请求线程封装成Node结点加入同步队列，从而保证每个线程获取同步状态都是先到先得的顺序执行的。
 
-非公平锁则是通过竞争的方式获取，不管同步队列是否存在Node结点，只有通过竞争获取就可以获取线程执行权。
+非公平锁则是通过竞争的方式获取，不管同步队列是否存在`Node`结点，只有通过竞争获取就可以获取线程执行权。
