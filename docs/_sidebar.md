@@ -4,10 +4,13 @@
   * [String](/computer/base/String.md)
   * [hashCodeAndEquals](/computer/base/hashCodeAndEquals.md)
   * [JavaByVal](/computer/base/JavaByVal.md)
+  * [JavaBase64](/computer/base/Base64.md)
+  * [final](/computer/concurrence/final.md)
+  
   * [走进JVM](/computer/jvm/knowJvm.md)
+  * [双亲加载模型](/computer/jvm/classLoader.md)
   * [JVM内存结构](/computer/jvm/jvmmemorystructure.md)
   * [Java内存模型](/computer/concurrence/javamemorymodel.md)
-  * [双亲加载模型](/computer/jvm/classLoader.md)
   * [Java重排序](/computer/concurrence/javareorder.md)
   * [顺序一致性](/computer/concurrence/ordinalconsistency.md)
   * [volatile](/computer/concurrence/volatile.md)
@@ -15,11 +18,9 @@
   * [Lock锁](/computer/concurrence/lock.md)
   * [Semaphore](/computer/concurrence/semaphore.md)
   * [ThreadLocal](/computer/concurrence/ThreadLocal.md)
-  * [final](/computer/concurrence/final.md)
   * [线程](/computer/concurrence/thread.md)
   * [线程池](/computer/concurrence/executor.md)
   * [Java通讯模型](/computer/io/connectModel.md)
-  * [JavaBase64](/computer/base/Base64.md)
 
 * 分布式系统问题锦集
   * [分布式Session](/distributedSystem/distributedSession.md)
