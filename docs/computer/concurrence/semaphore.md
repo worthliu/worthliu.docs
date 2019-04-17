@@ -321,7 +321,12 @@
     }
 ```
 
-而`Semaphore`释放流程与加锁过程相反;
+而`Semaphore`释放流程与加锁过程相反:
+
+>从上述实例代码中,使用`Semaphore`共享锁释放调用流程如下:
++ 使用`Semaphore.release()`释放资源
++ 通过`sync.acquireSharedInterruptibly(1)`获取同步资源(`AbstractQueuedSynchronizer.acquireSharedInterruptibly(int arg)`)
++ 通过公平锁或非公平锁获取资源`NonfairSync.tryAcquireShared(int acquires)`或`FairSync.tryAcquireShared(int acquires)`
 
 通过对`Semaphore`代码查看，共享锁的实现，即`AQS`中通过`state`值来控制对共享资源访问的线程数，每当线程请求同步状态成功，`state`值将会减1，如果超过限制数量的线程将被封装共享模式的Node结点加入同步队列等待，直到其他执行线程释放同步状态，才有机会获得执行权，而每个线程执行完成任务释放同步状态后，`state`值将会增加1，这就是共享锁的基本实现模型。
 
