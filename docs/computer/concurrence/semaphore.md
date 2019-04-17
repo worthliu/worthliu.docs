@@ -20,13 +20,60 @@
 就`Semaphore`而言,一般使用示例如下:
 
 ```
+	class RunnableDemo implements Runnable{
 
+        private Semaphore sp;
+
+        public RunnableDemo(Semaphore sp) {
+            this.sp = sp;
+        }
+
+        @Override
+        public void run() {
+            try{
+            	// 获取共享资源
+                sp.acquire();
+                System.out.println(String.format("[Thread-%s]任务id|已获取得到共享资源,剩余共享资源数量:[%d]",Thread.currentThread().getId(), sp.availablePermits()));
+                Thread.sleep(300);
+            }catch (Exception e){
+                e.printStackTrace();
+            }finally {
+            	// 释放共享资源
+                sp.release();
+                System.out.println(String.format("[Thread-%s]任务id|释放共享资源数量,当前共享资源数量:[%d]",Thread.currentThread().getId(), sp.availablePermits()));
+            }
+        }
+    }
 ```
 
+>从上述实例代码中,使用`Semaphore`共享锁调用流程如下:
++ 使用`Semaphore.acquire()`获取资源
++ 通过`sync.acquireSharedInterruptibly(1)`获取同步资源(`AbstractQueuedSynchronizer.acquireSharedInterruptibly(int arg)`)
++ 通过公平锁或非公平锁获取资源`NonfairSync.tryAcquireShared(int acquires)`或`FairSync.tryAcquireShared(int acquires)`
 
 对于内部实现而言,`Sync`基于`AQS`组件实现共享锁提供对外方法应用,具体实现如下:
 
+```Semaphore
+	public void acquire() throws InterruptedException {
+		// 中断模式下获取共享资源
+        sync.acquireSharedInterruptibly(1);
+    }
 ```
+
+```AbstractQueuedSynchronizer
+    public final void acquireSharedInterruptibly(int arg)
+            throws InterruptedException {
+        // 线程是否被中断
+        if (Thread.interrupted())
+            throw new InterruptedException();
+        // 尝试获取共享资源
+        if (tryAcquireShared(arg) < 0)
+            // 共享资源耗尽,中断获取操作
+            doAcquireSharedInterruptibly(arg);
+    }
+```
+
+```Sync
 	abstract static class Sync extends AbstractQueuedSynchronizer {
         private static final long serialVersionUID = 1192457210091910933L;
 
@@ -83,45 +130,6 @@
         }
     }
 
-```
-
->使用`Semaphore`共享锁调用流程:
-+ 使用`Semaphore.acquire()`获取资源
-+ 通过`sync.acquireSharedInterruptibly(1)`获取同步资源(`AbstractQueuedSynchronizer.acquireSharedInterruptibly(int arg)`)
-+ 通过公平锁或非公平锁获取资源`NonfairSync.tryAcquireShared(int acquires)`或`FairSync.tryAcquireShared(int acquires)`
-
-```Semaphore
-	public void acquire() throws InterruptedException {
-		// 中断模式下获取共享资源
-        sync.acquireSharedInterruptibly(1);
-    }
-```
-
-```AbstractQueuedSynchronizer
-    public final void acquireSharedInterruptibly(int arg)
-            throws InterruptedException {
-        // 线程是否被中断
-        if (Thread.interrupted())
-            throw new InterruptedException();
-        // 尝试获取共享资源
-        if (tryAcquireShared(arg) < 0)
-            // 共享资源耗尽,中断获取操作
-            doAcquireSharedInterruptibly(arg);
-    }
-```
-
-```Sync
-	final int nonfairTryAcquireShared(int acquires) {
-		// 自旋获取共享资源
-        for (;;) {
-            int available = getState();
-            int remaining = available - acquires;
-            // 当前还剩余共享资源,调用CAS更新共享资源数量
-            if (remaining < 0 ||
-                compareAndSetState(available, remaining))
-                return remaining;
-        }
-    }
 ```
 
 ```NonfairSync
