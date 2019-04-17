@@ -6,9 +6,9 @@
   * [JavaByVal](/computer/base/JavaByVal.md)
   * [JavaBase64](/computer/base/Base64.md)
   * [final](/computer/concurrence/final.md)
-  
+
   * [走进JVM](/computer/jvm/knowJvm.md)
-  * [双亲加载模型](/computer/jvm/classLoader.md)
+  * [类加载](/computer/jvm/classLoader.md)
   * [JVM内存结构](/computer/jvm/jvmmemorystructure.md)
   * [Java内存模型](/computer/concurrence/javamemorymodel.md)
   * [Java重排序](/computer/concurrence/javareorder.md)
