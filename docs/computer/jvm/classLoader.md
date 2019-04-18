@@ -85,7 +85,7 @@ public Class<?> loadClass(String name) throws ClassNotFoundException {
 >+ 加载指定名称（包括包名）的二进制类型;
 + 同时指定是否解析（但是这里的resolve参数不一定真正能达到解析的效果），供继承使用
 
-```
+```ClassLoader
 protected Class<?> loadClass(String name, boolean resolve)
         throws ClassNotFoundException {
         // 同步加锁
@@ -96,9 +96,11 @@ protected Class<?> loadClass(String name, boolean resolve)
                 long t0 = System.nanoTime();
                 try {
                     if (parent != null) {
-                        c = parent.loadClass(name, false);//调用父类加载器
+                        //调用父类加载器
+                        c = parent.loadClass(name, false);
                     } else {
-                        c = findBootstrapClassOrNull(name);//调用启动类加载器
+                        //调用启动类加载器
+                        c = findBootstrapClassOrNull(name);
                     }
                 } catch (ClassNotFoundException e) {
                     // ClassNotFoundException thrown if class not found
@@ -161,6 +163,17 @@ protected Class<?> loadClass(String name, boolean resolve)
     // 
     private native final Class<?> findLoadedClass0(String name);
 
+    // 
+    private Class<?> findBootstrapClassOrNull(String name)
+    {
+        if (!checkName(name)) return null;
+
+        return findBootstrapClass(name);
+    }
+
+    // return null if not found
+    private native Class<?> findBootstrapClass(String name);
+
 ```
 
 ```
@@ -189,7 +202,8 @@ protected Class<?> loadClass(String name, boolean resolve)
     #define JVM_END } }
 ```
 
-```  
+```看不懂-_-
+    // 在VM中查找已加载类的缓存
     JVM_ENTRY(jclass, JVM_FindLoadedClass(JNIEnv *env, jobject loader, jstring name))
       JVMWrapper("JVM_FindLoadedClass");
       ResourceMark rm(THREAD);
