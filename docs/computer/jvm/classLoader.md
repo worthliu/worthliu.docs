@@ -86,12 +86,11 @@ public Class<?> loadClass(String name) throws ClassNotFoundException {
 + 同时指定是否解析（但是这里的resolve参数不一定真正能达到解析的效果），供继承使用
 
 ```
-
 protected Class<?> loadClass(String name, boolean resolve)
-        throws ClassNotFoundException
-    {
+        throws ClassNotFoundException {
+        // 同步加锁
         synchronized (getClassLoadingLock(name)) {
-            // First, check if the class has already been loaded
+            // 首先检查是否已加载过类
             Class<?> c = findLoadedClass(name);
             if (c == null) {
                 long t0 = System.nanoTime();
@@ -124,6 +123,110 @@ protected Class<?> loadClass(String name, boolean resolve)
             return c;
         }
     }
+
+    // 获取类加载所对象
+    protected Object getClassLoadingLock(String className) {
+        // 获取本身对象作为锁对象
+        Object lock = this;
+        // 并行锁对象Map不为空
+        if (parallelLockMap != null) {
+            // 创建一个新的锁对象
+            Object newLock = new Object();
+            // put入Map集合内
+            lock = parallelLockMap.putIfAbsent(className, newLock);
+            // 替换锁对象
+            if (lock == null) {
+                lock = newLock;
+            }
+        }
+        return lock;
+    }
+    // 查找已加载过的类对象
+    protected final Class<?> findLoadedClass(String name) {
+        if (!checkName(name))
+            return null;
+        return findLoadedClass0(name);
+    }
+    // 检查类名规范
+    private boolean checkName(String name) {
+        if ((name == null) || (name.length() == 0))
+            return true;
+        // 类名存在/或虚拟机配置允许数组语法且类名为数组起头
+        if ((name.indexOf('/') != -1)
+            || (!VM.allowArraySyntax() && (name.charAt(0) == '[')))
+            return false;
+        return true;
+    }
+
+    // 
+    private native final Class<?> findLoadedClass0(String name);
+
+```
+
+```
+    JNIEXPORT jclass JNICALL
+    Java_java_lang_ClassLoader_findLoadedClass0(JNIEnv *env, jobject loader,
+                                               jstring name)
+    {
+        if (name == NULL) {
+            return 0;
+        } else {
+            return JVM_FindLoadedClass(env, loader, name);
+        }
+    }
+```
+
+```
+    #define JVM_ENTRY(result_type, header)                               \
+    extern "C" {                                                         \
+      result_type JNICALL header {                                       \
+        JavaThread* thread=JavaThread::thread_from_jni_environment(env); \
+        ThreadInVMfromNative __tiv(thread);                              \
+        debug_only(VMNativeEntryWrapper __vew;)                          \
+        VM_ENTRY_BASE(result_type, header, thread)
+
+
+    #define JVM_END } }
+```
+
+```  
+    JVM_ENTRY(jclass, JVM_FindLoadedClass(JNIEnv *env, jobject loader, jstring name))
+      JVMWrapper("JVM_FindLoadedClass");
+      ResourceMark rm(THREAD);
+
+      Handle h_name (THREAD, JNIHandles::resolve_non_null(name));
+      Handle string = java_lang_String::internalize_classname(h_name, CHECK_NULL);
+
+      const char* str   = java_lang_String::as_utf8_string(string());
+      // Sanity check, don't expect null
+      if (str == NULL) return NULL;
+
+      const int str_len = (int)strlen(str);
+      if (str_len > Symbol::max_length()) {
+        // It's impossible to create this class;  the name cannot fit
+        // into the constant pool.
+        return NULL;
+      }
+      TempNewSymbol klass_name = SymbolTable::new_symbol(str, str_len, CHECK_NULL);
+
+      // Security Note:
+      //   The Java level wrapper will perform the necessary security check allowing
+      //   us to pass the NULL as the initiating class loader.
+      Handle h_loader(THREAD, JNIHandles::resolve(loader));
+      if (UsePerfData) {
+        is_lock_held_by_thread(h_loader,
+                               ClassLoader::sync_JVMFindLoadedClassLockFreeCounter(),
+                               THREAD);
+      }
+
+      Klass* k = SystemDictionary::find_instance_or_array_klass(klass_name,
+                                                                  h_loader,
+                                                                  Handle(),
+                                                                  CHECK_NULL);
+
+      return (k == NULL) ? NULL :
+                (jclass) JNIHandles::make_local(env, k->java_mirror());
+    JVM_END
 ```
 
 >一般被loadClass方法调用去加载指定名称类，供继承使用
