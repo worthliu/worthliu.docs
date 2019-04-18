@@ -26,12 +26,18 @@
 
 Java对类的使用分为两种方式：主动使用和被动使用。其中主动使用如下图：
 
-![classusing](/images/classusing.png)
+>主动使用:
++ 创建类的实例
++ 访问某个类或接口的静态变量,或者对该静态变量赋值;
++ 调用类的静态方法
++ 反射(`Class.forName("XXXXX")`)
++ 初始化一个类的子类
++ Java虚拟机启动时被标明为启动类的类
 
 >区别：
   1. `Class cl=A.class;`JVM将使用类A的类装载器,将类A装入内存(前提是:类A还没有装入内存),不对类A做类的初始化工作.返回类A的Class的对象
   2. `Class cl=对象引用o.getClass();`返回引用o运行时真正所指的对象(因为:儿子对象的引用可能会赋给父对象的引用变量中)所属的类的Class的对象 
-  3. `Class.forName("类名");`JAVA人都知道.装入类A,并做类的初始化
+  3. `Class.forName("类名");`装入类A,并做类的初始化
 
 
 >从JVM的角度看，我们使用关键字`new`创建一个类的时候，这个类可以没有被加载。
@@ -44,9 +50,12 @@ Java对类的使用分为两种方式：主动使用和被动使用。其中主�
 ## Java类加载器
 
 >Java中有三个**默认类加载器**：
-1. **`启动类加载器（Bootstrap）`**：**引导类装入器是用本地代码实现的类装入器**，它负责将`Java_Home/lib`下面的核心类库或`-Xbootclasspath`选项指定的jar包加载到内存中。由于引导类加载器涉及到虚拟机本地实现细节，开发者无法直接获取到启动类加载器的引用，所以不允许直接通过引用进行操作；
-2. **`扩展类加载器（Extesion）`**：扩展类加载器是由Sun的`ExtClassLoader（sun.misc.Launcher$ExtClassLoader）`实现的。它负责将`Java_Home/lib/ext`或者由系统变量`-Djava.ext.dir`指定位置中的类库加载到内存中。开发者可以直接使用标准扩展类加载器
-3. **`系统类加载器（System）`**：系统类加载器是由Sun的`AppClassLoader（sun.misc.Launcher$AppClassLoader）`实现的。它负责将系统类路径`java-classpath`或`-Djava.class.path`变量所指的目录下的类库加载内存中。开发者可以直接使用系统类加载器
+1. **`启动类加载器（Bootstrap）`**：**引导类装入器是用本地代码实现的类装入器**，它负责将`Java_Home/lib`下面的核心类库或`-Xbootclasspath`选项指定的jar包加载到内存中。
+  + 由于引导类加载器涉及到虚拟机本地实现细节，开发者无法直接获取到启动类加载器的引用，所以不允许直接通过引用进行操作；
+2. **`扩展类加载器（Extesion）`**：扩展类加载器是由Sun的`ExtClassLoader（sun.misc.Launcher$ExtClassLoader）`实现的。它负责将`Java_Home/lib/ext`或者由系统变量`-Djava.ext.dir`指定位置中的类库加载到内存中。
+  + 开发者可以直接使用标准扩展类加载器
+3. **`系统类加载器（System）`**：系统类加载器是由Sun的`AppClassLoader（sun.misc.Launcher$AppClassLoader）`实现的。它负责将系统类路径`java-classpath`或`-Djava.class.path`变量所指的目录下的类库加载内存中。
+  + 开发者可以直接使用系统类加载器
 
 
 >**`线程上下文类加载器（context class loader）`**是从 JDK 1.2 开始引入的。类 `java.lang.Thread`中的方法 `getContextClassLoader()`和 `setContextClassLoader(ClassLoader cl)`用来获取和设置线程的上下文类加载器。
@@ -63,7 +72,7 @@ Java对类的使用分为两种方式：主动使用和被动使用。其中主�
 
 ## `java.lang.ClassLoader`
 
-从JDK源码查看可知，类加载器均是继承自java.lang.ClassLoader抽象类。让我们来看看其中几个重要方法：
+从JDK源码查看可知，类加载器均是继承自`java.lang.ClassLoader`抽象类。让我们来看看其中几个重要方法：
 
 ```
 /**
@@ -73,7 +82,8 @@ public Class<?> loadClass(String name) throws ClassNotFoundException {
         return loadClass(name, false);
 }
 ```
->加载指定名称（包括包名）的二进制类型;同时指定是否解析（但是这里的resolve参数不一定真正能达到解析的效果），供继承使用
+>+ 加载指定名称（包括包名）的二进制类型;
++ 同时指定是否解析（但是这里的resolve参数不一定真正能达到解析的效果），供继承使用
 
 ```
 
