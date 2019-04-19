@@ -134,7 +134,7 @@ protected Class<?> loadClass(String name, boolean resolve)
         if (parallelLockMap != null) {
             // 创建一个新的锁对象
             Object newLock = new Object();
-            // put入Map集合内
+            // put入Map集合内,已存在Key不存入
             lock = parallelLockMap.putIfAbsent(className, newLock);
             // 替换锁对象
             if (lock == null) {
