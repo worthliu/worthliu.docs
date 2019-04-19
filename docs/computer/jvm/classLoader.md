@@ -313,7 +313,7 @@ private Class<?> defineClass(String name, Resource res) throws IOException {
 }
 ```
 
->定义类型，一般在findClass方法中读取到对应字节码后调用，可以看出不可继承(JVM已经实现了对应具体功能，解析对应的字节码，产生对应的内部数据结构放置方法区，所以无需覆写，直接调用即可）
+>定义类型，一般在`findClass`方法中读取到对应字节码后调用，可以看出不可继承(JVM已经实现了对应具体功能，解析对应的字节码，产生对应的内部数据结构放置方法区，所以无需覆写，直接调用即可）
 
 ```
 protected final Class<?> defineClass(String name, java.nio.ByteBuffer b,
@@ -368,11 +368,11 @@ private static native Class forName0(String name, boolean initialize,ClassLoader
 ```
 
 >* 其中`initialize`参数是很重要的，它表示在加载同时是否完成初始化的工作（说明：单参数版本的forName方法默认是完成初始化的）
-* 有些场景下需要将`initialze`设置为true来强制加载同时完成初始化。例如典型的就是利用`DriverManager`进行JDBC驱动程序类注册的问题。因为每一个JDBC驱动程序类的静态初始化方法都用`DriverManager`注册驱动程序，这样才能被应用程序使用。
+* 有些场景下需要将`initialze`设置为`true`来强制加载同时完成初始化。例如典型的就是利用`DriverManager`进行`JDBC`驱动程序类注册的问题。因为每一个JDBC驱动程序类的静态初始化方法都用`DriverManager`注册驱动程序，这样才能被应用程序使用。
 
 ## 双亲委派模型破坏
 
-1. 双亲委派模型的第一次“被破坏”其实发生在双亲委派模型出现之前--即JDK1.2发布之前。
+1. 双亲委派模型的第一次“被破坏”其实发生在双亲委派模型出现之前--即`JDK1.2`发布之前。
   1. 由于双亲委派模型是在JDK1.2之后才被引入的，而类加载器和抽象类`java.lang.ClassLoader`则是JDK1.0时候就已经存在，面对已经存在的用户自定义类加载器的实现代码，Java设计者引入双亲委派模型时不得不做出一些妥协。
   2. 为了向前兼容，JDK1.2之后的`java.lang.ClassLoader`添加了一个新的proceted方法`findClass()`，在此之前，用户去继承`java.lang.ClassLoader`的唯一目的就是重写`loadClass()`方法，因为虚拟机在进行类加载的时候会调用加载器的私有方法`loadClassInternal()`，而这个方法的唯一逻辑就是去调用自己的`loadClass()`。
   3. JDK1.2之后已不再提倡用户再去覆盖`loadClass()`方法，应当把自己的类加载逻辑写到`findClass()`方法中，在`loadClass()`方法的逻辑里，如果父类加载器加载失败，则会调用自己的`findClass()`方法来完成加载，这样就可以保证新写出来的类加载器是符合双亲委派模型的。
