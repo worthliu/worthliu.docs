@@ -10,6 +10,7 @@
   * [走进JVM](/computer/jvm/knowJvm.md)
   * [类加载](/computer/jvm/classLoader.md)
   * [JVM内存结构](/computer/jvm/jvmmemorystructure.md)
+  * [JVM GC](/computer/jvm/jvmmemorygc.md)
   * [Java内存模型](/computer/concurrence/javamemorymodel.md)
   * [Java重排序](/computer/concurrence/javareorder.md)
   * [顺序一致性](/computer/concurrence/ordinalconsistency.md)
