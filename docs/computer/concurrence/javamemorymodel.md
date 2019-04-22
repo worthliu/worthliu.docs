@@ -16,9 +16,7 @@
 
 ## JVM内存结构
 
-<a href="#/computer/jvm/jvmstructure" title="JVM内存结构">`JVM内存结构`</a>
-
-简单了解一下`JVM内存结构`，我们可以发现其中主要反复提到**线程、线程共享的内存**；
+简单了解一下<a href="#/computer/jvm/jvmstructure" title="JVM内存结构">`JVM内存结构`</a>，我们可以发现其中主要反复提到**线程、线程共享的内存**；
 
 
 ## Java内存模型（JMM）
