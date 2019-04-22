@@ -14,11 +14,13 @@
   * [Java内存模型](/computer/concurrence/javamemorymodel.md)
   * [Java重排序](/computer/concurrence/javareorder.md)
   * [顺序一致性](/computer/concurrence/ordinalconsistency.md)
+  
   * [volatile](/computer/concurrence/volatile.md)
   * [synchronized锁](/computer/concurrence/synchronized.md)
   * [Lock锁](/computer/concurrence/lock.md)
   * [Semaphore](/computer/concurrence/semaphore.md)
   * [ThreadLocal](/computer/concurrence/ThreadLocal.md)
+  
   * [线程](/computer/concurrence/thread.md)
   * [线程池](/computer/concurrence/executor.md)
   * [Java通讯模型](/computer/io/connectModel.md)
@@ -70,6 +72,7 @@
   * [抽象工厂模式](/design/abstractFactory.md)
 
 * 算法与数据结构
+  * [数据结构浅谈](/algorithm/datastructure.md)
   * [常用排序算法总结](/algorithm/algorithmSummary.md)
   * [B树](/algorithm/BalancedTreeOfOrder.md)
   * [红黑树](/algorithm/BalancedTreeOfOrder.md)
