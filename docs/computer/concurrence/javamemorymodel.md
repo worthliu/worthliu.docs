@@ -16,7 +16,7 @@
 
 ## JVM内存结构
 
-[`JVM内存结构`](#/computer/jvm/jvmmemorystructure)
+[`JVM内存结构`](#/computer/jvm/jvmstructure)
 
 简单了解一下`JVM内存结构`，我们可以发现其中主要反复提到**线程、线程共享的内存**；
 
