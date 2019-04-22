@@ -12,7 +12,7 @@
 >1. `Heap`(堆区)
  + `Heap`时`OOM故障`的最主要的发源地,存储着几乎所有的实例对象,堆由垃圾收集器自动回收,**堆区由各子线程共享使用**.
  + 堆的内存空间既可以固定大小,也可以在运行是动态地调整,通过`-Xms`,`-Xmx`设置堆大小容量;
-   + 在通常情况下,服务器在运行过程中,堆空间不断地扩容与回缩,势必形成不必要的系统压力,所以在线上生产环境中,`JVM`的`Xms`,`Xmx`设置成一样大小,避免在GC后调整堆大小时带来的额外压力;
+   + **在通常情况下,服务器在运行过程中,堆空间不断地扩容与回缩,势必形成不必要的系统压力**,所以在线上生产环境中,`JVM`的`Xms`,`Xmx`设置成一样大小,避免在`GC`后调整堆大小时带来的额外压力;
  + 堆分成两大块:`新生代`和`老年代`:
   + 对象产生之初在新生代,步入暮年时进入老年代,但是老年代也接纳在新生代无法容纳的超大对象;
   + `新生代` = `1个Eden区` + `2个Surviror区`
@@ -51,10 +51,10 @@
 >4. `Native Method Stacks`(本地方法栈)
   + 在`JVM`内存布局中,也是线程对象私有的;
   + 本地方法栈为`Native`方法服务.线程开始调用本地方法时,会进入一个不再受`JVM`约束的世界;
-  + 本地方法可以通过`JNI(Java Native Interface)`来访问虚拟机运行时的数据区,甚至可以调用寄存器,具有和JVM相同的能力和权限;
+  + 本地方法可以通过`JNI(Java Native Interface)`来访问虚拟机运行时的数据区,甚至可以调用寄存器,具有和`JVM`相同的能力和权限;
 
 >5. `Program Counter Register`(程序计数寄存器)
-  + 在`程序计数寄存器`(Program Counter Register,PC)中,Register的命名源于CPU的寄存器,CPu只有把数据装载到寄存器才能运行;
+  + 在`程序计数寄存器`(Program Counter Register,PC)中,`Register`的命名源于`CPU`的寄存器,`CPU`只有把数据装载到寄存器才能运行;
   + **每个线程在创建后,都会产生自己的程序计数器和栈帧,程序计数器用来存放执行指令的偏移量和行号指示器等,线程执行或恢复都要依赖程序计数器.**
   + 程序计数器在各个线程之间互不影响,此区域也不会发生内存溢出异常;
 
@@ -100,8 +100,6 @@ stack=2, locals=2, args_size=1
 > `invokespecial` : 
 + 调用对象实例方法,通过栈顶的引用变量调用`<init>`方法;
 + **`<clinit>`是类初始化时执行的方法,而`<init>`是对象初始化时执行的方法;**
-
-
 
 **从执行步骤的角度来分析:**
 
@@ -341,7 +339,7 @@ JVM采用了分代收集的思想来管理内存,那内存回收时就必须能�
 jps|JVM Process Status Tool，显示指定系统内所有的HotSpot虚拟机进程|
 jstat|JVM Statistics Monitoring Tool，用于收集HotSpot虚拟机各方面的运行数据|
 jinfo|Configuration Info for Java，显示虚拟机配置信息|
-jmap|Memory Map for Java，生成虚拟机的内存转储快照（heapdump文件）|
+jmap|Memory Map for Java，生成虚拟机的内存转储快照（`heapdump`文件）|
 jhat|JVM Heap Dump Browser，用于分析heapdump文件，它会建立一个HTTP/HTML服务器，让用户可以在浏览器上查看分析结果|
 jstack|Stack Trace for Java，显式虚拟机的线程快照|
 
