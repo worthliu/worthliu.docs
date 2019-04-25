@@ -61,3 +61,94 @@ Java中的集合是用于与存储对象的工具类容器,它实现了常用的
 + `TreeSet`也是如此,从源码分析使用`TreeMap`来实现的,底层为树结构,在添加新元素到集合中时,按照某种比较规则将其插入合适的位置,保证插入后的集合仍然是有序;
 + `LinkedHashSet`继承自`HashSet`,具有`HashSet`的优点,内部使用链表维护了元素插入顺序;
 
+## 集合初始化
+
+集合初始化通常进行分配容量,设置特定参数等相关工作;
+
+以`ArrayList`,`HashMap`作为介绍;
+
+### `ArrayList`
+
+```ArrayList
+public class ArrayList<E> extends AbstractList<E>
+        implements List<E>, RandomAccess, Cloneable, java.io.Serializable {
+    // 默认容量大小
+	private static final int DEFAULT_CAPACITY = 10;
+	// 空表
+	private static final Object[] EMPTY_ELEMENTDATA = {};
+	// 默认空表
+    private static final Object[] DEFAULTCAPACITY_EMPTY_ELEMENTDATA = {};
+    // 底层数组
+    transient Object[] elementData;
+    // 元素数量
+    private int size;
+
+
+	public ArrayList(int initialCapacity) {
+        if (initialCapacity > 0) {
+        	// 初始化大小大于0时,根据构造方法的参数值,创建一个相应容量大小的数组
+            this.elementData = new Object[initialCapacity];
+        } else if (initialCapacity == 0) {
+            this.elementData = EMPTY_ELEMENTDATA;
+        } else {
+            throw new IllegalArgumentException("Illegal Capacity: "+
+                                               initialCapacity);
+        }
+    }
+
+
+    public boolean add(E e) {
+        ensureCapacityInternal(size + 1);  // Increments modCount!!
+        elementData[size++] = e;
+        return true;
+    }
+
+    public void add(int index, E element) {
+        rangeCheckForAdd(index);
+
+        ensureCapacityInternal(size + 1);  // Increments modCount!!
+        System.arraycopy(elementData, index, elementData, index + 1,
+                         size - index);
+        elementData[index] = element;
+        size++;
+    }
+
+    private void ensureCapacityInternal(int minCapacity) {
+        if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {
+            minCapacity = Math.max(DEFAULT_CAPACITY, minCapacity);
+        }
+
+        ensureExplicitCapacity(minCapacity);
+    }
+
+    private void ensureExplicitCapacity(int minCapacity) {
+        modCount++;
+
+        // overflow-conscious code
+        if (minCapacity - elementData.length > 0)
+            grow(minCapacity);
+    }
+
+
+    private void grow(int minCapacity) {
+        // overflow-conscious code
+        int oldCapacity = elementData.length;
+        int newCapacity = oldCapacity + (oldCapacity >> 1);
+        if (newCapacity - minCapacity < 0)
+            newCapacity = minCapacity;
+        if (newCapacity - MAX_ARRAY_SIZE > 0)
+            newCapacity = hugeCapacity(minCapacity);
+        // minCapacity is usually close to size, so this is a win:
+        elementData = Arrays.copyOf(elementData, newCapacity);
+    }
+
+    private static int hugeCapacity(int minCapacity) {
+        if (minCapacity < 0) // overflow
+            throw new OutOfMemoryError();
+        return (minCapacity > MAX_ARRAY_SIZE) ?
+            Integer.MAX_VALUE :
+            MAX_ARRAY_SIZE;
+    }
+
+}
+```
