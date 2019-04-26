@@ -154,10 +154,10 @@ public class ArrayList<E> extends AbstractList<E>
 }
 ```
 
-`ArrayList`扩容时,由于正数带符号右移的值肯定时正值,所以`oldCapacity + (oldCapacity >> 1)`的结果可能超过int可以表示的最大值,反而有可能比参数的`minCapacity`更小,则返回值为`minCapacity(size+1)`;
+`ArrayList`扩容时,由于正数带符号右移的值肯定时正值,所以`oldCapacity + (oldCapacity >> 1)`的结果可能超过`int`可以表示的最大值,反而有可能比参数的`minCapacity`更小,则返回值为`minCapacity(size+1)`;
 
 当`ArrayList`使用无参构造时,默认大小为10,在第一次调用`add()`的时候,分配为10的容量;
 
 后续的每次扩容都会调用`Array.copyof()`方法,创建新数组再复制;
 
-假如需要将1000个元素放置在`ArrayList`中,采用默认构造方法,则需要被动扩容13次才可以完成存储.反之,如果在初始化时便指定了容量`new ArrayList(1000)`,那么在初始化`ArrayList`对象的时候就直接分配1000个存储空间,从而避免被动扩容和数组复制的额外开销; 
+假如需要将1000个元素放置在`ArrayList`中,采用默认构造方法,则需要被动扩容`13次`才可以完成存储.反之,如果在初始化时便指定了容量`new ArrayList(1000)`,那么在初始化`ArrayList`对象的时候就直接分配`1000`个存储空间,从而避免被动扩容和数组复制的额外开销; 
