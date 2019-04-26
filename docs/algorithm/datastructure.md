@@ -141,7 +141,8 @@ public class ArrayList<E> extends AbstractList<E>
     }
 
     private static int hugeCapacity(int minCapacity) {
-    	// 所需扩容的真实容量小于0,意味着以元素数作为基数计算后扩容容量数为负数,即容量值已经达到溢出边界,直接抛出溢出异常信号
+    	// 所需扩容的真实容量小于0,意味着以元素数作为基数计算后扩容容量数为负数;
+    	// 即容量值已经达到溢出边界,直接抛出溢出异常信号
         if (minCapacity < 0) // overflow
             throw new OutOfMemoryError();
         // 获取数组最大容量数
