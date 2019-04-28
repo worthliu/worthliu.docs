@@ -6,6 +6,7 @@
   * [JavaByVal](/computer/base/JavaByVal.md)
   * [JavaBase64](/computer/base/Base64.md)
   * [final](/computer/concurrence/final.md)
+  * [集合与泛型](/computer/concurrence/genericity.md)
 
   * [走进JVM](/computer/jvm/knowJvm.md)
   * [类加载](/computer/jvm/classLoader.md)
