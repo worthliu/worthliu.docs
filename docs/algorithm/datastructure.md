@@ -297,7 +297,8 @@ public class HashMap<K,V> extends AbstractMap<K,V>
                         // 当前数据元素结构为Tree Node
                         ((TreeNode<K,V>)e).split(this, newTab, j, oldCap);
                     else { 
-                    	// 当数据元素结构为链表时,由于新的容量以2倍进行扩容,因此数据元素在新数据表将以高位低位均匀的分为两部分
+                    	// 当数据元素结构为链表时,由于新的容量以2倍进行扩容;
+                        // 因此数据元素在新数据表将以高位低位均匀的分为两部分
                         Node<K,V> loHead = null, loTail = null;
                         Node<K,V> hiHead = null, hiTail = null;
                         Node<K,V> next;
