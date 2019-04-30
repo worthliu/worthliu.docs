@@ -78,7 +78,7 @@
   * [数据结构浅谈](/algorithm/datastructure.md)
   * [常用排序算法总结](/algorithm/algorithmSummary.md)
   * [B树](/algorithm/BalancedTreeOfOrder.md)
-  * [红黑树](/algorithm/BalancedTreeOfOrder.md)
+  * [红黑树](/algorithm/redBlackTree.md)
   * [Hash树](/algorithm/HashTree.md)
   * [前綴树](/algorithm/PrefixTree.md)
   * [布隆過濾器](/algorithm/BloomFilter.md)
