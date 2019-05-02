@@ -9,6 +9,9 @@
   * [集合与泛型](/computer/base/genericity.md)
   * [元素比较](/computer/base/comparation.md)
   * [Map类集合](/computer/base/map.md)
+  * [HashMap](/computer/base/hashMap.md)
+  * [TreeMap](/computer/base/treeMap.md)
+  * [ConcurrentHashMap](/computer/base/concurrentHashMap.md)
 
   * [走进JVM](/computer/jvm/knowJvm.md)
   * [类加载](/computer/jvm/classLoader.md)

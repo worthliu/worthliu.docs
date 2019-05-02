@@ -45,5 +45,3 @@
 `ConcurrentHashMap`|不允许为`null`|不允许为`null`|`AbstractMap`|1.5|锁分段技术或`CAS`(JDK8及以上)|
 `TreeMap`|不允许为`null`|允许为`null`|`AbstractMap`|1.2|线程不安全(有序)|
 `HashMap`|允许为`null`|允许为`null`|`AbstractMap`|1.2|线程不安全(resize死链问题)|
-
-
