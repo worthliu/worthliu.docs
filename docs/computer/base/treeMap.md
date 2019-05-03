@@ -340,7 +340,8 @@ public class TreeMap<K,V>
         modCount++;
         size--;
 
-        // If strictly internal, copy successor's element to p and then make p
+        // 目标节点左右子节点都不为空时
+        // 将其后继节点复制到p,然后让p指向后继节点
         // point to successor.
         if (p.left != null && p.right != null) {
             Entry<K,V> s = successor(p);
@@ -349,12 +350,14 @@ public class TreeMap<K,V>
             p = s;
         } // p has 2 children
 
-        // Start fixup at replacement node, if it exists.
+        // 获取取代p节点位置replace节点(先左后右)
         Entry<K,V> replacement = (p.left != null ? p.left : p.right);
 
         if (replacement != null) {
-            // Link replacement to parent
+            // 先提升replace节点父节点位置, 取代p位置
             replacement.parent = p.parent;
+            
+            // 顶级节点即根节点,p节点原位置在哪里,取代节点也在哪里
             if (p.parent == null)
                 root = replacement;
             else if (p == p.parent.left)
@@ -362,18 +365,23 @@ public class TreeMap<K,V>
             else
                 p.parent.right = replacement;
 
-            // Null out links so they are OK to use by fixAfterDeletion.
+            // 清除p节点链接
             p.left = p.right = p.parent = null;
 
-            // Fix replacement
+            // p节点为黑色时,直接进行调整取代节点
             if (p.color == BLACK)
                 fixAfterDeletion(replacement);
-        } else if (p.parent == null) { // return if we are the only node.
+        } else if (p.parent == null) { 
+            
+            // 红黑树只有一个节点时,删除节点后只余空树
             root = null;
-        } else { //  No children. Use self as phantom replacement and unlink.
+        } else { // 没有下级关联节点时
+            
+            // p节点为黑色时,直接调整红黑树结构
             if (p.color == BLACK)
                 fixAfterDeletion(p);
 
+            // p父节点存在时,剔除p节点位置
             if (p.parent != null) {
                 if (p == p.parent.left)
                     p.parent.left = null;
@@ -381,6 +389,106 @@ public class TreeMap<K,V>
                     p.parent.right = null;
                 p.parent = null;
             }
+        }
+    }
+```
+
+```TreeMap.fixAfterDeletion()
+    // 删除后进行红黑树调整
+    private void fixAfterDeletion(Entry<K,V> x) {
+        // 1.根节点,无须调整
+        // 2.红色节点,无须调整,只需重新着色即可
+        while (x != root && colorOf(x) == BLACK) {
+            // x节点为左节点时
+            if (x == leftOf(parentOf(x))) {
+                // 获取x的右节点sib
+                Entry<K,V> sib = rightOf(parentOf(x));
+
+                // 右节点sib若为红色节点时,
+                if (colorOf(sib) == RED) {
+                    // 变为黑色节点
+                    setColor(sib, BLACK);
+                    // 父节点变成红色并下沉为左节点
+                    setColor(parentOf(x), RED);
+                    rotateLeft(parentOf(x));
+
+                    sib = rightOf(parentOf(x));
+                }
+                // 左右节点都为黑色,向上调整父节点
+                if (colorOf(leftOf(sib))  == BLACK &&
+                    colorOf(rightOf(sib)) == BLACK) {
+                    setColor(sib, RED);
+                    x = parentOf(x);
+                } else {
+                    if (colorOf(rightOf(sib)) == BLACK) {
+                        setColor(leftOf(sib), BLACK);
+                        setColor(sib, RED);
+                        rotateRight(sib);
+                        sib = rightOf(parentOf(x));
+                    }
+                    setColor(sib, colorOf(parentOf(x)));
+                    setColor(parentOf(x), BLACK);
+                    setColor(rightOf(sib), BLACK);
+                    rotateLeft(parentOf(x));
+                    x = root;
+                }
+            } else { // 对称操作
+                Entry<K,V> sib = leftOf(parentOf(x));
+
+                if (colorOf(sib) == RED) {
+                    setColor(sib, BLACK);
+                    setColor(parentOf(x), RED);
+                    rotateRight(parentOf(x));
+                    sib = leftOf(parentOf(x));
+                }
+
+                if (colorOf(rightOf(sib)) == BLACK &&
+                    colorOf(leftOf(sib)) == BLACK) {
+                    setColor(sib, RED);
+                    x = parentOf(x);
+                } else {
+                    if (colorOf(leftOf(sib)) == BLACK) {
+                        setColor(rightOf(sib), BLACK);
+                        setColor(sib, RED);
+                        rotateLeft(sib);
+                        sib = leftOf(parentOf(x));
+                    }
+                    setColor(sib, colorOf(parentOf(x)));
+                    setColor(parentOf(x), BLACK);
+                    setColor(leftOf(sib), BLACK);
+                    rotateRight(parentOf(x));
+                    x = root;
+                }
+            }
+        }
+
+        setColor(x, BLACK);
+    }
+```
+
+```TreeMap.successor()
+    // 获取目标节点后继节点
+    static <K,V> TreeMap.Entry<K,V> successor(Entry<K,V> t) {
+        
+        if (t == null) // 目标节点为null,直接返回null
+            return null;
+        else if (t.right != null) { // 右子节不为null时
+            // 取得其右子节点
+            Entry<K,V> p = t.right;
+            // 取到t节点的右子节p的左叶子节点
+            while (p.left != null)
+                p = p.left;
+            return p;
+        } else { // 右子节为null
+            // 获取t节点的父节点p
+            Entry<K,V> p = t.parent;
+            Entry<K,V> ch = t;
+            // 取得根节点或次级根节点??
+            while (p != null && ch == p.right) {
+                ch = p;
+                p = p.parent;
+            }
+            return p;
         }
     }
 ```
