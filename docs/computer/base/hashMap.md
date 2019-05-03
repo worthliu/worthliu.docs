@@ -36,8 +36,8 @@
             n = (tab = resize()).length;
         // 通过hash值计算数据表位置,并检查是否目标位置是否存在节点
         if ((p = tab[i = (n - 1) & hash]) == null)
-            // 不存在,创建新的结点存储
-            tab[i] = newNode(hash, key, value, null);
+            // 不存在,创建新的结点存储                     
+            tab[i] = newNode(hash, key, value, null);// 不安全
         else {
         	// 存在
             Node<K,V> e; K k;
@@ -49,10 +49,10 @@
                 // 若当前结点是TreeNode,执行树结构插入
                 e = ((TreeNode<K,V>)p).putTreeVal(this, tab, hash, key, value);
             else {
-            	// 当前结点存在值时,以链表形式插入新结点
+            	// 当前结点存在值时,以链表形式,在链尾插入新结点
                 for (int binCount = 0; ; ++binCount) {
                     if ((e = p.next) == null) {
-                        p.next = newNode(hash, key, value, null);
+                        p.next = newNode(hash, key, value, null);// 不安全
                         // 当链表长度超过TREEIFY_THRESHOLD时,变更结点结构为树结构
                         if (binCount >= TREEIFY_THRESHOLD - 1) 
                             treeifyBin(tab, hash);
@@ -83,6 +83,28 @@
     }
 ```
 
+如上源码中,新添加元素直接放在`slot`槽上,使新添加的元素在下次提取时可以更快地被访问到;如果两个线程同时执行到第1处时,那么一个线程的赋值就会被另一个覆盖掉,这是`对象丢失`的原因之一;
+
+### `HashMap.resize()`
+
+名称|说明|
+--|--|
+`length`|`table`数组长度|
+`size`|成功通过`put`方法添加到`HashMap`中所有的元素|
+`hashCode`|`Object.hashCode()`返回的`int`值,尽可能地离散均匀分布|
+`hash`|`Object.hashCode()`与当前集合的`table.length`进行位运算的结果,以确定哈希槽的位置|
+
+对于理想的哈希集合对象的存放应该符合:
++ 只要对象不一样,`hashCode`就不一样
++ 只要`hashCode`不一样,得到的`hashCode`与`hashSeed`位运算的`hash`就不一样
++ 只要`hash`不一样,存放在数组上的`slot`就不一样
+
+由于理想与实际的差异,哈希表大小是比较固定,通过不断扩容以满足元素增加需求;那么什么时候才需要进行扩容呢?
+
+**负载因子是用以权衡资源利用率与分配空间的系数.默认的负载因子是`0.75`;当`元素数量 > 容量*负载因子`时会进行扩容;**
+
+在`HashMap`中,每次进行`resize()`操作都会将容量扩充为原来的2倍;
+
 ```HashMap.resize()
 	// 初始化或扩容数据表
     final Node<K,V>[] resize() {
@@ -98,7 +120,7 @@
                 threshold = Integer.MAX_VALUE;
                 return oldTab;
             }
-            // 新容量在旧容量基础上扩容2倍,只要不超过最大容量值且大于或等于初始容量大小
+            // 新容量在旧容量基础上扩容2倍,只要不超过最大容量值,且大于或等于初始容量大小
             else if ((newCap = oldCap << 1) < MAXIMUM_CAPACITY &&
                      oldCap >= DEFAULT_INITIAL_CAPACITY)
                 // 阈值2倍扩容
@@ -127,7 +149,7 @@
             for (int j = 0; j < oldCap; ++j) {
                 Node<K,V> e;
                 if ((e = oldTab[j]) != null) {
-                    // 释放旧数据表元素
+                    // 释放旧数据表
                     oldTab[j] = null;
                     // 
                     if (e.next == null)
@@ -142,7 +164,7 @@
                         Node<K,V> loHead = null, loTail = null;
                         Node<K,V> hiHead = null, hiTail = null;
                         Node<K,V> next;
-                        // 链表循环,分隔元素位置
+                        // 链表循环,分隔元素位置,逆序迁移元素到新的元素位置中
                         do {
                             next = e.next;
                             // 低位元素
@@ -178,3 +200,17 @@
         return newTab;
     }
 ```
+
+`HashMap`中数组非常大时,进行数据迁移会非常消耗资源.当前线程迁移过程中,其他线程新增的元素有可能落在已经遍历过的哈希槽上;在遍历完成之后,`table`数组引用指向了`newTable`,这时新增元素就会丢失,被无情地垃圾回收;
+
+如果`resize()`过程中,执行了`table = newTab;`,则后续的元素就可以在新表上进行插入操作;
+
+但是如果多个线程同时执行`resize()`,每个线程又都会`(Node<K,V>[])new Node[newCap]`,这是线程内的局部数组对象,线程之间时不可见的.
+
+迁移过程中,不同线程的`resize()`操作,共同赋值给`table`线程共享变量,从而覆盖其他线程的操作,因此在新表中进行插入操作的对象会被无情地丢弃;
+
+>新增对象丢失原因:
++ 并发赋值时被覆盖
++ 已遍历区间新增元素会丢失
++ "新表"被覆盖
++ 迁移丢失
