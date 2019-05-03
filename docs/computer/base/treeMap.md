@@ -188,8 +188,9 @@ public class TreeMap<K,V>
         }
         root.color = BLACK;
     }
+```
 
-
+```TreeMap.rotateLeft
     // 左旋操作
     private void rotateLeft(Entry<K,V> p) {
     	// 节点不为空
@@ -219,7 +220,9 @@ public class TreeMap<K,V>
             p.parent = r;
         }
     }
+```
 
+```TreeMap.rotateRight
     // 右旋操作
     private void rotateRight(Entry<K,V> p) {
         if (p != null) {
@@ -246,7 +249,8 @@ public class TreeMap<K,V>
             p.parent = l;
         }
     }
-
+```
+```TreeMap.tool
     // 获取目标节点的父节点
     private static <K,V> Entry<K,V> parentOf(Entry<K,V> p) {
         return (p == null ? null: p.parent);
