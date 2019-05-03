@@ -21,6 +21,8 @@
   * [Java重排序](/computer/concurrence/javareorder.md)
   * [顺序一致性](/computer/concurrence/ordinalconsistency.md)
   
+
+  * [并发与多线程](/computer/concurrence/concurrenceIntro.md)
   * [volatile](/computer/concurrence/volatile.md)
   * [synchronized锁](/computer/concurrence/synchronized.md)
   * [Lock锁](/computer/concurrence/lock.md)

@@ -27,7 +27,7 @@ public interface Lock {
 }
 ```
 
-### `ReentrantLock`可重入锁
+## `ReentrantLock`可重入锁
 
 `ReetrantLock`本身也是一种支持重进入的锁，**即该锁可以支持一个线程对资源重复加锁，同时也支持公平锁与非公平锁。**
 
@@ -37,7 +37,7 @@ public interface Lock {
 
 `ReentrantLock`的实现依赖于Java同步器框架`AbstractQueuedSynchronizer`(AQS).AQS使用一个整型的`volatile`变量(命名为`state`)来维护同步状态;
 
-### 并发组件`AbstractQueuedSynchronizer`
+## 并发组件`AbstractQueuedSynchronizer`
 
 `AbstractQueuedSynchronizer`又称为队列同步器(后面简称AQS)，它是用来构建锁或其他同步组件的基础框架，内部通过一个int类型的成员变量`state`来控制同步状态;
 
@@ -49,7 +49,7 @@ public interface Lock {
 **注意这里涉及到两种队列，一种的同步队列，当线程请求锁而等待的后将加入同步队列等待，而另一种则是等待队列(可有多个)，通过`Condition`调用`await()`方法释放锁后，将加入等待队列**
 
 
-#### AQS中的同步队列模型
+### AQS中的同步队列模型
 
 ```
 public abstract class AbstractQueuedSynchronizer
@@ -148,7 +148,7 @@ static final class Node {
   + `FairSync`：是`ReentrantLock`的内部类，继承自`Sync`，公平锁的实现类。
 
 
-#### `ReetrantLock`,`AQS`独占模式实现
+### `ReetrantLock`,`AQS`独占模式实现
 
 `AQS同步器`的实现依赖于内部的同步队列(FIFO的双向链表对列)完成对同步状态(state)的管理，当前线程获取锁(同步状态)失败时，**AQS会将该线程以及相关等待信息包装成一个节点(Node)并将其加入同步队列，同时会阻塞当前线程**，当同步状态释放时，会将`头结点head`中的线程唤醒，让其尝试获取同步状态。
 
