@@ -16,7 +16,7 @@
 + 并发程序的执行过程是断断续续的;
 + 当并发数设置合理并且`CPU`拥有足够的处理能力时,并发会提高程序的运行效率;
 
-### 线程安全
+### 线程
 
 线程是`CPU`调度和分派的基本单位,为了更充分地利用`CPU`资源,一般都会使用多线程进行处理.
 
@@ -36,6 +36,20 @@
   + 实现`Runnable`接口;
   + 实现`Callable`接口;
 
+```Runnable
+    /**
+     * When an object implementing interface <code>Runnable</code> is used
+     * to create a thread, starting the thread causes the object's
+     * <code>run</code> method to be called in that separately executing
+     * thread.
+     * <p>
+     * The general contract of the method <code>run</code> is that it may
+     * take any action whatsoever.
+     *
+     * @see     java.lang.Thread#run()
+     */
+    public abstract void run();
+```
 
 ```Callable
  	/**
@@ -46,7 +60,22 @@
      */
     V call() throws Exception;
 ```
+从上述`Callable`声明中,可知`Callable`和`Runnable`有两点不同:
++ `Callable.call()`可以获得返回值,而`Runnable`无法直接获取执行结果,需要借助共享变量等获取;
++ `Callable.call()`可以抛出异常,而`Runnable`只有通过`Threa.setDefaultUncaughtExceptionHandler()`的方式才能在主线程中捕捉到子线程异常;
 
 
+2. `RUNNABLE`(就绪状态),是调用`start()`之后运行之前的状态.
+  + 线程的`start()`不能被多次调用,否则会抛出`IllegalThreadStateException`异常;
 
-2. 
+3. `RUNNING`(运行状态),是`run()`正在执行时线程的状态;
+
+4. `BLOCKED`(阻塞状态),进入此状态,有以下种情况:
+  + 同步阻塞 : 锁被其他线程占用;
+  + 主动阻塞 : 调用`Thread`的某些方法,主动让出CPU执行权,比如`sleep()`,`join()`等;
+  + 等待阻塞 : 执行了`wait()`;
+
+5. `DAED`(终止状态),是`run()`执行结束,或因异常退出后状态,此状态不可逆转;
+
+### 线程安全
+
