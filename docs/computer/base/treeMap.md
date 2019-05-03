@@ -52,6 +52,8 @@ public class TreeMap<K,V>
     + 如果是根节点,则直接退出,设置为黑色即可;
     + 如果不是根节点,并且父节点为红色,会一直进行调整,直到退出循环;
 
+### `TreeMap.put()`
+
 ```TreeMap
     // 塞入节点
 	public V put(K key, V value) {
@@ -266,5 +268,119 @@ public class TreeMap<K,V>
     // 获取目标节点的颜色,若为null,默认为黑色
     private static <K,V> boolean colorOf(Entry<K,V> p) {
         return (p == null ? BLACK : p.color);
+    }
+```
+
+### `TreeMap.deleteEntry()`
+
+
+```TreeMap.remove()
+    // 删除节点
+    public V remove(Object key) {
+        // 获取节点
+        Entry<K,V> p = getEntry(key);
+        if (p == null)
+            return null;
+
+        V oldValue = p.value;
+        // 删除目标节点
+        deleteEntry(p);
+        return oldValue;
+    }
+```
+
+```TreeMap.getEntry()
+    final Entry<K,V> getEntry(Object key) {
+        // 出于性能考虑，卸载基于外部比较器的版本
+        if (comparator != null)
+            return getEntryUsingComparator(key);
+
+        // key不允许为null
+        if (key == null)
+            throw new NullPointerException();
+
+        // 内部比较器, 从根节点出发,依据比较结果向左右节点查找目标key节点
+        Comparable<? super K> k = (Comparable<? super K>) key;
+        Entry<K,V> p = root;
+        while (p != null) {
+            int cmp = k.compareTo(p.key);
+            if (cmp < 0)
+                p = p.left;
+            else if (cmp > 0)
+                p = p.right;
+            else
+                return p;
+        }
+        return null;
+    }
+
+    // 基于外部比较器获取节点对象
+    final Entry<K,V> getEntryUsingComparator(Object key) {
+        K k = (K) key;
+        Comparator<? super K> cpr = comparator;
+        if (cpr != null) {
+            // 从根节点出发,依据比较结果向左右节点查找目标key节点
+            Entry<K,V> p = root;
+            while (p != null) {
+                int cmp = cpr.compare(k, p.key);
+                if (cmp < 0)
+                    p = p.left;
+                else if (cmp > 0)
+                    p = p.right;
+                else
+                    return p;
+            }
+        }
+        return null;
+    }
+```
+
+```TreeMap.deleteEntry()
+    private void deleteEntry(Entry<K,V> p) {
+        modCount++;
+        size--;
+
+        // If strictly internal, copy successor's element to p and then make p
+        // point to successor.
+        if (p.left != null && p.right != null) {
+            Entry<K,V> s = successor(p);
+            p.key = s.key;
+            p.value = s.value;
+            p = s;
+        } // p has 2 children
+
+        // Start fixup at replacement node, if it exists.
+        Entry<K,V> replacement = (p.left != null ? p.left : p.right);
+
+        if (replacement != null) {
+            // Link replacement to parent
+            replacement.parent = p.parent;
+            if (p.parent == null)
+                root = replacement;
+            else if (p == p.parent.left)
+                p.parent.left  = replacement;
+            else
+                p.parent.right = replacement;
+
+            // Null out links so they are OK to use by fixAfterDeletion.
+            p.left = p.right = p.parent = null;
+
+            // Fix replacement
+            if (p.color == BLACK)
+                fixAfterDeletion(replacement);
+        } else if (p.parent == null) { // return if we are the only node.
+            root = null;
+        } else { //  No children. Use self as phantom replacement and unlink.
+            if (p.color == BLACK)
+                fixAfterDeletion(p);
+
+            if (p.parent != null) {
+                if (p == p.parent.left)
+                    p.parent.left = null;
+                else if (p == p.parent.right)
+                    p.parent.right = null;
+                p.parent = null;
+            }
+        }
     }
 ```
