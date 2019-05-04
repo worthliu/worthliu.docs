@@ -79,3 +79,36 @@
 
 ### 线程安全
 
+**线程安全问题只在多线程环境下才出现,单线程串行执行不存在此问题.**
+
+保证高并发场景下的线程安全,可以从以下四个维度考量:
+
+>+ 数据单线程内可见;
+  + 单线程总是安全的.通过限制数据仅在单线程内可见,可以避免数据被其它线程篡改;
+  + 线程局部变量,它存储在独立虚拟机栈帧的局部变量表中,与其他线程毫无瓜葛;`ThreadLocal`就是采用此种方式;
++ 只读对象.它的特性是允许复制,拒绝写入;
+  + 一个对象想要拒绝任何写入,必须要满足以下条件:
+    + `final`关键字修饰类,避免被继承;
+    + 使用`private final`关键字避免属性被中途修改;
+    + 没有任何更新方法;
+    + 返回值不能为可变对象;
++ 线程安全类
++ 同步与锁机制
+
+
+>**线程安全的核心理念:`要么只读,要么加锁`**
+
+### JDK并发包
+
+对于线程安全,JDK提供并发包,往往能化腐朽为神奇;
+
+并发包主要分为以下几个类族:
++ 线程同步类:
+  + `CountDownLatch`,`Semaphore`,`CycliBarrier`;
++ 并发集合类:
+  + `ConcurrentHashMap`,`ConcurrentSkipListMap`,`CopyOnWriteArrayList`,`BlockingQueue`等;
++ 线程管理类:
+  + `ThreadLocal`,`Executors`,`ThreadPoolExecutor`,`ScheduledExecutorService`等;
++ 锁相关类:
+  + `ReentrantLock`
+
