@@ -124,4 +124,15 @@ Java种常用锁实现的方式有两种:
   
   并发包的类族中,`Lock`是JUC包的顶层接口,它的实现逻辑并未用到`synchronized`,而是利用了`volatile`的可见性;
 
-  
+  以`ReentrantLock`为例,`ReentrantLock`对于`Lock`接口的实现主要依赖了`Sync`,而`Sync`继承了`AbstractQueuedSynchronizer(AQS)`,它是JUC包实现同步的基础工具;
+
+  在`AQS`中,定义了一个`volatile int state`变量作为共享资源,如果线程获取资源失败,则进入同步`FIFO`队列中等待;如果成功获取资源就执行临界区代码.执行完释放资源,会通知同步队列中的等待线程来获取资源后出队并执行;
+
+  **`AQS`是抽象类,内置自旋锁实现的同步队列,封装入队和出队的操作,提供独占,共享,中断等特性方法;`AQS`的子类可以定义不同的资源实现不同性质的方法;**
+  + 可重入锁`ReentrantLock`,定义`state`为`0`时可以获取资源并置为1.若以获得资源,`state`不断加`1`,在释放资源时`state`减`1`,直至为`0`;
+  + `CountDownLatch`初始时定义了资源总量`state=count`,`countDown()`不断将`state`减`1`,当`state=0`时才能获得锁,释放后`state`就一直为`0`.所有线程调用`await()`都不会等待,所以`CountDownLatch`时一次性,用完后如果再想用就只能重新创建一个;
+  + `CyclicBarrier`是可重复使用得资源;
+  + `Semaphore`同样定义了资源总量`state=permits`,当`state>0`时就能获得锁,并将`state`减`1`,当`state=0`时只能等待其他线程释放锁,当释放锁时`state`加`1`,其他等待线程又能获得这个锁.当`Semaphore`的`permits`定义为`1`时,就是互斥锁,当`permits>1`就是共享锁;
+
+  查看详细的<a href="#/computer/concurrence/lock" title="Lock">`Lock`</a>介绍,可以点击这里;
++ 
