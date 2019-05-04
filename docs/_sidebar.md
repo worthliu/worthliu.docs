@@ -20,7 +20,6 @@
   * [Java内存模型](/computer/concurrence/javamemorymodel.md)
   * [Java重排序](/computer/concurrence/javareorder.md)
   * [顺序一致性](/computer/concurrence/ordinalconsistency.md)
-  
 
   * [并发与多线程](/computer/concurrence/concurrenceIntro.md)
   * [线程](/computer/concurrence/thread.md)
