@@ -2,7 +2,7 @@
 
 JDK中除去`synchronized`关键字实现的隐式同步锁外,在1.5后还提供由`Lock接口`实现可重入锁(`ReentrantLock`)显示同步锁;
 
-```
+```Lock
 public interface Lock {
     //加锁
     void lock();
@@ -27,19 +27,19 @@ public interface Lock {
 }
 ```
 
-## `ReentrantLock`可重入锁
+## `ReentrantLock`
 
 `ReetrantLock`本身也是一种支持重进入的锁，**即该锁可以支持一个线程对资源重复加锁，同时也支持公平锁与非公平锁。**
 
-所谓的公平与非公平指的是在请求先后顺序上，先对锁进行请求的就一定先获取到锁，那么这就是公平锁，反之，如果对于锁的获取并没有时间上的先后顺序，如后请求的线程可能先获取到锁，这就是非公平锁;
+所谓的`公平`与`非公平`指的是**在请求先后顺序上，先对锁进行请求的就一定先获取到锁**，那么这就是公平锁，反之，**如果对于锁的获取并没有时间上的先后顺序，如后请求的线程可能先获取到锁**，这就是非公平锁;
 
 >**`ReetrantLock`支持对同一线程重加锁,但是加锁多少次,就必须结束多少次;**
 
 `ReentrantLock`的实现依赖于Java同步器框架`AbstractQueuedSynchronizer`(AQS).AQS使用一个整型的`volatile`变量(命名为`state`)来维护同步状态;
 
-## 并发组件`AbstractQueuedSynchronizer`
+## `AbstractQueuedSynchronizer`
 
-`AbstractQueuedSynchronizer`又称为队列同步器(后面简称AQS)，它是用来构建锁或其他同步组件的基础框架，内部通过一个int类型的成员变量`state`来控制同步状态;
+`AbstractQueuedSynchronizer`又称为队列同步器(后面简称`AQS`)，它是用来构建锁或其他同步组件的基础框架，内部通过一个int类型的成员变量`state`来控制同步状态;
 
 >+ 当`state=0`时，则说明没有任何线程占有共享资源的锁;
 + 当`state=1`时，则说明有线程目前正在使用共享变量，其他线程必须加入同步队列进行等待;
@@ -51,7 +51,7 @@ public interface Lock {
 
 ### AQS中的同步队列模型
 
-```
+```AbstractQueuedSynchronizer
 public abstract class AbstractQueuedSynchronizer
     extends AbstractOwnableSynchronizer{
 //指向同步队列队头
@@ -64,10 +64,11 @@ private transient volatile Node tail;
 private volatile int state;
 
 }
-
 ```
 
-`head`和`tail`分别是AQS中的变量，其中`head`指向同步队列的头部，注意`head`为空结点，不存储信息。而`tail`则是同步队列的队尾，**同步队列采用的是双向链表的结构这样可方便队列进行结点增删操作。**
+`head`和`tail`分别是AQS中的变量，其中`head`指向同步队列的头部，注意`head`为空结点，不存储信息。
+
+而`tail`则是同步队列的队尾，**同步队列采用的是双向链表的结构这样可方便队列进行结点增删操作。**
 
 + `state`变量则是代表同步状态，执行当线程调用`lock`方法进行加锁后，如果此时`state`的值为0，则说明当前线程可以获取到锁，同时将`state`设置为1，表示获取成功。
 + 如果`state`已为1，也就是当前锁已被其他线程持有，那么当前执行线程将**被封装为`Node`结点加入同步队列等待**。
@@ -76,7 +77,7 @@ private volatile int state;
 
 每个`Node`结点内部关联其`前继结点prev`和`后继结点next`，这样可以方便线程释放锁后快速唤醒下一个在等待的线程;
 
-```
+```Node
 static final class Node {
     //共享模式
     static final Node SHARED = new Node();
