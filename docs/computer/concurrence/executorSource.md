@@ -94,16 +94,18 @@
         for (;;) {
             int c = ctl.get();
             int rs = runStateOf(c);
-            // 
-            // Check if queue empty only if necessary.
+            // 如果RUNNING状态,则条件为假,不执行后面的判断
+            // 如果是SHUTDOWN状态,且firstTask初始线程不为空,或者队列为空
+            // 都会直接返回创建失败
             if (rs >= SHUTDOWN &&
                 ! (rs == SHUTDOWN &&
                    firstTask == null &&
                    ! workQueue.isEmpty()))
                 return false;
-
+            // 
             for (;;) {
                 int wc = workerCountOf(c);
+                // 如果超过最大允许线程数则不能再添加新的线程
                 if (wc >= CAPACITY ||
                     wc >= (core ? corePoolSize : maximumPoolSize))
                     return false;
