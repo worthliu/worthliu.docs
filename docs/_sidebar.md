@@ -24,6 +24,7 @@
   * [并发与多线程](/computer/concurrence/concurrenceIntro.md)
   * [线程](/computer/concurrence/thread.md)
   * [线程池](/computer/concurrence/executor.md)
+  * [Executors](/computer/concurrence/executors.md)
   * [volatile](/computer/concurrence/volatile.md)
   * [synchronized锁](/computer/concurrence/synchronized.md)
   * [Lock锁](/computer/concurrence/lock.md)
