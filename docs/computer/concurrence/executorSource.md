@@ -80,12 +80,21 @@
 ```
 
 ```ThreadPoolExecutor.addWorker
+    // 根据当前线程池状态,检查是否可以添加新的任务线程,如果可以则创建并启动任务;
+    // 如果一切正常则返回true,返回false的可能性如下:
+    // 1. 线程池没有处于RUNNING状态
+    // 2. 线程工厂创建新的线程任务失败
+    // firstTask : 外部启动线程池是需要构造的第一个线程,它是线程的母体
+    // core : 新增工作线程时的判断指标:
+    //       true 表示新增工作线程时,需要判断当前RUNNING状态的线程是否小于corePoolSize
+    //       false 表示新增工作线程时,需要判断当前RUNNING状态的线程是否小于maximunPoolSize
 	private boolean addWorker(Runnable firstTask, boolean core) {
+		// goto跳转标签
         retry:
         for (;;) {
             int c = ctl.get();
             int rs = runStateOf(c);
-
+            // 
             // Check if queue empty only if necessary.
             if (rs >= SHUTDOWN &&
                 ! (rs == SHUTDOWN &&
