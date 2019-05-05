@@ -173,7 +173,39 @@ public ThreadPoolExecutor(int corePoolSize,
 7. `handler`：执行拒绝策略的对象.
   + 当`workQueue`的任务缓存区到达上限后,并且活动线程数大于`maximumPoolSize`时候,线程池通过该策略处理请求,这是一种简单的限流保护;
 
-### 线程池拒绝策略``
+### 线程池拒绝策略`RejectedExecutionHandler`
+
+```ThreadPoolExecutor
+private static final RejectedExecutionHandler defaultHandler =
+        new AbortPolicy();
+```
+```ThreadPoolExecutor.AbortPolicy
+public static class AbortPolicy implements RejectedExecutionHandler {
+        public AbortPolicy() { }
+
+        /**
+         * 丢弃任务,并抛出RejectedExecutionException异常
+         */
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+            throw new RejectedExecutionException("Task " + r.toString() +
+                                                 " rejected from " +
+                                                 e.toString());
+        }
+    }
+```
+
+>**线程池默认的拒绝策略是`AbortPolicy`;**
+
+在`ThreadPoolExecutor`中提供了四个公开的内部静态类:
++ `AbortPolicy`(默认) : 丢弃任务,并抛出`RejectedExecutionException`异常
++ `DiscardPolicy` : 丢弃任务,但是不抛出异常,这是不推荐的做法
++ `DiscardOldestPolicy` : 抛弃队列中等待最久的任务,然后把当前任务加入队列中;
++ `CallerRunsPolicy` : 调用任务的`run()`方法绕过线程池直接执行;
+
+
+
+
+### 线程池设置
 
 >`ThreadPoolExecutor`执行任务时遵循以下规则：
   1. 如果线程池中的线程数量未达到核心线程的数量，那么会直接启动一个核心线程来执行任务； 
@@ -182,6 +214,8 @@ public ThreadPoolExecutor(int corePoolSize,
   4. 如果步骤3中线程数量已经达到线程池规定的最大值，那么就拒绝执行此任务，`ThreadPoolExecutor`会调用`RejectedExecutionHandler`的`rejectedExecution`方法来通知调用者。
 
 >调整线程池的大小:**线程池的最佳大小主要取决于系统的可用cpu的数目，以及工作队列中任务的特点;**
-* 假如一个具有N个cpu的系统上只有一个工作队列，并且其中全部是**运算性质(不会阻塞)的任务**，那么**当线程池拥有`N或N+1`个工作线程时，一般会获得最大的`cpu使用率`**。
-* 如果工作队列中包含会**执行IO操作并经常阻塞的任务**，则要让线程池的大小超过可用 cpu的数量，因为并不是所有的工作线程都一直在工作。选择一个典型的任务，然后估计在执行这个任务的工程中，**等待时间与实际占用cpu进行运算的时间的比例WT/ST。对于一个具有`N个cpu的系统`，需要设置大约N(1+WT/ST)个线程来保证cpu得到充分利用**。
-* 当然,cpu利用率不是调整线程池过程中唯一要考虑的事项，随着线程池工作数目的增长，还会碰到内存或者其他资源的限制，如套接字，打开的文件句柄或数据库连接数目等。要保证多线程消耗的系统资源在系统承受的范围之内。	
++ 假如一个具有`N`个`cpu`的系统上只有一个工作队列，并且其中全部是**运算性质(不会阻塞)的任务**，那么**当线程池拥有`N或N+1`个工作线程时，一般会获得最大的`cpu使用率`**。
++ 如果工作队列中包含会**执行IO操作并经常阻塞的任务**，则要让线程池的大小超过可用`cpu`的数量，因为并不是所有的工作线程都一直在工作。
+  + 选择一个典型的任务，然后估计在执行这个任务的工程中，**等待时间与实际占用cpu进行运算的时间的比例`WT/ST`**。
+  + 对于一个具有`N个cpu的系统`，需要设置大约`N(1+WT/ST)`个线程来保证cpu得到充分利用**。
++ 当然,cpu利用率不是调整线程池过程中唯一要考虑的事项，随着线程池工作数目的增长，还会碰到内存或者其他资源的限制，如套接字，打开的文件句柄或数据库连接数目等。要保证多线程消耗的系统资源在系统承受的范围之内。	
