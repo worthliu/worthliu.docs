@@ -1,11 +1,63 @@
 ## 线程池
 
-从JDK实现看,线程池通过`Executor`、`ExecutorService`两个接口定义线程池基础，`AbstractExecutorService`、`ThreadPoolExecutor`定义出线程池具体实现：
+线程使应用能够更加充分合理地协调利用CPU,内存,网络,IO等系统资源.线程的创建需要开辟虚拟机栈,本地方法栈,程序计数器等线程私有的内存空间.在线程销毁时需要回收这些系统资源.频繁地创建和销毁线程会浪费大量的系统资源,增加并发编程风险;
+
+>所以需要通过线程池协调多个线程,并实现类似主次线程隔离,定时执行,周期执行等任务;线程池的作用包括:
++ 利用线程池管理并复用线程,控制最大并发数等;
++ 实现任务线程队列缓存策略和拒绝机制;
++ 实现某些与时间相关的功能,如定时执行,周期执行等;
++ 隔离线程环境; 
 
 ![executor](/images/executor.png)
 
-### AbstractExecutorService
-AbstractExecutorService是他们的抽象实现类，提供线程池底层接口方法的所有实现；
+从JDK实现看,线程池通过`Executor`、`ExecutorService`两个接口定义线程池基础，`AbstractExecutorService`、`ThreadPoolExecutor`定义出线程池具体实现：
+
+```Executor
+public interface Executor {
+    void execute(Runnable command);
+}
+```
+
+```ExecutorService
+public interface ExecutorService extends Executor {
+
+    void shutdown();
+
+    List<Runnable> shutdownNow();
+
+    boolean isShutdown();
+
+    boolean isTerminated();
+
+    boolean awaitTermination(long timeout, TimeUnit unit)
+        throws InterruptedException;
+
+    <T> Future<T> submit(Callable<T> task);
+
+    <T> Future<T> submit(Runnable task, T result);
+
+    Future<?> submit(Runnable task);
+
+    <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks)
+        throws InterruptedException;
+
+    <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks,
+                                  long timeout, TimeUnit unit)
+        throws InterruptedException;
+
+    <T> T invokeAny(Collection<? extends Callable<T>> tasks)
+        throws InterruptedException, ExecutionException;
+
+    <T> T invokeAny(Collection<? extends Callable<T>> tasks,
+                    long timeout, TimeUnit unit)
+        throws InterruptedException, ExecutionException, TimeoutException;
+}
+
+```
+
+
+### `AbstractExecutorService`
+`AbstractExecutorService`是他们的抽象实现类，提供线程池底层接口方法的所有实现；
 
 ```
 	protected <T> RunnableFuture<T> newTaskFor(Runnable runnable, T value) {
@@ -31,7 +83,7 @@ AbstractExecutorService是他们的抽象实现类，提供线程池底层接口
     }
 ```
 
-### FutureTask
+### `FutureTask`
 
 `FutureTask`，是线程池最后转换的执行单元入口参数（其实最终执行还是`Runnable`）
 
@@ -91,7 +143,7 @@ public void run() {
 
 `ThreadPoolExecutor`是线程池的真正实现，它的构造方法提供了一系列参数来配置线程池;
 
-```
+```ThreadPoolExecutor
 public ThreadPoolExecutor(int corePoolSize,
                               int maximumPoolSize,
                               long keepAliveTime,
@@ -113,7 +165,7 @@ public ThreadPoolExecutor(int corePoolSize,
   1. 如果线程池中的线程数量未达到核心线程的数量，那么会直接启动一个核心线程来执行任务； 
   2. 如果线程池中的线程数量已经达到或者超过核心线程的数量，那么任务会被插入到任务队列中排队等待执行； 
   3. 如果步骤2中无法将任务插入到任务队列中，这往往是由于任务队列已满，这个时候如果线程数量未达到线程池规定的最大值，那么会立刻启动一个非核心线程来执行。 
-  4. 如果步骤3中线程数量已经达到线程池规定的最大值，那么就拒绝执行此任务，ThreadPoolExecutor会调用RejectedExecutionHandler的rejectedExecution方法来通知调用者。
+  4. 如果步骤3中线程数量已经达到线程池规定的最大值，那么就拒绝执行此任务，`ThreadPoolExecutor`会调用`RejectedExecutionHandler`的`rejectedExecution`方法来通知调用者。
 
 >调整线程池的大小:**线程池的最佳大小主要取决于系统的可用cpu的数目，以及工作队列中任务的特点;**
 * 假如一个具有N个cpu的系统上只有一个工作队列，并且其中全部是**运算性质(不会阻塞)的任务**，那么**当线程池拥有`N或N+1`个工作线程时，一般会获得最大的`cpu使用率`**。
