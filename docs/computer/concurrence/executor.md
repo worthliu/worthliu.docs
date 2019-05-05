@@ -135,18 +135,45 @@ public ThreadPoolExecutor(int corePoolSize,
                               int maximumPoolSize,
                               long keepAliveTime,
                               TimeUnit unit,
-                              BlockingQueue<runnable> workQueue);
+                              BlockingQueue<Runnable> workQueue,
+                              ThreadFactory threadFactory,
+                              RejectedExecutionHandler handler) {
+        if (corePoolSize < 0 ||
+            // maximumPoolSize必须大于或等于1也要大于或等于corePoolSize
+            maximumPoolSize <= 0 ||
+            maximumPoolSize < corePoolSize ||
+            keepAliveTime < 0)
+            throw new IllegalArgumentException();
+        if (workQueue == null || threadFactory == null || handler == null)
+            throw new NullPointerException();
+        this.corePoolSize = corePoolSize;
+        this.maximumPoolSize = maximumPoolSize;
+        this.workQueue = workQueue;
+        this.keepAliveTime = unit.toNanos(keepAliveTime);
+        this.threadFactory = threadFactory;
+        this.handler = handler;
+    }
 ```
 
->1. `corePoolSize`：线程池核心线程数，默认情况下，核心线程会在线程池中一直存活，即使它们处于闲置状态。
-   * 如果`ThreadPoolExecutor`的`allowCoreThreadTimeOut`属性设置为true,那么闲置的核心线程在等待新任务到来时会有超时策略，这个时间间隔由`keepAliveTime`所指定的时长后，核心线程就会被终止。
-2. `maximumPoolSize`：线程池所能容纳的最大线程数，当活动线程达到这个数值后，后续的新任务将被阻塞。
-3. `keepAliveTime`：非核心线程闲置时的超时时长，超过这个时长，非核心线程就会被回收。
-   * 当`ThreadPoolExecutor`的`allowCoreThreadTimeOut`属性设置为true时，`keepAliveTime`同样会作用于非核心线程。
+>1. `corePoolSize`：**常驻核心线程数;**
+  + 如果等于`0`,则任务执行完之后,没有任何请求进入时销毁线程池的线程;
+   + 如果`ThreadPoolExecutor`的`allowCoreThreadTimeOut`属性设置为true,那么闲置的核心线程在等待新任务到来时会有超时策略，这个时间间隔由`keepAliveTime` 所指定的时长后，核心线程就会被终止。
+  + 如果大于`0`,即使本地任务执行完毕,核心线程也不会被销毁.
+2. `maximumPoolSize`：线程池所能容纳同时执行的最大线程数，当活动线程达到这个数值后，后续的新任务将被阻塞。
+  + 如果待执行的线程数大于此值,需要借助缓存队列,缓存起来;
+  + 如果`maximumPoolSize`与`corePoolSize`相等,既是固定大小线程池;
+3. `keepAliveTime`：表示线程池中的线程空闲时间,当空闲时间达到`keepAliveTime`值时,线程会被销毁,直到只剩下`corePoolSize`个线程为止,避免浪费内存和句柄资源;
+  + 当线程池的线程数大于`corePoolSize`时,`keepAliveTime`才会起作用;
+  + 当`ThreadPoolExecutor`的`allowCoreThreadTimeOut`属性设置为true时，核心线程超时后也会被回收。
 4. `unit`：`keepAliveTime` 参数的时间单位。
-5. `workQueue`：执行前用于保持任务的队列。此队列仅保持由 `execute` 方法提交的 `Runnable` 任务。
+5. `workQueue`：缓存队列。此队列仅保持由 `execute` 方法提交的 `Runnable` 任务。
+  + 当请求的线程数大于`corePoolSize`时,线程进入`BlockingQueue`阻塞队列.
 6. `threadFactory`：执行程序创建新线程时使用的工厂。
-7. `handler`：由于超出线程范围和队列容量而使执行被阻塞时所使用的处理程序。
+  + 它用来生产一组相同任务的线程.
+7. `handler`：执行拒绝策略的对象.
+  + 当`workQueue`的任务缓存区到达上限后,并且活动线程数大于`maximumPoolSize`时候,线程池通过该策略处理请求,这是一种简单的限流保护;
+
+
 
 >`ThreadPoolExecutor`执行任务时遵循以下规则：
   1. 如果线程池中的线程数量未达到核心线程的数量，那么会直接启动一个核心线程来执行任务； 
