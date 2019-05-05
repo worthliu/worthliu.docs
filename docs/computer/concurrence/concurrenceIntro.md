@@ -36,33 +36,33 @@
   + 实现`Runnable`接口;
   + 实现`Callable`接口;
 
-```Runnable
-    /**
-     * When an object implementing interface <code>Runnable</code> is used
-     * to create a thread, starting the thread causes the object's
-     * <code>run</code> method to be called in that separately executing
-     * thread.
-     * <p>
-     * The general contract of the method <code>run</code> is that it may
-     * take any action whatsoever.
-     *
-     * @see     java.lang.Thread#run()
-     */
-    public abstract void run();
-```
+  ```Runnable
+      /**
+       * When an object implementing interface <code>Runnable</code> is used
+       * to create a thread, starting the thread causes the object's
+       * <code>run</code> method to be called in that separately executing
+       * thread.
+       * <p>
+       * The general contract of the method <code>run</code> is that it may
+       * take any action whatsoever.
+       *
+       * @see     java.lang.Thread#run()
+       */
+      public abstract void run();
+  ```
 
-```Callable
- 	/**
-     * 返回结果或抛出异常
-     *
-     * @return computed result
-     * @throws Exception if unable to compute a result
-     */
-    V call() throws Exception;
-```
-从上述`Callable`声明中,可知`Callable`和`Runnable`有两点不同:
-+ `Callable.call()`可以获得返回值,而`Runnable`无法直接获取执行结果,需要借助共享变量等获取;
-+ `Callable.call()`可以抛出异常,而`Runnable`只有通过`Threa.setDefaultUncaughtExceptionHandler()`的方式才能在主线程中捕捉到子线程异常;
+  ```Callable
+   	/**
+       * 返回结果或抛出异常
+       *
+       * @return computed result
+       * @throws Exception if unable to compute a result
+       */
+      V call() throws Exception;
+  ```
+  从上述`Callable`声明中,可知`Callable`和`Runnable`有两点不同:
+  + `Callable.call()`可以获得返回值,而`Runnable`无法直接获取执行结果,需要借助共享变量等获取;
+  + `Callable.call()`可以抛出异常,而`Runnable`只有通过`Threa.setDefaultUncaughtExceptionHandler()`的方式才能在主线程中捕捉到子线程异常;
 
 
 2. `RUNNABLE`(就绪状态),是调用`start()`之后运行之前的状态.
@@ -98,12 +98,12 @@
 
 >**线程安全的核心理念:`要么只读,要么加锁`**
 
-### JDK并发包
+### `JDK`并发包
 
-对于线程安全,JDK提供并发包,往往能化腐朽为神奇;
+对于线程安全,`JDK`提供并发包,往往能化腐朽为神奇;
 
 并发包主要分为以下几个类族:
-+ 线程同步类:
+>+ 线程同步类:
   + `CountDownLatch`,`Semaphore`,`CycliBarrier`;
 + 并发集合类:
   + `ConcurrentHashMap`,`ConcurrentSkipListMap`,`CopyOnWriteArrayList`,`BlockingQueue`等;
@@ -150,3 +150,4 @@ Java种常用锁实现的方式有两种:
   + 如果`monitor`非`0`,其他线程就会进入阻塞状态;
 
   查看详细的<a href="#/computer/concurrence/synchronized" title="synchronized">`synchronized`</a>介绍,可以点击这里;
+
