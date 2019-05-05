@@ -10,7 +10,7 @@
 
 ![executor](/images/executor.png)
 
-从JDK实现看,线程池通过`Executor`、`ExecutorService`两个接口定义线程池基础，`AbstractExecutorService`、`ThreadPoolExecutor`定义出线程池具体实现：
+从JDK实现看,线程池通过`Executor`、`ExecutorService`两个接口定义线程池基础;
 
 ```Executor
 public interface Executor {
@@ -55,44 +55,35 @@ public interface ExecutorService extends Executor {
 
 ```
 
-
 ### `AbstractExecutorService`
-`AbstractExecutorService`是他们的抽象实现类，提供线程池底层接口方法的所有实现；
 
-```
-	protected <T> RunnableFuture<T> newTaskFor(Runnable runnable, T value) {
-	        return new FutureTask<T>(runnable, value);
-	    }
+`AbstractExecutorService`是线程池抽象实现类，提供线程池底层接口方法的最底层实现；
 
-    protected <T> RunnableFuture<T> newTaskFor(Callable<T> callable) {
-        return new FutureTask<T>(callable);
-    }
-
-    public <T> Future<T> submit(Runnable task, T result) {
-        if (task == null) throw new NullPointerException();
-        RunnableFuture<T> ftask = newTaskFor(task, result);
-        execute(ftask);
-        return ftask;
-    }
-
+```AbstractExecutorService
+    // 
+    protected <T> RunnableFuture<T> newTaskFor(Runnable runnable, T value) {
+        return new FutureTask<T>(runnable, value);
+    }	  
+    // 执行任务提交
     public <T> Future<T> submit(Callable<T> task) {
         if (task == null) throw new NullPointerException();
         RunnableFuture<T> ftask = newTaskFor(task);
         execute(ftask);
         return ftask;
-    }
+    }  
 ```
 
-### `FutureTask`
+#### `FutureTask`
 
 `FutureTask`，是线程池最后转换的执行单元入口参数（其实最终执行还是`Runnable`）
 
-```
-public class FutureTask<V> implements RunnableFuture<V>
-
+```RunnableFuture
 public interface RunnableFuture<V> extends Runnable, Future<V>
 ```
+```FutureTask
+public class FutureTask<V> implements RunnableFuture<V>
 ```
+```FutureTask
 public FutureTask(Callable<V> callable) {
         if (callable == null)
             throw new NullPointerException();
@@ -127,11 +118,7 @@ public void run() {
                     set(result);
             }
         } finally {
-            // runner must be non-null until state is settled to
-            // prevent concurrent calls to run()
             runner = null;
-            // state must be re-read after nulling runner to prevent
-            // leaked interrupts
             int s = state;
             if (s >= INTERRUPTING)
                 handlePossibleCancellationInterrupt(s);
