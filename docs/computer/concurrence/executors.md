@@ -5,10 +5,14 @@ Java 类库提供了一个灵活的线程池以及一些有用的默认配置。
 调用方法|说明|
 --|--|
 `Executors.newWorkStealingPool`|`JDK8`引入,创建持有足够线程的线程池支持给定的并行度,并通过使用多个队列减少竞争,此构造方法中把`CPU`数量设置未默认的并行度;|
+`Executors.newScheduledThreadPool`|线程数最大至`Integer.MAX_VALUE`,它是`ScheduledExecutorService`接口家族的实现类,支持定时及周期性任务执行.|
 `Executors.newCachedThreadPool`|`maximumPoolSize`最大可以达到`Integer.MAX_VALUE`,是高度可伸缩的线程池,如果达到上限,相信没有任务服务器能够继续工作,肯定会抛出OOM异常;`keepAliveTime`默认为60秒,工作线程处于空闲状态,则回收工作线程.如果任务数增加,再次创建出线程处理任务;|
-`Executors.`||
-`Executors.`||
-`Executors.`||
+`Executors.newSingleThreadExecutor`|创建一个单线程的线程池,相当于单线程串行执行所有任务,保证按任务的提交顺序依次执行;|
+`Executors.newFixedThreadPool`|输入的参数既是固定线程数,既是核心线程数也是最大线程数,不存在空闲线程,所以`keepAliveTime`等于`0`|
+
+对于`Executors.newFixedThreadPool`,`ExecutorService.newSingleThreadExecutor`,所使用的缓存队列是`new LinkedBlockingQueue<Runnable>()`;由于使用无界队列,如果瞬间请求非常大,会有OOM的风险;
+	
+而`Executors.newCachedThreadPool`,所使用的缓存队列是`new SynchronousQueue<Runnable>()`;
 
 
 

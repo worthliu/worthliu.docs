@@ -173,7 +173,7 @@ public ThreadPoolExecutor(int corePoolSize,
 7. `handler`：执行拒绝策略的对象.
   + 当`workQueue`的任务缓存区到达上限后,并且活动线程数大于`maximumPoolSize`时候,线程池通过该策略处理请求,这是一种简单的限流保护;
 
-
+### 线程池拒绝策略``
 
 >`ThreadPoolExecutor`执行任务时遵循以下规则：
   1. 如果线程池中的线程数量未达到核心线程的数量，那么会直接启动一个核心线程来执行任务； 
