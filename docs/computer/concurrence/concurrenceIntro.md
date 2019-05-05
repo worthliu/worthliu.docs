@@ -126,7 +126,9 @@ Java种常用锁实现的方式有两种:
 
   以`ReentrantLock`为例,`ReentrantLock`对于`Lock`接口的实现主要依赖了`Sync`,而`Sync`继承了`AbstractQueuedSynchronizer(AQS)`,它是JUC包实现同步的基础工具;
 
-  在`AQS`中,定义了一个`volatile int state`变量作为共享资源,如果线程获取资源失败,则进入同步`FIFO`队列中等待;如果成功获取资源就执行临界区代码.执行完释放资源,会通知同步队列中的等待线程来获取资源后出队并执行;
+  >在`AQS`中,定义了一个`volatile int state`变量作为共享资源,如果线程获取资源失败,则进入同步`FIFO`队列中等待;
+
+  **如果成功获取资源就执行临界区代码.执行完释放资源,会通知同步队列中的等待线程来获取资源后出队并执行;**
 
   **`AQS`是抽象类,内置自旋锁实现的同步队列,封装入队和出队的操作,提供独占,共享,中断等特性方法;`AQS`的子类可以定义不同的资源实现不同性质的方法;**
   + 可重入锁`ReentrantLock`,定义`state`为`0`时可以获取资源并置为1.若以获得资源,`state`不断加`1`,在释放资源时`state`减`1`,直至为`0`;
@@ -135,4 +137,16 @@ Java种常用锁实现的方式有两种:
   + `Semaphore`同样定义了资源总量`state=permits`,当`state>0`时就能获得锁,并将`state`减`1`,当`state=0`时只能等待其他线程释放锁,当释放锁时`state`加`1`,其他等待线程又能获得这个锁.当`Semaphore`的`permits`定义为`1`时,就是互斥锁,当`permits>1`就是共享锁;
 
   查看详细的<a href="#/computer/concurrence/lock" title="Lock">`Lock`</a>介绍,可以点击这里;
-+ 
++ 利用同步代码块
+  + 同步代码块一般使用`Java`的`synchronized`关键字来实现
+    + 在方法签名处加`synchronized`关键字
+    + 使用`synchronized`对象或锁进行同步;
+  JVM底层时通过监视锁来实现`synchronized`同步的.监视锁`monitor`,是每个对象与生俱来的一个隐藏字段.使用`synchronized`的当前使用环境,找到对应对象的`monitor`,再根据`monitor`的状态进行加锁解锁的判断;
+
+  方法元信息中会使用`ACC_SYNCHRONIZED`标识该方法是一个同步方法.同步代码块中会使用`monitorenter`及`monitorexit`两个字节码指令获取和释放`monitor`;
+
+  + 如果使用`monitorenter`进入时`monitor`为`0`,表示该线程可以持有`monitor`后续代码,并将`monitor`加`1`;
+  + 如果当前线程已经持有了`monitor`,那么`monitor`继续加`1`;
+  + 如果`monitor`非`0`,其他线程就会进入阻塞状态;
+
+  查看详细的<a href="#/computer/concurrence/synchronized" title="synchronized">`synchronized`</a>介绍,可以点击这里;
