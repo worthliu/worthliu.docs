@@ -15,7 +15,9 @@
 
 ### 具体实现
 
-```Strategy 抽象的策略角色
+抽象的策略角色
+
+```Strategy
 public interface Strategy {
     void doSomething();
 }
