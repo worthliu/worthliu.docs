@@ -44,6 +44,10 @@
     private static boolean isRunning(int c) {
         return c < SHUTDOWN;
     }
+
+    private boolean compareAndIncrementWorkerCount(int expect) {
+        return ctl.compareAndSet(expect, expect + 1);
+    }
 ```
 
 ```ThreadPoolExecutor.execute
@@ -106,39 +110,50 @@
             for (;;) {
                 int wc = workerCountOf(c);
                 // 如果超过最大允许线程数则不能再添加新的线程
+                // 不能超过最大线程数2^29,否则影响左边3位的线程池状态值
                 if (wc >= CAPACITY ||
                     wc >= (core ? corePoolSize : maximumPoolSize))
                     return false;
+               
+                // 将当前活动线程数加1
                 if (compareAndIncrementWorkerCount(c))
                     break retry;
+               
+                // 线程池状态和工作线程数是可变化的,需要经常提取这个最新值
                 c = ctl.get();  // Re-read ctl
+
+                // 来到这步,rs的状态必然是RUNNING,若当前获取线程池状态不是RUNNING,再跳转到retry进行循环
                 if (runStateOf(c) != rs)
                     continue retry;
                 // else CAS failed due to workerCount change; retry inner loop
             }
         }
 
+        //开始创建工作线程
         boolean workerStarted = false;
         boolean workerAdded = false;
         Worker w = null;
         try {
+        	// 利用Worker构造方法中的线程池工厂(采用默认线程池工厂类)创建线程,并封装成工作线程Worker对象
             w = new Worker(firstTask);
+            // 注意这是Worker中的属性对象thread
             final Thread t = w.thread;
             if (t != null) {
+            	// 在进行ThreadPoolExecutor的敏感操作时
+            	// 都需要持有主锁,避免在添加和启动线程时被干扰
                 final ReentrantLock mainLock = this.mainLock;
                 mainLock.lock();
                 try {
-                    // Recheck while holding lock.
-                    // Back out on ThreadFactory failure or if
-                    // shut down before lock acquired.
+                    // 再次获取当前线程池状态
                     int rs = runStateOf(ctl.get());
-
+                    // 当线程池状态为RUNNING或SHUTDOWN且firstTask初始化线程为空时
                     if (rs < SHUTDOWN ||
                         (rs == SHUTDOWN && firstTask == null)) {
                         if (t.isAlive()) // precheck that t is startable
                             throw new IllegalThreadStateException();
                         workers.add(w);
                         int s = workers.size();
+                        // 整个线程池在运行期间的最大并发任务个数
                         if (s > largestPoolSize)
                             largestPoolSize = s;
                         workerAdded = true;
@@ -146,16 +161,70 @@
                 } finally {
                     mainLock.unlock();
                 }
+                // 增加工作线程成功时,执行线程
                 if (workerAdded) {
                     t.start();
                     workerStarted = true;
                 }
             }
         } finally {
+        	// 线程启动失败,把刚才上述代码加上的工作线程计数再减回去
             if (! workerStarted)
                 addWorkerFailed(w);
         }
         return workerStarted;
     }
 
+```
+
+```ThreadPoolExecutor.addWorkerFailed
+	private void addWorkerFailed(Worker w) {
+        final ReentrantLock mainLock = this.mainLock;
+        mainLock.lock();
+        try {
+            if (w != null)
+                workers.remove(w);
+            decrementWorkerCount();
+            tryTerminate();
+        } finally {
+            mainLock.unlock();
+        }
+    }
+```
+
+```ThreadPoolExecutor.Worker
+	Worker(Runnable firstTask) {
+        setState(-1); // inhibit interrupts until runWorker
+        this.firstTask = firstTask;
+        this.thread = getThreadFactory().newThread(this);
+    }
+```
+
+```Executors.DefaultThreadFactory
+	static class DefaultThreadFactory implements ThreadFactory {
+        private static final AtomicInteger poolNumber = new AtomicInteger(1);
+        private final ThreadGroup group;
+        private final AtomicInteger threadNumber = new AtomicInteger(1);
+        private final String namePrefix;
+
+        DefaultThreadFactory() {
+            SecurityManager s = System.getSecurityManager();
+            group = (s != null) ? s.getThreadGroup() :
+                                  Thread.currentThread().getThreadGroup();
+            namePrefix = "pool-" +
+                          poolNumber.getAndIncrement() +
+                         "-thread-";
+        }
+
+        public Thread newThread(Runnable r) {
+            Thread t = new Thread(group, r,
+                                  namePrefix + threadNumber.getAndIncrement(),
+                                  0);
+            if (t.isDaemon())
+                t.setDaemon(false);
+            if (t.getPriority() != Thread.NORM_PRIORITY)
+                t.setPriority(Thread.NORM_PRIORITY);
+            return t;
+        }
+    }
 ```
