@@ -98,6 +98,7 @@
 
 * 网络
   * [网络基础知识](/network/network.md)
+  * [信息安全](/network/webSecurity.md)
   * [HTTP](/network/http.md)
   * [HTTPS](/network/https.md)
 
