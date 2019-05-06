@@ -78,6 +78,7 @@
   * [单态模式](/design/singleton.md)
   * [工厂模式](/design/factory.md)
   * [抽象工厂模式](/design/abstractFactory.md)
+  * [策略模式](/design/strategy.md)
 
 * 算法与数据结构
   * [数据结构浅谈](/algorithm/datastructure.md)
