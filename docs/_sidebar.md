@@ -70,7 +70,7 @@
   * [Netty](/middleware/Netty.md)
 
 * 数据库
-  * [mysql](/database/mysql.md)
+  * [mysql优化](/database/mysql.md)
   * [存储引擎](/database/storeEngine.md)
 
 * 设计模式
