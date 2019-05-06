@@ -329,7 +329,7 @@ private final class Worker
     }
 ```
 
-```Executors.DefaultThreadFactory 线程产生默认线程工厂
+```Executors.DefaultThreadFactory线程产生默认线程工厂
 	static class DefaultThreadFactory implements ThreadFactory {
         private static final AtomicInteger poolNumber = new AtomicInteger(1);
         private final ThreadGroup group;
