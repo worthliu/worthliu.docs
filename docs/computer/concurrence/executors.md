@@ -11,10 +11,8 @@ Java 类库提供了一个灵活的线程池以及一些有用的默认配置。
 `Executors.newFixedThreadPool`|输入的参数既是固定线程数,既是核心线程数也是最大线程数,不存在空闲线程,所以`keepAliveTime`等于`0`|
 
 对于`Executors.newFixedThreadPool`,`ExecutorService.newSingleThreadExecutor`,所使用的缓存队列是`new LinkedBlockingQueue<Runnable>()`;由于使用无界队列,如果瞬间请求非常大,会有OOM的风险;
-	
+
 而`Executors.newCachedThreadPool`,所使用的缓存队列是`new SynchronousQueue<Runnable>()`;
-
-
 
 
 >1. `newFixedThreadPool`：将创建一个固定长度的线程池，每当提交一个任务时就创建一个线程，直到达到线程池的最大数量。
@@ -24,4 +22,4 @@ Java 类库提供了一个灵活的线程池以及一些有用的默认配置。
   * 特点：基本线程数为0，最大线程数为`Integer.MAX_VALUE`.存活时间60s,采用异步队列`SynchronousQueue`来避免任务排队。
 3. `newSingleThreadExecutor`：是一个单线程的`Executor`,它创建单个工作者线程来执行任务，如果这个线程异常结束，会创建另一个线程来替代。它能确保依照任务在对列中的顺序来串行执行（例如FIFO,LIFO,优先级）。
   * 特点：基本线程数和最大线程数都为1，无存活时间，采用无界的`LinkedBlockingQueue`来保存等待执行的任务。
-4. `newScheduledThreadPool`：创建一个固定长度的线程池，而且以延迟或定时的方式来执行任务，类似于Timer.
+4. `newScheduledThreadPool`：创建一个固定长度的线程池，而且以延迟或定时的方式来执行任务，类似于`Timer`.

@@ -203,8 +203,6 @@ public static class AbortPolicy implements RejectedExecutionHandler {
 + `CallerRunsPolicy` : 调用任务的`run()`方法绕过线程池直接执行;
 
 
-
-
 ### 线程池设置
 
 >`ThreadPoolExecutor`执行任务时遵循以下规则：
