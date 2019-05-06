@@ -43,3 +43,23 @@
 
 #### `HTTPS`握手过程
 
+![httpsBuilding](/images/httpsBuilding.png)
+
++ 客户端发送一个`Client Hello`协议的请求;
+  + 在`Client Hello`中最重要的信息是`Cipher Suites`字段,告诉服务端自己支持哪些加密的套件;
+
++ 服务端在收到客户端发来的`Client Hello`的请求后,会返回一系列的协议数据,并以一个没有数据内容的`Server Hello Done`作为结束;
+  + `Server Hello 协议` : 告知客户端后续协议中要使用的`TLS`协议版本;
+  + `Certificate 协议` : 主要传输服务端的证书内容;
+  + `Server Key Exchange` : 如果在`Certificate`协议中未给出客户端足够的信息,则会在`Server Key Exchange`进行补充;
+  + `Certificate Request` : 协议可选项,当服务端需要对客户端进行证书验证的时候,才会向客户端发送一个证书请求;
+  + `最后以Server Hello Done作为结束信息,告知客户端整个Server Hello过程结束`;
+
++ 客户端在收到服务端的握手信息后,根据服务端的请求,也会发送一系列的协议;
+  + `Certificate` : 可选项,对应服务端是否发送了`Certificate Request`需要对客户端进行证书验证 
+  + `Client Key Exchange` : 对客户端`Certificate`信息进行补充;
+  + `Certificate Verity` : 对服务端发送的证书信息进行确认; 
+  + `Change Cipher Spec` : 作为一个独立协议告知服务端,客户端已经接收之前的服务端确认的加密套件,并会在后续通信中使用该加密套件进行加密;
+  + `Encrypted Handshake Message` : 用于客户端给服务端加密套件加密一端`Finish`的数据,用以验证这条建立的加解密通道的正确性; 
+  + `Change Cipher Spec` : 通过使用私钥对客户端发送的数据进行解密,并告知后续将使用协商好的加密套件进行加密传输数据;
+  + `Encrypted Handshake Message` : 与客户端的操作相同,发送一段`Finish`的加密数据验证加密通道的正确性; 
