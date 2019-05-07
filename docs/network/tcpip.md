@@ -2,7 +2,7 @@
 
 ### 网络协议
 
-TCP/IP(Transmission Control Protocol/Internet Protocol)，传输控制协议/因特网互联协议，这个协议族群里还有HTTP、HTTPS、FTP、SMTP、UDP、ARP、PPP、IEEE802.x等。
+`TCP/IP`(Transmission Control Protocol/Internet Protocol)，传输控制协议/因特网互联协议，这个协议族群里还有HTTP、HTTPS、FTP、SMTP、UDP、ARP、PPP、IEEE802.x等。
 
 >+ `链路层`：链路层以字节为单位把`0`与`1`进行分组，定义数据帧，写入源和目标机器的物理地址、数据、校验位来传输数据；
 + `网络层`：根据IP定义网络地址，区分网段。
@@ -13,7 +13,6 @@ TCP/IP(Transmission Control Protocol/Internet Protocol)，传输控制协议/因
 + `应用层`：传输层的数据到达应用程序时，以某种统一规定的协议格式解读数据；
 
 >程序在发送消息时，应用按既定的协议打包数据，随后由`传输层`加上双方的`端口号`，由`网络层`加上双方的`IP地址`，有`链路层`加上双方的`MAC地址`，并将`数据`拆分成`数据帧`，经过多个路由器和网关后，到达目标机器。简而言之，就是按`“端口->IP地址->MAC地址”`，这样的路径进行数据的封装和发送，解包的时候反过来操作即可；
-
 
 ![messageStructure](/images/messageStructure.png)
 
@@ -71,8 +70,9 @@ lsof -n | awk '{print $2}' | sort | uniq -c | sort -nr | more
 >+ TCP在协议层面支持Keep Alive功能,即隔段时间通过向对方发送数据表示连接处于健康状态.
 + 不少服务将确保连接健康的行为放到了应用层,通过定期发送心跳包检查连接的健康度.一旦心跳包出现异常不仅会主动关闭连接,还会回收与连接相关的其他用于提供服务的资源,确保系统资源最大限度地被有效利用;
 
-### TCP断开连接
+### `TCP`断开连接
 
 TCP是全双工通信,双方都能作为数据的发送方和接收方,但TCP连接也会有断开的时间.建立连接只有三次,而挥手断开则需要四次;
 
 **由于断开连接,需要等待已接受的数据处理完毕,才能断开,因此双方都要处于半关闭状态,等待双方作答,方可真正的关闭连接;**
+
