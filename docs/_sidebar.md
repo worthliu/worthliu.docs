@@ -72,6 +72,7 @@
   * [MQ](/middleware/MQ.md)
   * [Netty](/middleware/Netty.md)
   * [Linux](/middleware/linux.md)
+  * [Linux查看CPU](/middleware/linuxCommand.md)
 
 * 数据库
   * [事务隔离级别](/database/transaction.md)
