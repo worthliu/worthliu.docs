@@ -1,6 +1,7 @@
   
 * 基础
-  * [计算机基础](/computer/base/ComputerBase.md)
+  * [计算机基础](/computer/base/computerBase.md)
+  * [浮点数](/computer/base/float.md)
   * [String](/computer/base/String.md)
   * [hashCodeAndEquals](/computer/base/hashCodeAndEquals.md)
   * [JavaByVal](/computer/base/JavaByVal.md)
