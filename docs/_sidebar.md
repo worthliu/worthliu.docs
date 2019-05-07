@@ -6,6 +6,8 @@
   * [JavaByVal](/computer/base/JavaByVal.md)
   * [JavaBase64](/computer/base/Base64.md)
   * [final](/computer/base/final.md)
+  * [bean](/computer/bean.md)
+  * [测试类型](/computer/testType.md)
   * [集合与泛型](/computer/base/genericity.md)
   * [元素比较](/computer/base/comparation.md)
   * [Map类集合](/computer/base/map.md)
@@ -80,6 +82,7 @@
   * [工厂模式](/design/factory.md)
   * [抽象工厂模式](/design/abstractFactory.md)
   * [策略模式](/design/strategy.md)
+  * [代理](/design/proxy.md)
 
 * 算法与数据结构
   * [数据结构浅谈](/algorithm/datastructure.md)
@@ -172,9 +175,6 @@
   * [复杂链表的复制](/leetcode/ComplexLinkCopy.md)
 
 * 其他
-  * [bean](/other/bean.md)
-  * [测试类型](/other/testType.md)
-  * [代理](/other/proxy.md)
   * [时间管理](/time/time.md)
   * [面试题](/interview/20190305.md)
 
