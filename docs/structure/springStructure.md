@@ -44,3 +44,16 @@ Instrumentation模块提供了类instrumentation的支持，和用于某些应�
 
 #### 测试Test
 　　测试模块支持使用JUnit或者TestNG来测试Spring 组件。它提供了对Spring ApplicationContexts和这些上下文的缓存的一致加载。它也提供模拟对象，你可以用它在隔离条件下来测试你的代码。
+
+
+## spring源码导入
+
+The following has been tested against `IntelliJ IDEA 2016.2.2`
+
+Steps
+Within your locally cloned spring-framework working directory:
+
++ Precompile `spring-oxm` with `./gradlew :spring-oxm:compileTestJava`
++ Import into IntelliJ (`File -> New -> Project from Existing Sources -> Navigate to directory -> Select build.gradle`)
++ When prompted exclude the `spring-aspects` module (or after the import via `File-> Project Structure -> Modules`)
++ Code away

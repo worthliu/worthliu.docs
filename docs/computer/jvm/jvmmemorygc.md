@@ -127,7 +127,7 @@ Serial收集器一个**单线程的收集器**(`在进行垃圾收集时,必须�
   + **CMS收集器无法处理浮动垃圾（Floating Garbage）**，由于CMS并发清理阶段用户线程还在运行着，伴随着程序的运行自然还会有新的垃圾不断产生，这部分垃圾出现在标记过程之后，CMS无法在本次收集中处理掉它们；
 
 >**参数控制**：
-  + `-XX:+UseConcMarkSweepGC` ： 使用CMS收集器
+  + `-XX:+UseConcMarkSweepGC` ： 使用`CMS`收集器
   + `-XX:+UseCMSCompactAtFullCollection` ：`Full GC`后，进行一次碎片整理；整理过程是独占的，会引起停顿时间变长
   + `-XX:+CMSFullGCsBeforeCompaction` ： 设置进行几次`Full GC`后，进行一次碎片整理
   + `-XX:ParallelCMSThreads` ： 设定`CMS的线程数量`（一般情况约等于可用CPU数量）
