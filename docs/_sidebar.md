@@ -40,6 +40,7 @@
   * [分布式Session](/distributedSystem/distributedSession.md)
   * [一致Hash算法](/distributedSystem/consistentHash.md)
   * [缓存一致性](/distributedSystem/cacheConsistent.md)
+  * [分布式主键生成算法](/distributedSystem/keyGenerationAlgorithm.md)
 
 * 框架
   * [Servlet](/structure/servlet.md)
