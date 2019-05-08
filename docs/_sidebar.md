@@ -78,6 +78,7 @@
   * [Linux查看CPU](/middleware/linuxCommand.md)
 
 * 数据库
+  * [数据库并发控制](/database/concurrentControl.md)
   * [事务隔离级别](/database/transaction.md)
   * [mysql优化](/database/mysql.md)
   * [存储引擎](/database/storeEngine.md)
