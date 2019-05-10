@@ -82,6 +82,7 @@
   * [事务隔离级别](/database/transaction.md)
   * [mysql优化](/database/mysql.md)
   * [存储引擎](/database/storeEngine.md)
+  * [查询优化](/database/queryOptimize.md)
 
 * 设计模式
   * [设计原则](/design/philosophy.md)
