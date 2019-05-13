@@ -327,5 +327,3 @@ private LazyIterator lookupIterator;
 
 1. 对于一个`spi`接口的实现,由于内部存放的数据缓存为`LinkedHashMap`,无法通过`key`快速查找,每次查找都需要遍历;
 2. 由于一个`spi`接口对应一份配置文件,每加载一种`spi`接口都需要初始化一个`ServiceLoader`对象,需要外部使用时进行管理相关对象加载器;
-3. `spi`接口多时,相应的配置文件会大量积聚,不好有效管理;
-

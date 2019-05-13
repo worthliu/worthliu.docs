@@ -63,6 +63,8 @@
     * [mybatisMapper](/structure/mybatisMapper.md)
     * [mybatis原理](/structure/mybatis.md)
     * [mybatis插件](/structure/mybatisPlugin.md)
+  * dubbo
+    * [dubbo spi](/structure/dubboSpi.md)
 
 * 中间件
   * ZooKeeper
