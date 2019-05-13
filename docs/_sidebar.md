@@ -8,6 +8,7 @@
   * [JavaBase64](/computer/base/Base64.md)
   * [final](/computer/base/final.md)
   * [bean](/computer/base/bean.md)
+  * [spi](/computer/base/spi.md)
   * [测试类型](/computer/base/testType.md)
   * [集合与泛型](/computer/base/genericity.md)
   * [元素比较](/computer/base/comparation.md)
