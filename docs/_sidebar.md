@@ -48,6 +48,7 @@
   * [hessian](/structure/hessian.md)
   * spring
     * [spring整体架构](/structure/springStructure.md)
+    * [spring扩展](/structure/springExtension.md)
     * [spring IOC And AOP](/structure/springIOC&AOP.md)
     * [spring IOC](/structure/iocSource.md)
     * [spring AOP](/structure/aopSource.md)
@@ -66,6 +67,8 @@
   * dubbo
     * [dubbo spi](/structure/dubboSpi.md)
     * [dubbo 负载均衡](/structure/dubboLoadBalance.md)
+    * [dubbo 协议](/structure/dubboProtocol.md)
+    * [dubbo 序列化](/structure/dubboSerialization.md)
 
 * 中间件
   * ZooKeeper
