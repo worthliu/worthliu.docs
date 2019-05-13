@@ -65,6 +65,7 @@
     * [mybatis插件](/structure/mybatisPlugin.md)
   * dubbo
     * [dubbo spi](/structure/dubboSpi.md)
+    * [dubbo 负载均衡](/structure/dubboLoadBalance.md)
 
 * 中间件
   * ZooKeeper
