@@ -73,6 +73,7 @@
 * 中间件
   * ZooKeeper
     * [ZooKeeper原理](/middleware/zookeeper.md)
+    * [Zab协议](/middleware/zabProtocol.md)
     * [ZooKeeper与Dubbo](/middleware/zookeeperDubbo.md)
     * [ZooKeeper安装](/middleware/zookeeperInstall.md)
   * [LVS](/middleware/lvs.md)
