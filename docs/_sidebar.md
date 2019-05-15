@@ -76,7 +76,9 @@
     * [Zab协议](/middleware/zabProtocol.md)
     * [ZooKeeper与Dubbo](/middleware/zookeeperDubbo.md)
     * [ZooKeeper安装](/middleware/zookeeperInstall.md)
-  * [LVS](/middleware/lvs.md)
+  * LVS
+    * [LVS](/middleware/lvs.md)
+    * [LVS实战](/middleware/lvsPractice.md)
   * [tomcat](/middleware/tomcat.md)
   * [rpc](/middleware/rpc.md)
   * [redis](/middleware/Redis.md)
