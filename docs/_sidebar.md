@@ -81,7 +81,8 @@
     * [LVS实战](/middleware/lvsPractice.md)
   * [tomcat](/middleware/tomcat.md)
   * [rpc](/middleware/rpc.md)
-  * [redis](/middleware/Redis.md)
+  * redis
+    * [数据结构与对象](/middleware/redisDataStructures.md)
   * [MQ](/middleware/MQ.md)
   * [Netty](/middleware/Netty.md)
   * [Linux](/middleware/linux.md)
