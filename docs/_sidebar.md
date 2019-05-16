@@ -105,6 +105,7 @@
   * [策略模式](/design/strategy.md)
   * [代理模式](/design/proxy.md)
   * [装饰者模式](/design/decorator.md)
+  * [观察者模式](/design/observer.md)
 
 * 算法与数据结构
   * [数据结构浅谈](/algorithm/datastructure.md)
