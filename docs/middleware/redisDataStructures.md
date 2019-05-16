@@ -108,4 +108,71 @@ typedef struct list {
 
 ## 字典
 
-字典,又称为符号表(symbol table),关联数组(associative array)
+字典,又称为`符号表(symbol table)`,`关联数组(associative array)`或`映射(map)`,是一种用于保存`键值对(key-value pair)`的抽象数据结构;
+
+字典在`Redis`中的应用相当广泛,比如`Redis`的数据库就是使用字典来作为底层实现的,对数据库的增删查改操作也是构建在对字典的操作之上的;
+
+字典还是哈希键的底层实现之一,当一个哈希键包含的键值对比较多,又或者键值对中的元素都是比较长的字符串时,`Redis`就会使用字典作为哈希键的底层实现;
+
+### 字典的实现
+
+`Redis`的字典使用哈希表作为底层实现,一个哈希表里面可以有多个哈希表节点,而每个哈希表节点就保存了字典中的一个键值对;
+
+```dict.h
+typedef struct dictht {
+	// 哈希表数组
+    dictEntry **table;
+    // 哈希表大小
+    unsigned long size;
+    // 哈希表大小掩码,用于计算索引值,总是等于size-1
+    unsigned long sizemask;
+    // 该哈希表已有节点的数量
+    unsigned long used;
+} dictht;
+```
+
++ `table`属性是一个数组,数组中的每个元素都是一个指向`dict.h/dictEntry`结构的指针,每个`dictEntry`结构保存着一个键值对.
++ `size`属性记录了哈希表的大小,也即是`table`数组的大小;
++ `used`属性则记录了哈希表目前已有节点的数量;
++ `sizemask`属性的值总是等于`size-1`,这个属性和哈希值一起决定一个键应该被放到`table`数组的那个索引上面;
+
+```
+typedef struct dictEntry {
+	// 键
+    void *key;
+    // 值
+    union {
+        void *val;
+        uint64_t u64;
+        int64_t s64;
+        double d;
+    } v;
+
+    // 指向下个哈希表节点,形成链表
+    struct dictEntry *next;
+} dictEntry;
+```
+
++ `key`属性保存着键值对中的键,而`v`属性则保存着键值对中的值,其中键值对的值可以是一个指针,或者是一个`uint64_t`整数,或者是一个`int64_t`整数;
++ `next`属性是指向另一个哈希表节点的指针,这个指针可以将多个哈希值相同的键值对连接在一次,以此来解决冲突的问题;
+
+```
+typedef struct dict {
+	// 类型特定函数
+    dictType *type;
+    // 私有数据
+    void *privdata;
+    // 哈希表
+    dictht ht[2];
+    // rehash索引,当rehash不进行时,值为-1
+    long rehashidx; 
+    // 当前迭代器数量
+    unsigned long iterators;
+} dict;
+```
+
+`type`属性和`privdata`属性是针对不同类型的键值对,为创建多态字典而设置的;
++ `type`属性是一个指向`dictType`结构的指针,每个`dictType`结构保存了一簇用于操作特定类型键值对的函数,`Redis`会为用途不同的字典设置不同的类型特定函数;
++ `privdata`属性则保存了需要传给哪些类型特定函数的可选参数;
+
+
