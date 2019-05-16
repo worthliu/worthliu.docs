@@ -176,3 +176,51 @@ typedef struct dict {
 + `privdata`属性则保存了需要传给哪些类型特定函数的可选参数;
 
 
+
+// TODO 哈希表 计算 ,冲突, 扩容与缩容
+
+## 跳跃表
+
+跳跃表(`skiplist`)是一种有序数据结构,它通过在每个节点中维持多个指向其他节点的指针,从而达到快速访问节点的目的;
+
+跳跃表支持平均`O(logN)`,最坏`O(N)`复杂度的节点查找,还可以通过顺序性操作来批量处理节点;
+
+`Redis`使用跳跃表作为有序集合键的底层实现之一,如果一个有序集合包含的元素数量比较多,又或者有序集合中的元素的成员是比较长的字符串时,`Redis`就会使用跳跃表来作为有序集合键的底层实现;
+
+>`Redis`只在两个地方用到了跳跃表:
++ 实现有序集合键
++ 在集群节点中用作内部数据结构
+
+```
+typedef struct zskiplistNode {
+    sds ele;
+    double score;
+    struct zskiplistNode *backward;
+    struct zskiplistLevel {
+        struct zskiplistNode *forward;
+        unsigned long span;
+    } level[];
+} zskiplistNode;
+
+typedef struct zskiplist {
+    struct zskiplistNode *header, *tail;
+    unsigned long length;
+    int level;
+} zskiplist;
+```
+
+>`zskiplist`结构
++ `header` : 指向跳跃表的表头节点
++ `tail` : 指向跳跃表的表尾节点
++ `length` : 记录跳跃表的长度
++ `level` : 记录目前跳跃表内,层数最大的那个节点的层数
+
+>`zskiplistNode`结构:
++ `层(level)` : 节点中用`L1,L2,L3`等字样标记节点的各个层;
+  + 每个层都带有两个属性:`前进指针`和`跨度`;
+  + `前进指针` : 用于访问位于表尾方向的其他节点;
+  + `跨度` : 记录了前进指针所指向的节点和当前节点的距离;
++ `后退指针(backward)` : 指向位于当前节点的前一个节点;
+  + 在程序从表尾向表头遍历时使用;
++ `分值` 
++ `成员值(ele)`
