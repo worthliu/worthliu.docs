@@ -82,7 +82,8 @@
   * [tomcat](/middleware/tomcat.md)
   * [rpc](/middleware/rpc.md)
   * redis
-    * [数据结构与对象](/middleware/redisDataStructures.md)
+    * [数据结构](/middleware/redisDataStructures.md)
+    * [数据对象](/middleware/redisDataObject.md)
   * [MQ](/middleware/MQ.md)
   * [Netty](/middleware/Netty.md)
   * [Linux](/middleware/linux.md)
@@ -102,7 +103,8 @@
   * [工厂模式](/design/factory.md)
   * [抽象工厂模式](/design/abstractFactory.md)
   * [策略模式](/design/strategy.md)
-  * [代理](/design/proxy.md)
+  * [代理模式](/design/proxy.md)
+  * [装饰者模式](/design/decorator.md)
 
 * 算法与数据结构
   * [数据结构浅谈](/algorithm/datastructure.md)
