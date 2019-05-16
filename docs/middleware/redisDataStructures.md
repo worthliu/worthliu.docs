@@ -8,7 +8,7 @@
 
 每个`sds.h/sdshdr`结构表示一个`SDS`值:
 
-```sds.h/sdshdr
+```sdshdr
 struct sdshdr{
 	// 记录buf数组中已使用子节的数量
 	// 等于SDS所保存字符串的长度
@@ -19,7 +19,7 @@ struct sdshdr{
 
 	// 子节数组,用于保存字符串
 	char buf[];
-}
+}sdshdr;
 ```
 
 **`SDS`遵循C字符串以空字符结尾的惯例,保存空字符的1子节空间不计算在`SDS`的`len`属性里面,并且为空字符分配额外的1子节空间,以及添加空字符到字符串末尾等操作,都是由`SDS`函数自动完成的,所以这个空字符对于`SDS`的使用者来说是完全透明的;**
@@ -59,7 +59,7 @@ C语言使用长度为`N+1`的字符数组来表示长度为`N`的字符串,并�
 
 **每个链表节点使用一个`adlist.h/listNode`结构来表示:**
 
-```
+```listNode
 typedef struct  listNode{
 	// 前置节点
 	struct listNode *prev;
@@ -69,13 +69,43 @@ typedef struct  listNode{
 
 	// 节点的值
 	void *vlaue;
-}
+}listNode;
 ```
 
 多个`listNode`可以通过`prev`和`next`指针组成双端链表;
 
 使用`adlist.h/list`来持有链表的话.操作起来更加方便:
 
+```list
+typedef struct list {
+	// 表头节点
+    listNode *head;
+    // 表尾节点
+    listNode *tail;
+    // 节点值复制函数
+    void *(*dup)(void *ptr);
+    // 节点值释放函数
+    void (*free)(void *ptr);
+    // 节点值对比函数
+    int (*match)(void *ptr, void *key);
+    // 链表所包含的节点数量
+    unsigned long len;
+} list;
 ```
 
-```
+`list`结构为链表提供了表头指针`head`,表尾指针`tail`,以及链表长度计数器`len`,而`dup`,`free`,`match`成员则是用于实现多态链表所需的类型特定函数;
++ `dup`函数用于复制链表节点所保存的值
++ `free`函数用于释放链表节点所保存的值
++ `match`函数用于对比链表节点所保存的值和另一个输入值是否相等
+
+
+>`Redis`的链表实现的特性:
++ 双端 : 链表节点带有`prev`和`next`指针,获取某个节点的前置节点和后置节点的复杂度都是`O(1)`;
++ 无环 : 表头节点的`prev`指针和表尾节点的`next`指针都指向`NULL`,对链表的访问以`NULL`为终点;
++ 带表头指针和表尾指针 : 通过`list`结构的`head`指针和`tail`指针,程序获取链表的表头节点和表尾节点的复杂度为`O(1)`
++ 多态 : 链表节点使用`void*`指针来保存节点值,并且可以通过`list`结构的`dup`,`free`,`match`三个属性为节点值设置类型特定函数,所以链表可以用于保存各种不同类型的值;
+
+
+## 字典
+
+字典,又称为符号表(symbol table),关联数组(associative array)
