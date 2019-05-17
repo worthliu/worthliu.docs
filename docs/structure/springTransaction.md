@@ -21,9 +21,10 @@
 #### `Spring`传播机制
 
 `Spring`配置文件中关于事务配置总是由三个组成部分，
- + 分别是`DataSource`
+ + `DataSource`
  + `TransactionManager`
  + `代理机制`
+
 这三部分，无论哪种配置方式，一般变化的只是`代理机制`这部分。
 
 
