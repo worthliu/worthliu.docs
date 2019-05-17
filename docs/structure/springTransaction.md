@@ -18,7 +18,7 @@
   + 这些具体的事务处理器，就是IOC容器中配置声明式事务处理时，配置的`PlatformTransactionManager`的具体实现，比如`DataSourceTransactionManager`和`HibernateTransactionManager`等；
 
 
-#### `Spring`事务配置
+#### `Spring`传播机制
 
 `Spring`配置文件中关于事务配置总是由三个组成部分，
  + 分别是`DataSource`
