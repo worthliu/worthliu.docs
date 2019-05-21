@@ -15,13 +15,14 @@ public class Application {
 
 ## `SpringApplication`
 
-启动时,`SpringApplication.run()`首先创建一个`SpringApplication`对象实例,`SpringApplication`实例通过`SpringFactoriesLoader.loadFactoryNames()`加载配置信息:
+启动时,通过`SpringApplication.run()`创建一个`SpringApplication`对象实例;
++ `SpringApplication`实例通过`SpringFactoriesLoader.loadFactoryNames()`加载配置信息:
 + 根据`classpath`里面是否存在某个特征类（`org.springframework.web.context.ConfigurableWebApplicationContext`）来决定是否应该创建一个为`Web`应用使用的ApplicationContext类型。
 + 使用`SpringFactoriesLoader`在应用的`classpath`中查找并加载所有可用的`ApplicationContextInitializer`。
 + 使用`SpringFactoriesLoader`在应用的`classpath`中查找并加载所有可用的`ApplicationListener`。
 + 推断并设置`main`方法的定义类。
 
-```
+```SpringApplication
 	public static ConfigurableApplicationContext run(Class<?>[] primarySources,
 			String[] args) {
 				// 创建实例
@@ -66,11 +67,10 @@ public class Application {
 ```
 
 + `SpringApplication`实例初始化完成并且完成设置后，就开始执行`run`方法的逻辑了，方法执行伊始，首先遍历执行所有通过`SpringFactoriesLoader`可以查找到并加载的`SpringApplicationRunListener`;
-+ 调用它们的`started()方`法，通知`SpringApplicationRunListener`;
++ 调用它们的`started()`方法，通知`SpringApplicationRunListener`;
 
 
-```run
-public ConfigurableApplicationContext run(String... args) {
+```SpringApplication.run
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 		ConfigurableApplicationContext context = null;
