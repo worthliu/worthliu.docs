@@ -1,6 +1,6 @@
 当前`SpringBoot`程序启动时,依赖两个方面:
-+ `@SpringBootApplication`
 + `SpringApplication.run()`
++ `@SpringBootApplication`
 
 由上述两个入口,在启动之初构建`Spring`容器,并自动化加载相应`Bean`配置;
 
