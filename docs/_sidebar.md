@@ -98,6 +98,9 @@
   * [存储引擎](/database/storeEngine.md)
   * [查询优化](/database/queryOptimize.md)
 
+* 系统设计
+  * [系统设计原则](/systemDesign/designPrinciple.md)
+
 * 设计模式
   * [设计原则](/design/philosophy.md)
   * [单态模式](/design/singleton.md)
