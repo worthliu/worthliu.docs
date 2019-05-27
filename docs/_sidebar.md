@@ -101,6 +101,7 @@
 * 系统设计
   * [系统设计原则](/systemDesign/designPrinciple.md)
   * [业务设计原则](/systemDesign/businessPrinciple.md)
+  * [高可用与高并发架构图](/systemDesign/highPreference.md)
   * [高可用](/systemDesign/highAvailability.md)
 
 * 设计模式
