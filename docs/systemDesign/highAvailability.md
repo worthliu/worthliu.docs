@@ -97,3 +97,16 @@ upstream backend{
 + `rise` : 检测成功多少次后,上游服务器标记为存活,并可以处理请求;
 + `timeout` : 检测请求超时时间配置;
 
++ `HTTP`心跳检查
+
+```
+upstream backend{
+	server xxx.xxx.xxx.1:8080 weight=1;
+	server xxx.xxx.xxx.2:8080 weight=1;
+
+	check interval=3000 rise=1 fall=3 timeout=2000 type=http;
+	check_http_send "HEAD /status HTTP/1.0\r\n\r\n";
+	check_http_expect_alive http_2xx http_3xx;
+}
+```
+
