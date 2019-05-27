@@ -171,3 +171,35 @@ location ~ ^/backend/(.*)${
 
 ### `HTTP动态负载均衡`
 
+若通过`upstream`列表有变更,都需要到服务器进行修改,首先是管理容易出现问题,而且对于`upstream`服务上线无法自动注册到`nginx upstream`列表;
+
+因此,我们需要一种服务注册与发现的系统;
+
+**`Consul`是一款开源的分布式服务注册与发现系统,通过`HTTP API`可以使得服务注册,发现实现起来非常简单;**
+
+>+ `服务注册` : 服务实现者可以通过`HTTP API`或`DNS`方式,将服务注册到`Consul`;
++ `服务发现` : 服务消费者可以通过`HTTP API`或`DNS`方式,从`Consul`获取服务的`IP:PORT`;
++ `故障检测` : 支持`TCP`或`HTTP`等方式的健康检查机制,从而在服务故障时自动摘除; 
++ `KV存储` : 使用KV存储实现动态配置中心,其使用`HTTP`长轮询实现变更触发和配置更改;
++ `多数据中心`
++ `Raft算法` : `Consul`使用`Raft算法`实现集群数据一致性;
+
+![consul.png](/images/consul.png)
+
+#### `Consul+Consul-template`
+
+>+ `upstream`服务启动,通过管理后台向`Consule`注册服务;
++ 在`Nginx`机器上部署并启动`Consul-template Agent`,其通过长轮询监听服务变更;
++ `Consul-template`监听到变更后,动态修改`upstream`列表;
++ `Consul-template`修改完`upstream`列表后,调用重启`Nginx`脚本重启`Nginx`;
+
+**通过`Consul+Consul-template`方式,每次发现配置变更都需要`reload nginx`,而`reload`是有一定损耗的.而且,如果需要长连接支持的话,那么当`reload nginx`时长连接所在`worker`进程会进行优雅退出,并当该`worker`进程上的所有连接都释放时,进程才真正退出;**
+
+#### `Consul+OpenResty`
+使用`Consul`注册服务,使用`OpenResty balancer_by_lua`实现无`reload`动态负载均衡;
+
+>+ 通过`upstream server`启动或停止时注册服务,或者通过`Consul`管理后台注册服务
++ `Nginx`启动时会调用`init_by_lua`,启动时拉取配置,并更新到共享字典来存储`upstream`列表;
++ 通过`init_worker_by_lua`启动定时器,定期去`Consul`拉取配置并实时更新到共享字典;
++ `balancer_by_lua`使用共享字典存储的`upstream`列表进行动态负载均衡;
+
