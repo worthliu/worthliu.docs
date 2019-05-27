@@ -4,4 +4,4 @@
 
 ## `高可用`
 
-![highAvailability](/images/highAvailability.md)
+![highAvailability](/images/highAvailability.png)
