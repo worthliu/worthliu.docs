@@ -110,3 +110,64 @@ upstream backend{
 }
 ```
 
+>`HTTP`心跳检查需要额外配置:
++ `check_http_send` : 检查时发的`HTTP`请求内容;
++ `check_http_expect_alive` : 当上游服务器返回匹配的响应状态码时,则认为上游服务器存活;
+
+**检查间隔时间不能太短,否则可能因为心跳检查包太多造成上游服务器挂掉,同时要设置合理的超时时间;**
+
+
+### `HTTP`反向代理
+
++ `全局配置(proxy cache)`
+```
+proxy_buffering on;
+proxy_buffer_size 4k;
+proxy_buffers 512 4k;
+proxy_busy_buffers_size 64k;
+proxy_temp_file_write_size 256k;
+proxy_cache_lock on;
+proxy_cache_lock_timeout 200ms;
+proxy_temp_path /tmpfs/proxy_temp;
+proxy_cache_path /tmpfs/proxy_cache levels=1:2 keysd_zone=cache:512m inactive=5m max_size=8g;
+
+proxy_connect_timeout 3s;
+proxy_read_timeout 5s;
+proxy_send_timeout 5s;
+```
+
+**开启`proxy_buffer`,缓存内容将存放在`tmpfs`以提升性能,设置超时时间;**
+
++ `location配置`
+
+```
+location ~ ^/backend/(.*)${
+	# 设置一致性哈希负载均衡key
+	set_by_lua_file $consistent_key "/export/App/c.3.cn/lua/lua_balancing_backend.properties";
+
+	#失败重试配置
+	proxy_next_upstream error timeout http_500 http_502 http_504;
+	proxy_next_upstream_timeout 2s;
+	proxy_next_upstream+tries 2;
+
+	#请求上游服务器使用GET方法(不管请求是什么方法)
+	proxy_method GET;
+	#不给上游服务器传递请求体
+	proxy_pass_request_body off;
+	#不给上游服务器传递请求头
+	proxy_pass_request_headers off;
+	#设置上游服务器的哪些响应头不发送给客户端
+	proxy_hide_header Vary;
+	#支持keep-alive
+	proxy_http_version 1.1;
+	proxy_set_header Connection "";
+	#给上游服务器传递Reference,Cookie和Host(按需传递)
+	proxy_set_header Referer $http_referer;
+	proxy_set_header Cookie $http_cookie;
+	proxy_set_header Host web.c.3.local;
+	proxy_pass http://backend /$1$is_args$args;
+}
+```
+
+### `HTTP动态负载均衡`
+
