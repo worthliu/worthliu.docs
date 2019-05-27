@@ -99,6 +99,7 @@ upstream backend{
 
 + `HTTP`心跳检查
 
+
 ```
 upstream backend{
 	server xxx.xxx.xxx.1:8080 weight=1;
@@ -120,6 +121,7 @@ upstream backend{
 ### `HTTP`反向代理
 
 + `全局配置(proxy cache)`
+
 ```
 proxy_buffering on;
 proxy_buffer_size 4k;
@@ -139,6 +141,7 @@ proxy_send_timeout 5s;
 **开启`proxy_buffer`,缓存内容将存放在`tmpfs`以提升性能,设置超时时间;**
 
 + `location配置`
+
 
 ```
 location ~ ^/backend/(.*)${
