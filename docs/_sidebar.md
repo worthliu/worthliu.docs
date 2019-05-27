@@ -104,6 +104,7 @@
   * [高可用与高并发架构图](/systemDesign/highPreference.md)
   * [高可用](/systemDesign/highAvailability.md)
   * [隔离术](/systemDesign/isolationTechnique.md)
+  * [限流](/systemDesign/currentLimiting.md)
 
 * 设计模式
   * [设计原则](/design/philosophy.md)
