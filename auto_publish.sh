@@ -64,7 +64,9 @@ echo -e "\033[49;31;1;5m restart service beginning ...\033[0m"
 nohup bash ./start.sh &
 
 #
-git reset --hard && git clean -fdx
+git clean -fdx
+
+git reset --hard 
 
 #
 cd ..
