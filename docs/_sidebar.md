@@ -103,12 +103,12 @@
   * [业务设计原则](/systemDesign/businessPrinciple.md)
   * [高可用与高并发架构图](/systemDesign/highPreference.md)
   * [高可用](/systemDesign/highAvailability.md)
-    * [隔离术](/systemDesign/isolationTechnique.md)
-    * [限流](/systemDesign/currentLimiting.md)
-    * [降级](/systemDesign/downgrading.md)
-    * [超时与重试机制](/systemDesign/timeoutAndRetry.md)
-    * [回滚机制](/systemDesign/rollbackMechanism.md)
-    * [压测与预案](/systemDesign/pressureTest.md)
+  * [隔离术](/systemDesign/isolationTechnique.md)
+  * [限流](/systemDesign/currentLimiting.md)
+  * [降级](/systemDesign/downgrading.md)
+  * [超时与重试机制](/systemDesign/timeoutAndRetry.md)
+  * [回滚机制](/systemDesign/rollbackMechanism.md)
+  * [压测与预案](/systemDesign/pressureTest.md)
 
 * 设计模式
   * [设计原则](/design/philosophy.md)
