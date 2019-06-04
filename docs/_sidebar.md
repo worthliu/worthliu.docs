@@ -107,6 +107,7 @@
   * [限流](/systemDesign/currentLimiting.md)
   * [降级](/systemDesign/downgrading.md)
   * [超时与重试机制](/systemDesign/timeoutAndRetry.md)
+  * [回滚机制](/systemDesign/rollbackMechanism.md)
 
 * 设计模式
   * [设计原则](/design/philosophy.md)
