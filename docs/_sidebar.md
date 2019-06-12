@@ -111,6 +111,7 @@
   * [压测与预案](/systemDesign/pressureTest.md)
 
   * [应用级缓存](/systemDesign/applicationLevelCache.md)
+  * [HTTP缓存](/systemDesign/httpCache.md)
 
 * 设计模式
   * [设计原则](/design/philosophy.md)
