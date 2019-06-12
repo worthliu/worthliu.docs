@@ -110,6 +110,8 @@
   * [回滚机制](/systemDesign/rollbackMechanism.md)
   * [压测与预案](/systemDesign/pressureTest.md)
 
+  * [应用级缓存](/systemDesign/applicationLevelCache.md)
+
 * 设计模式
   * [设计原则](/design/philosophy.md)
   * [单态模式](/design/singleton.md)
