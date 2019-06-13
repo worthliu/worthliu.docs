@@ -17,10 +17,8 @@
 
 ```接口定义
 public interface SpiInterface {
-
     void execute();
 }
-
 ```
 
 ```接口实现类
