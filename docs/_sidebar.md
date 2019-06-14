@@ -222,6 +222,7 @@
 * 其他
   * [时间管理](/time/time.md)
   * [面试题](/interview/20190305.md)
+  * [海量运营之道](/other/operationMode.md)
 
 * 职业发展
   * [程序员核心竞争力](/career/contend.md)
