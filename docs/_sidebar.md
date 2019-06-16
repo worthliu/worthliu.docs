@@ -125,8 +125,10 @@
   * [观察者模式](/design/observer.md)
   * [责任链模式](/design/handleChain.md)
 
-* 算法与数据结构
+* 数据结构与算法
   * [数据结构浅谈](/algorithm/datastructure.md)
+  * [排序基础类](algorithm/sortBaseClass.md)
+  * [简单排序](/algorithm/simpleSort.md)
   * [常用排序算法总结](/algorithm/algorithmSummary.md)
   * [B树](/algorithm/BalancedTreeOfOrder.md)
   * [红黑树](/algorithm/redBlackTree.md)
