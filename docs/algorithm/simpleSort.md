@@ -11,6 +11,12 @@
 
 ```Selection
 public class Selection extends AbstractSortExample {
+    /**
+     * 1.选择出目标元素最终位置
+     * 2.交换元素位置
+     * 3.循环操作
+     * @param arrSort
+     */
     @Override
     public void sort(Comparable[] arrSort) {
         SortUtils.checkNullArrayParam(arrSort);
@@ -27,11 +33,6 @@ public class Selection extends AbstractSortExample {
             SortUtils.exch(arrSort, ind, minInd);
             showSort(arrSort, ind, minInd);
         }
-    }
-
-    @Override
-    public void showData(Comparable[] arrSort) {
-        System.out.println(Arrays.toString(arrSort));
     }
 }
 ```

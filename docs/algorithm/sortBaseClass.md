@@ -1,11 +1,22 @@
 ```SortExample
 public interface SortExample {
 
+    /**
+     * 排序实现类,交由子类实现
+     * @param arrSort
+     */
     void sort(Comparable[] arrSort);
 
-    void showData(Comparable[] arrSort);
+    /**
+     * 展示排序数组元素表
+     * @param arrSort
+     */
+    default void showData(Comparable[] arrSort){
+        System.out.println(String.format("The origin array is %s", Arrays.toString(arrSort)));
+    }
 
     /**
+     * 展示数组当前排序位置与排序后数组元素表
      * @param arrSort
      * @param beInd
      * @param exInd
@@ -22,7 +33,8 @@ public interface SortExample {
     default boolean isSorted(Comparable[] arrSort){
         SortUtils.checkNullArrayParam(arrSort);
         //
-        for(int ind = 1; ind < arrSort.length; ind++){
+        int arrayLength = arrSort.length;
+        for(int ind = 1; ind < arrayLength; ind++){
             if(SortUtils.less(arrSort[ind], arrSort[ind - 1])){
                 return false;
             }
