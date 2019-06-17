@@ -45,6 +45,16 @@ public interface SortExample {
 }
 ```
 
+```
+public abstract class AbstractSortExample implements SortExample {
+    @Override
+    public void sort(Comparable[] arrSort) {
+        SortUtils.checkNullArrayParam(arrSort);
+        showData(arrSort);
+    }
+}
+```
+
 ```SortUtils
 package com.worthliu.algothrim;
 
