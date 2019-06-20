@@ -113,6 +113,7 @@
   * [应用级缓存](/systemDesign/applicationLevelCache.md)
   * [HTTP缓存](/systemDesign/httpCache.md)
   * [多级缓存](/systemDesign/multistageCache.md)
+  * [如何扩容](/systemDesign/expandCapacity.md)
 
 * 设计模式
   * [设计原则](/design/philosophy.md)
