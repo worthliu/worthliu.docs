@@ -109,7 +109,6 @@
   * [超时与重试机制](/systemDesign/timeoutAndRetry.md)
   * [回滚机制](/systemDesign/rollbackMechanism.md)
   * [压测与预案](/systemDesign/pressureTest.md)
-
   * [应用级缓存](/systemDesign/applicationLevelCache.md)
   * [HTTP缓存](/systemDesign/httpCache.md)
   * [多级缓存](/systemDesign/multistageCache.md)
