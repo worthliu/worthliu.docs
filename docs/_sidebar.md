@@ -85,6 +85,7 @@
   * redis
     * [数据结构](/middleware/redisDataStructures.md)
     * [数据对象](/middleware/redisDataObject.md)
+    * [数据库](/middleware/redisDatabase.md)
   * [MQ](/middleware/MQ.md)
   * [Netty](/middleware/Netty.md)
   * [Linux](/middleware/linux.md)
@@ -231,4 +232,5 @@
   * [程序员核心竞争力](/career/contend.md)
   * [项目架构图](/career/projectStructure.md)
   * [自我增值](/career/selfAppreciation.md)
+  * [职场汇报](/career/careerReport.md)
 
